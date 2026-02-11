@@ -427,9 +427,18 @@ BtnApply(ctrl, *) {
         SetStatus("Applied " applied "/" changes.Length ": " change.text)
 
         ; Wait for CPRS to process (GetData fires an RPC which takes time)
-        ; Longer wait for first click (parent expansion), shorter for children
         Sleep(300)
+
+        ; Some checkboxes trigger intermediate popup dialogues
+        ; ("Press OK to continue", informational messages, etc.)
+        ; Auto-dismiss these so template application continues smoothly.
+        ; NEVER dismisses the final Finish/Submit - only OK/Continue/Yes
+        ; on small popups that don't contain text input or dangerous buttons.
+        DismissIntermediatePopups()
     }
+
+    ; One final check for any lingering popups
+    DismissIntermediatePopups()
 
     ; Re-scan to pick up any newly appeared child controls
     SetStatus("Applied " applied " changes. Re-scanning for new controls...")
@@ -805,6 +814,128 @@ RefreshTemplateList() {
         else
             TemplateListBox.Add([StrReplace(A_LoopFileName, ".json", "")])
     }
+}
+
+; ===========================================================================
+; INTERMEDIATE POPUP DISMISSAL
+;
+; Some CPRS checkboxes trigger popup dialogues mid-form ("Press OK to
+; continue", informational messages, confirmation prompts). These block
+; further checkbox clicking until dismissed.
+;
+; We auto-dismiss popups that match ALL of these criteria:
+;   1. Owned by CPRSChart.exe
+;   2. Small window (under 500x400 px - not the main form)
+;   3. Contains an OK/Continue/Yes button
+;   4. Does NOT contain Finish/Submit/Sign/File/Save/Delete buttons
+;   5. Does NOT contain text input fields (not a data entry form)
+;
+; We NEVER dismiss the final Finish/Submit that files the note.
+; ===========================================================================
+
+DismissIntermediatePopups() {
+    Sleep(150)
+
+    loop 3 {
+        found := false
+        for wnd in WinGetList("ahk_exe CPRSChart.exe") {
+            try {
+                cls := WinGetClass(wnd)
+
+                ; Skip the main windows
+                if cls = "TfrmRemDlg" || cls = "TCPRSChart" || cls = "TfrmFrame"
+                    continue
+
+                ; Must be popup-sized
+                WinGetPos(,, &w, &h, wnd)
+                if w > 500 || h > 400
+                    continue
+
+                ; Check for buttons we must never auto-click
+                if HasDangerousButton(wnd)
+                    continue
+
+                ; Find and click the OK button
+                okHwnd := FindOKButton(wnd)
+                if okHwnd {
+                    PostMessage(0x00F5, 0, 0, okHwnd)  ; BM_CLICK
+                    Sleep(200)
+                    found := true
+                }
+            }
+        }
+        if !found
+            break
+    }
+}
+
+HasDangerousButton(windowHwnd) {
+    global _hasDangerous := false
+
+    enumDangerous := CallbackCreate(_CheckDangerousCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumDangerous, "Ptr", 0)
+    CallbackFree(enumDangerous)
+
+    return _hasDangerous
+}
+
+_CheckDangerousCallback(hwnd, lParam) {
+    global _hasDangerous
+
+    className := GetClassName(hwnd)
+
+    ; Text input fields mean this is a data entry form, not just an OK popup
+    if InStr(className, "TEdit") || InStr(className, "TMemo") || InStr(className, "TRichEdit") {
+        _hasDangerous := true
+        return 0
+    }
+
+    ; Check button text for labels that file/sign/submit the note
+    if InStr(className, "TButton") || InStr(className, "TBitBtn") {
+        text := GetWindowText(hwnd)
+        textUpper := StrUpper(text)
+
+        if InStr(textUpper, "FINISH") || InStr(textUpper, "SUBMIT")
+            || InStr(textUpper, "SIGN") || InStr(textUpper, "FILE")
+            || InStr(textUpper, "COMPLETE") || InStr(textUpper, "SAVE")
+            || InStr(textUpper, "DELETE") || InStr(textUpper, "REMOVE") {
+            _hasDangerous := true
+            return 0
+        }
+    }
+
+    return 1
+}
+
+FindOKButton(windowHwnd) {
+    global _foundOKHwnd := 0
+
+    enumOK := CallbackCreate(_FindOKCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumOK, "Ptr", 0)
+    CallbackFree(enumOK)
+
+    return _foundOKHwnd
+}
+
+_FindOKCallback(hwnd, lParam) {
+    global _foundOKHwnd
+
+    className := GetClassName(hwnd)
+
+    if !(InStr(className, "TButton") || InStr(className, "TBitBtn"))
+        return 1
+
+    text := GetWindowText(hwnd)
+    textUpper := StrUpper(text)
+
+    ; Only dismiss OK, Continue, Yes - never anything that files/signs
+    if textUpper = "OK" || textUpper = "&OK" || textUpper = "CONTINUE"
+        || textUpper = "&CONTINUE" || textUpper = "YES" || textUpper = "&YES" {
+        _foundOKHwnd := hwnd
+        return 0
+    }
+
+    return 1
 }
 
 ; ===========================================================================

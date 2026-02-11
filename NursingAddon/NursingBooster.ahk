@@ -131,8 +131,9 @@ ApplyNamedTemplate(templateName) {
 ; Scans the live CPRS dialogue for all checkboxes, matches them to the
 ; saved template by label text, and clicks any that need to change state.
 ;
-; IMPORTANT: Only clicks checkboxes. Never clicks OK, Finish, or Submit.
-; The nurse reviews the dialogue and submits manually.
+; Only clicks checkboxes and dismisses intermediate "OK to continue" popups.
+; NEVER clicks the final Finish/Submit button that files the note.
+; The nurse always reviews the dialogue and submits manually.
 ; ===========================================================================
 
 ApplyTemplate(templatePath) {
@@ -180,13 +181,164 @@ ApplyTemplate(templatePath) {
             ; just like a real mouse click, which triggers GetData/SetData RPCs
             PostMessage(0x00F5, 0, 0, cb.hwnd)  ; BM_CLICK
             applied++
-            Sleep(250)  ; wait for CPRS to process
+            Sleep(300)  ; wait for CPRS to process
+
+            ; Some checkboxes trigger intermediate popup dialogues
+            ; ("Press OK to continue", informational messages, etc.)
+            ; Auto-dismiss these so the template application continues.
+            ; These are NOT the final Finish/Submit - they're mid-form gates.
+            DismissIntermediatePopups()
+
             break
         }
     }
 
+    ; One final check for any lingering popups after the last checkbox
+    DismissIntermediatePopups()
+
     ToolTip("Applied " applied " changes (" skipped " already set). Review in CPRS before finishing.")
     SetTimer(ClearToolTip, -3000)
+}
+
+; ---------------------------------------------------------------------------
+; Dismiss intermediate popup dialogues that CPRS spawns mid-form.
+;
+; These are small modal windows with a single OK button - informational
+; messages or "Press OK to continue" confirmations. They are child windows
+; of CPRS (owned by CPRSChart.exe) with standard Delphi form classes.
+;
+; We ONLY dismiss popups that match ALL of these criteria:
+;   1. Owned by CPRSChart.exe
+;   2. Small window (not the main CPRS window or the reminder dialogue)
+;   3. Contains an "OK" button but NOT "Finish", "Submit", or "Sign"
+;   4. Does NOT have a text input field (not a data entry form)
+;
+; This is deliberately conservative. If a popup doesn't match, it stays
+; open and the nurse handles it manually.
+; ---------------------------------------------------------------------------
+DismissIntermediatePopups() {
+    ; Give CPRS a moment to spawn the popup
+    Sleep(150)
+
+    ; Look for popup windows owned by CPRS
+    loop 3 {  ; check up to 3 times (chained popups)
+        found := false
+        for wnd in WinGetList("ahk_exe CPRSChart.exe") {
+            try {
+                cls := WinGetClass(wnd)
+                title := WinGetTitle(wnd)
+
+                ; Skip the main CPRS window and the reminder dialogue itself
+                if cls = "TfrmRemDlg" || cls = "TCPRSChart" || cls = "TfrmFrame"
+                    continue
+
+                ; Must be a small Delphi form (popup-sized)
+                WinGetPos(,, &w, &h, wnd)
+                if w > 500 || h > 400
+                    continue  ; too big - probably not a simple OK popup
+
+                ; Check for dangerous buttons we must NEVER click
+                if HasDangerousButton(wnd)
+                    continue
+
+                ; Look for an OK button to click
+                okHwnd := FindOKButton(wnd)
+                if okHwnd {
+                    PostMessage(0x00F5, 0, 0, okHwnd)  ; BM_CLICK the OK button
+                    Sleep(200)
+                    found := true
+                }
+            }
+        }
+        if !found
+            break
+    }
+}
+
+; Check if a window contains buttons we must never auto-click
+HasDangerousButton(windowHwnd) {
+    global _hasDangerous := false
+
+    enumDangerous := CallbackCreate(_CheckDangerousCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumDangerous, "Ptr", 0)
+    CallbackFree(enumDangerous)
+
+    return _hasDangerous
+}
+
+_CheckDangerousCallback(hwnd, lParam) {
+    global _hasDangerous
+
+    buf := Buffer(256, 0)
+    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
+    className := StrGet(buf)
+
+    ; If it has text input fields, it's a data entry form - don't auto-dismiss
+    if InStr(className, "TEdit") || InStr(className, "TMemo") || InStr(className, "TRichEdit") {
+        _hasDangerous := true
+        return 0
+    }
+
+    ; Check button text for dangerous labels
+    if InStr(className, "TButton") || InStr(className, "TBitBtn") {
+        len := SendMessage(0x000E, 0, 0, hwnd)
+        if len > 0 {
+            textBuf := Buffer((len + 1) * 2, 0)
+            SendMessage(0x000D, len + 1, textBuf, hwnd)
+            text := StrGet(textBuf)
+            textUpper := StrUpper(text)
+
+            ; These are the buttons that file/sign/submit the note
+            if InStr(textUpper, "FINISH") || InStr(textUpper, "SUBMIT")
+                || InStr(textUpper, "SIGN") || InStr(textUpper, "FILE")
+                || InStr(textUpper, "COMPLETE") || InStr(textUpper, "SAVE")
+                || InStr(textUpper, "DELETE") || InStr(textUpper, "REMOVE") {
+                _hasDangerous := true
+                return 0
+            }
+        }
+    }
+
+    return 1
+}
+
+; Find an OK button in a window
+FindOKButton(windowHwnd) {
+    global _foundOKHwnd := 0
+
+    enumOK := CallbackCreate(_FindOKCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumOK, "Ptr", 0)
+    CallbackFree(enumOK)
+
+    return _foundOKHwnd
+}
+
+_FindOKCallback(hwnd, lParam) {
+    global _foundOKHwnd
+
+    buf := Buffer(256, 0)
+    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
+    className := StrGet(buf)
+
+    if !(InStr(className, "TButton") || InStr(className, "TBitBtn"))
+        return 1
+
+    len := SendMessage(0x000E, 0, 0, hwnd)
+    if len > 0 {
+        textBuf := Buffer((len + 1) * 2, 0)
+        SendMessage(0x000D, len + 1, textBuf, hwnd)
+        text := StrGet(textBuf)
+        textUpper := StrUpper(text)
+
+        ; Only dismiss OK, Continue, Yes - never anything that files/signs
+        if textUpper = "OK" || textUpper = "&OK" || textUpper = "CONTINUE"
+            || textUpper = "&CONTINUE" || textUpper = "YES" || textUpper = "&YES" {
+            _foundOKHwnd := hwnd
+            return 0
+        }
+    }
+
+    return 1
 }
 
 LabelsMatch(liveLabel, templateLabel) {
