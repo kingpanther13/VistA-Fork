@@ -1,0 +1,1947 @@
+{
+  "template": "VAAES Skin",
+  "source": "Copy of VAAES_HF_Template_View.xlsx (Skin sheet)",
+  "total_categories": 14,
+  "total_health_factors": 371,
+  "body_systems": [
+    {
+      "category_hf_name": "PRESSURE ULCER PROTOCOL [C]",
+      "short_name": "PRESSURE ULCER PROTOCOL",
+      "health_factors": [
+        {
+          "name": "SKIN - EDUCATION",
+          "print_name": "Skin Care Education",
+          "description": "Skin care education."
+        },
+        {
+          "name": "SKIN - MAXIMAL REMOBILIZATION",
+          "print_name": "Maximal Remobilization Intervention For Skin Protocol",
+          "description": "Maximal remobilization intervention for skin protocol."
+        },
+        {
+          "name": "SKIN - PRESSURE-REDISTRIBUTION MEASURES",
+          "print_name": "Pressure Redistribution Measures For Skin Protocol",
+          "description": "Pressure redistribution measures for skin protocol."
+        },
+        {
+          "name": "SKIN MANAGE MOISTURE",
+          "print_name": "Manage Moisture Intervention For Skin Protocol",
+          "description": "Manage moisture intervention for skin protocol."
+        },
+        {
+          "name": "SKIN MANAGE NUTRITION",
+          "print_name": "Manage Nutrition Intervention For Skin Protocol",
+          "description": "Manage nutrition intervention for skin protocol."
+        },
+        {
+          "name": "SKIN REDUCE FRICTION AND SHEAR",
+          "print_name": "Reduce Friction And Shear Interventions For Skin Protocol",
+          "description": "Reduce friction and shear interventions for skin protocol."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "PRESSURE ULCER STAGE [C]",
+      "short_name": "PRESSURE ULCER STAGE",
+      "health_factors": [
+        {
+          "name": "MUCOSAL MEM PI",
+          "print_name": "Pressure Injury On The Mucosal Membrane",
+          "description": "Pressure injury on the mucosal membrane."
+        },
+        {
+          "name": "MUCOSAL MEM PI #2",
+          "print_name": "Pressure Injury On The Mucosal Membrane - Second",
+          "description": "Pressure injury on the mucosal membrane - second."
+        },
+        {
+          "name": "MUCOSAL MEM PI #3",
+          "print_name": "Pressure Injury On The Mucosal Membrane - Third",
+          "description": "Pressure injury on the mucosal membrane - third."
+        },
+        {
+          "name": "MUCOSAL MEM PI #4",
+          "print_name": "Pressure Injury On The Mucosal Membrane - Fourth",
+          "description": "Pressure injury on the mucosal membrane - fourth."
+        },
+        {
+          "name": "MUCOSAL MEM PI #5",
+          "print_name": "Pressure Injury On The Mucosal Membrane - Fifth",
+          "description": "Pressure injury on the mucosal membrane - fifth."
+        },
+        {
+          "name": "STAGE I",
+          "print_name": "Pressure Injury Stage 1 (Intact Skin; Nonblanchable Redness)",
+          "description": "Intact skin with nonblanchable redness of a localized area, usually over a bony prominence. Darkly pigmented skin may not have visible blanching; its color may differ from the surrounding area."
+        },
+        {
+          "name": "STAGE I #2",
+          "print_name": "Pressure Injury Stage1(Intact Skin; Nonblanchable Redness)#2",
+          "description": "Intact skin with nonblanchable redness of a localized area, usually over a bony prominence. Darkly pigmented skin may not have visible blanching; its color may differ from the surrounding area, second."
+        },
+        {
+          "name": "STAGE I #3",
+          "print_name": "Pressure Injury Stage1(Intact Skin; Nonblanchable Redness)#3",
+          "description": "Intact skin with nonblanchable redness of a localized area, usually over a bony prominence. Darkly pigmented skin may not have visible blanching; its color may differ from the surrounding area, third."
+        },
+        {
+          "name": "STAGE I #4",
+          "print_name": "Pressure Injury Stage1(Intact Skin; Nonblanchable Redness)#4",
+          "description": "Intact skin with nonblanchable redness of a localized area, usually over a bony prominence. Darkly pigmented skin may not have visible blanching; its color may differ from the surrounding area, fourth."
+        },
+        {
+          "name": "STAGE I #5",
+          "print_name": "Pressure Injury Stage1(Intact Skin; Nonblanchable Redness)#5",
+          "description": "Intact skin with nonblanchable redness of a localized area, usually over a bony prominence. Darkly pigmented skin may not have visible blanching; its color may differ from the surrounding area, fifth."
+        },
+        {
+          "name": "STAGE II",
+          "print_name": "Pressure Injury Stage 2 (Open Shallow Ulcer)",
+          "description": "Partial thickness loss of dermis presenting as a shallow open ulcer with a red-pink wound bed, without slough. It may also present as an intact or open/ruptured serum-filled blister."
+        },
+        {
+          "name": "STAGE II #2",
+          "print_name": "Pressure Injury Stage 2 (Open Shallow Ulcer)#2",
+          "description": "Partial thickness loss of dermis presenting as a shallow open ulcer with a red-pink wound bed, without slough. It may also present as an intact or open/ruptured serum-filled blister, second."
+        },
+        {
+          "name": "STAGE II #3",
+          "print_name": "Pressure Injury Stage 2 (Open Shallow Ulcer)#3",
+          "description": "Partial thickness loss of dermis presenting as a shallow open ulcer with a red-pink wound bed, without slough. It may also present as an intact or open/ruptured serum-filled blister, third."
+        },
+        {
+          "name": "STAGE II #4",
+          "print_name": "Pressure Injury Stage 2 (Open Shallow Ulcer)#4",
+          "description": "Partial thickness loss of dermis presenting as a shallow open ulcer with a red-pink wound bed, without slough. It may also present as an intact or open/ruptured serum-filled blister.-fourth"
+        },
+        {
+          "name": "STAGE II #5",
+          "print_name": "Pressure Injury Stage 2 (Open Shallow Ulcer)#5",
+          "description": "Partial thickness loss of dermis presenting as a shallow open ulcer with a red-pink wound bed, without slough. It may also present as an intact or open/ruptured serum-filled blister, fifth."
+        },
+        {
+          "name": "STAGE III",
+          "print_name": "Pressure Injury Stage 3 (Subcutaneous Tissue Visible)",
+          "description": "Subcutaneous tissue visible within pressure injury."
+        },
+        {
+          "name": "STAGE III #2",
+          "print_name": "Pressure Injury Stage 3 (Subcutaneous Tissue Visible)#2",
+          "description": "Subcutaneous tissue visible within pressure injury-second."
+        },
+        {
+          "name": "STAGE III #3",
+          "print_name": "Pressure Injury Stage 3 (Subcutaneous Tissue Visible)#3",
+          "description": "Subcutaneous tissue visible within pressure injury-third."
+        },
+        {
+          "name": "STAGE III #4",
+          "print_name": "Pressure Injury Stage 3 (Subcutaneous Tissue Visible)#4",
+          "description": "Subcutaneous tissue visible within pressure injury-fourth."
+        },
+        {
+          "name": "STAGE III #5",
+          "print_name": "Pressure Injury Stage 3 (Subcutaneous Tissue Visible)#5",
+          "description": "Subcutaneous tissue visible within pressure injury-fifth."
+        },
+        {
+          "name": "STAGE IV",
+          "print_name": "Pressure Injury Stage 4 (Bone, Prosthesis, Tendon Visible)",
+          "description": "Bone pins visible within pressure injury; Bone visible within pressure injury; Prosthesis visible within pressure injury; Tendon visible within pressure injury."
+        },
+        {
+          "name": "STAGE IV #2",
+          "print_name": "Pressure Injury Stage 4 (Bone, Prosthesis, Tendon Visible)#2",
+          "description": "Bone pins visible within pressure injury; Bone visible within pressure injury; Prosthesis visible within pressure injury; Tendon visible within pressure injury-second."
+        },
+        {
+          "name": "STAGE IV #3",
+          "print_name": "Pressure Injury Stage 4 (Bone, Prosthesis, Tendon Visible)#3",
+          "description": "Bone pins visible within pressure injury; Bone visible within pressure injury; Prosthesis visible within pressure injury; Tendon visible within pressure injury-third."
+        },
+        {
+          "name": "STAGE IV #4",
+          "print_name": "Pressure Injury Stage 4 (Bone, Prosthesis, Tendon Visible)#4",
+          "description": "Bone pins visible within pressure injury; Bone visible within pressure injury; Prosthesis visible within pressure injury; Tendon visible within pressure injury-fourth."
+        },
+        {
+          "name": "STAGE IV #5",
+          "print_name": "Pressure Injury Stage 4 (Bone, Prosthesis, Tendon Visible)#5",
+          "description": "Bone pins visible within pressure injury; Bone visible within pressure injury; Prosthesis visible within pressure injury; Tendon visible within pressure injury-fifth."
+        },
+        {
+          "name": "SUSPECTED DEEP TISSUE INJURY",
+          "print_name": "Pressure Injury With Suspected Deep Tissue Injury",
+          "description": "Intact or non-intact skin with localized area of persistent non-blanchable deep red, maroon, purple discoloration or epidermal separation revealing a dark wound bed or blood filled blister."
+        },
+        {
+          "name": "SUSPECTED DEEP TISSUE INJURY #2",
+          "print_name": "Pressure Injury With Suspected Deep Tissue Injury#2",
+          "description": "Intact or non-intact skin with localized area of persistent non-blanchable deep red, maroon, purple discoloration or epidermal separation revealing a dark wound bed or blood filled blister, second."
+        },
+        {
+          "name": "SUSPECTED DEEP TISSUE INJURY #3",
+          "print_name": "Pressure Injury With Suspected Deep Tissue Injury#3",
+          "description": "Intact or non-intact skin with localized area of persistent non-blanchable deep red, maroon, purple discoloration or epidermal separation revealing a dark wound bed or blood filled blister, third."
+        },
+        {
+          "name": "SUSPECTED DEEP TISSUE INJURY #4",
+          "print_name": "Pressure Injury With Suspected Deep Tissue Injury#4",
+          "description": "Intact or non-intact skin with localized area of persistent non-blanchable deep red, maroon, purple discoloration or epidermal separation revealing a dark wound bed or blood filled blister, fourth."
+        },
+        {
+          "name": "SUSPECTED DEEP TISSUE INJURY #5",
+          "print_name": "Pressure Injury With Suspected Deep Tissue Injury#5",
+          "description": "Intact or non-intact skin with localized area of persistent non-blanchable deep red, maroon, purple discoloration or epidermal separation revealing a dark wound bed or blood filled blister, fifth."
+        },
+        {
+          "name": "UNABLE TO STAGE (PU)",
+          "print_name": "Unstageable PI-Full Thickness Skin/Tissue Loss",
+          "description": "Full thickness skin or tissue loss \u2013 depth unknown. Full thickness tissue loss in which actual depth of the ulcer is completely obscured by slough (yellow, tan, gray, green or brown) and/or eschar (tan, brown or black) in the wound bed."
+        },
+        {
+          "name": "UNABLE TO STAGE (PU) #2",
+          "print_name": "Unstageable PI-Full Thickness Skin/Tissue Loss#2",
+          "description": "Full thickness skin or tissue loss \u2013 depth unknown. Full thickness tissue loss in which actual depth of the ulcer is completely obscured by slough (yellow, tan, gray, green or brown) and/or eschar (tan, brown or black) in the wound bed, second."
+        },
+        {
+          "name": "UNABLE TO STAGE (PU) #3",
+          "print_name": "Unstageable PI-Full Thickness Skin/Tissue Loss#3",
+          "description": "Full thickness skin or tissue loss \u2013 depth unknown. Full thickness tissue loss in which actual depth of the ulcer is completely obscured by slough (yellow, tan, gray, green or brown) and/or eschar (tan, brown or black) in the wound bed, third."
+        },
+        {
+          "name": "UNABLE TO STAGE (PU) #4",
+          "print_name": "Unstageable PI-Full Thickness Skin/Tissue Loss#4",
+          "description": "Full thickness skin or tissue loss \u2013 depth unknown. Full thickness tissue loss in which actual depth of the ulcer is completely obscured by slough (yellow, tan, gray, green or brown) and/or eschar (tan, brown or black) in the wound bed, fourth."
+        },
+        {
+          "name": "UNABLE TO STAGE (PU) #5",
+          "print_name": "Unstageable PI-Full Thickness Skin/Tissue Loss#5",
+          "description": "Full thickness skin or tissue loss \u2013 depth unknown. Full thickness tissue loss in which actual depth of the ulcer is completely obscured by slough (yellow, tan, gray, green or brown) and/or eschar (tan, brown or black) in the wound bed, fifth."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "PRESSURE ULCER-EDUCATION [C]",
+      "short_name": "PRESSURE ULCER-EDUCATION",
+      "health_factors": [
+        {
+          "name": "EDUCATE IMPORTANCE OF CHANGING POSITION",
+          "print_name": "Pressure Injury Education Importance Of Changing Position",
+          "description": "Pressure Injury education for the importance of changing positions."
+        },
+        {
+          "name": "EDUCATION MATERIALS ON ULCER PREVENTION",
+          "print_name": "Pressure Injury Education Material For Ulcer Prevention",
+          "description": "Pressure Injury education material for ulcer prevention."
+        },
+        {
+          "name": "PROVIDE EDUCATION ON CAUSE/PREVENTION",
+          "print_name": "Pressure Injury Education For Cause And Prevention",
+          "description": "Pressure Injury education for cause and prevention."
+        },
+        {
+          "name": "PROVIDE EDUCATION REGARDING TX PLAN",
+          "print_name": "Pressure Injury Education On Treatment Plan",
+          "description": "Pressure Injury education on treatment plan."
+        },
+        {
+          "name": "PU EDUCATION-OTHER",
+          "print_name": "Pressure Injury Education-Other",
+          "description": "Pressure Injury education-OTHER-subjective."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "PRESSURE ULCER-FRICTION/SHEAR [C]",
+      "short_name": "PRESSURE ULCER-FRICTION/SHEAR",
+      "health_factors": [
+        {
+          "name": "ELEVATE HOB FOR MEALS",
+          "print_name": "Elevate Head Of Bed For Meals-Prevent Friction And Shearing",
+          "description": "Elevate head of bed for all meals to prevent friction and shearing."
+        },
+        {
+          "name": "HOB BELOW 30 DEGREES WHEN NOT EATING",
+          "print_name": "Elevate Hob 30 Degrees When Not Eating",
+          "description": "Elevate head of bed 30 degrees when not eating to prevent friction and shearing."
+        },
+        {
+          "name": "PU FRICTION/SHEAR-OTHER",
+          "print_name": "Pressure Injury Friction/Shearing-Other",
+          "description": "Pressure Injury friction/shearing-OTHER-subjective."
+        },
+        {
+          "name": "USE BED TRAPEZE OR PULL SHEET",
+          "print_name": "Use Bed Trapeze Or Pull Sheet-Prevent Friction And Shearing",
+          "description": "Use bed trapeze or pull sheet to prevent friction and shearing."
+        },
+        {
+          "name": "WHEN HOB ELEVATED RAISE KNEE",
+          "print_name": "When Hob Elevated, Raise Knees-Prevent Friction And Shearing",
+          "description": "When head of bed is elevated, raise knees to prevent friction and shearing."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "PRESSURE ULCER-MOISTURE [C]",
+      "short_name": "PRESSURE ULCER-MOISTURE",
+      "health_factors": [
+        {
+          "name": "CONDOM CATHETER",
+          "print_name": "Application Of Condom Catheter",
+          "description": "Application of condom catheter."
+        },
+        {
+          "name": "FECAL COLLECTOR",
+          "print_name": "Application Of Fecal Collector",
+          "description": "Application of fecal collector."
+        },
+        {
+          "name": "INSTRUCT PT/FAMILY TO REQUEST ASSISTANCE",
+          "print_name": "Instruct To Ask For Help-Pressure Injury Care/Intervention",
+          "description": "Instruct patient and family to request assistance with Pressure Injury care/moisture intervention."
+        },
+        {
+          "name": "MAINTAIN CLEAN DRY SKIN",
+          "print_name": "Maintain Clean Dry Skin As A Moisture Intervention",
+          "description": "Maintain clean dry skin as a moisture intervention."
+        },
+        {
+          "name": "NO MORE THAN 1 LINEN LAYER",
+          "print_name": "No More Than 1 Linen Layer To Manage Moisture",
+          "description": "No more than 1 linen layer to manage moisture."
+        },
+        {
+          "name": "OFFER BEDPAN/URINAL",
+          "print_name": "Offer Bedpan Or Urinal To Patient As A Moisture Intervention",
+          "description": "Offer bedpan or urinal to patient as a moisture intervention."
+        },
+        {
+          "name": "PROTECTIVE BARRIER OINTMENT",
+          "print_name": "Protective Barrier Ointment Applied To Skin",
+          "description": "Protective barrier ointment applied to skin as a moisture intervention."
+        },
+        {
+          "name": "PU MOISTURE-OTHER",
+          "print_name": "Pressure Injury Moisture-Other Intervention",
+          "description": "Pressure Injury Moisture-OTHER-subjective."
+        },
+        {
+          "name": "SCHEDULED TOILETING",
+          "print_name": "Scheduled Toileting For Patient As A Moisture Intervention",
+          "description": "Scheduled toileting for patient as a moisture intervention."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "PRESSURE ULCER-NUTRITION [C]",
+      "short_name": "PRESSURE ULCER-NUTRITION",
+      "health_factors": [
+        {
+          "name": "ENCOURAGE EATING AND ASSIST WITH MEALS",
+          "print_name": "Encouragement Of Eating And Assistance With Meals",
+          "description": "Encouragement of eating and assistance with meals."
+        },
+        {
+          "name": "ENCOURAGE MEALS AND ASSIST AS NEEDED",
+          "print_name": "Encourage Meals And Assist As Needed",
+          "description": "Encourage meals and assist as needed."
+        },
+        {
+          "name": "MONITOR FLUID/FOOD INTAKE",
+          "print_name": "Monitor Fluid/Food Intake",
+          "description": "Monitor Fluid/Food Intake."
+        },
+        {
+          "name": "OFFER LIQUIDS Q2H WHEN TURNING",
+          "print_name": "Provision Of Oral Fluids Every 2 Hours When Repositioning",
+          "description": "Provision of oral fluids every two hours with patient repositioning."
+        },
+        {
+          "name": "OFFER ORDERED SUPPLEMENTS",
+          "print_name": "Provision Of Provider Ordered Nutritional Supplements",
+          "description": "Provision of provider ordered nutritional supplements."
+        },
+        {
+          "name": "PROVIDE/ENCOURAGE ORAL CARE AS NEEDED",
+          "print_name": "Provision Or Encouragement Of Oral Care",
+          "description": "Provision or encouragement of oral care."
+        },
+        {
+          "name": "PU NUTRITION-OTHER",
+          "print_name": "Pressure Ulcer-Nutrition Intervention-Other",
+          "description": "Pressure Ulcer-nutrition intervention-OTHER-subjective."
+        },
+        {
+          "name": "TRAY SET UP AND ASSISTANCE",
+          "print_name": "Tray Set Up/Assistance Provided As A Nutrition Intervention",
+          "description": "Tray set up and assistance provided as a nutrition intervention."
+        },
+        {
+          "name": "TUBE FEEDINGS AS ORDERED",
+          "print_name": "Tube Feeding As Ordered",
+          "description": "Tube feeding."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "PRESSURE ULCER-PRESSURE REDUCING [C]",
+      "short_name": "PRESSURE ULCER-PRESSURE REDUCING",
+      "health_factors": [
+        {
+          "name": "ELEVATE HEELS",
+          "print_name": "Bedrail Pads, Heel Boots And Elbow Pads For Pressure Relief",
+          "description": "Use of bedrail pads for pressure relief; Use of foam heel protector boots for pressure relief; Use of heel protector boots (Prevalon) for pressure relief; Use of heel protector boots (Sage) for pressure relief; Use of pressure relief ankle foot orthosis."
+        },
+        {
+          "name": "FREQUENT POSITION CHANGES",
+          "print_name": "Frequent Position Changes To Reduce Pressure",
+          "description": "Frequent position changes to reduce pressure."
+        },
+        {
+          "name": "HEEL/ELBOW PADS",
+          "print_name": "Heel/Elbow Pads In Place To Reduce Pressure",
+          "description": "Heel/elbow pads in place to reduce pressure."
+        },
+        {
+          "name": "PU PRESSURE REDUCING-OTHER",
+          "print_name": "Pressure Ulcer-Pressure Reducing-Other",
+          "description": "Pressure ulcer-pressure reducing-OTHER-subjective."
+        },
+        {
+          "name": "SPECIALTY BED/SURFACE",
+          "print_name": "Specialty Bed/Surface Used To Reduce Pressure",
+          "description": "Specialty bed/surface used to reduce pressure."
+        },
+        {
+          "name": "TURN AND REPOSITION Q2H",
+          "print_name": "Turn And Reposition Patient Every 2 Hours To Reduce Pressure",
+          "description": "Turn and reposition patient every 2 hours to reduce pressure."
+        },
+        {
+          "name": "TURN TO SIDE LESS THAN 30 DEGREES",
+          "print_name": "Turn Patient To Side Less Than 30 Degrees To Reduce Pressure",
+          "description": "Turn patient to side less than 30 degrees to reduce pressure."
+        },
+        {
+          "name": "WHEELCHAIR CUSHION",
+          "print_name": "Wheelchair Cushion Used To Reduce Pressure",
+          "description": "Wheelchair cushion used to reduce pressure."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "PRESSURE ULCER-REMOBILIZE [C]",
+      "short_name": "PRESSURE ULCER-REMOBILIZE",
+      "health_factors": [
+        {
+          "name": "ENCOURAGE ACTIVITY AS TOLERATED",
+          "print_name": "Encourage Activity As Tolerated To Provide Remobilization",
+          "description": "Encourage activity as tolerated to provide remobilization."
+        },
+        {
+          "name": "LIMIT SITTING OOB TO 2 HR PERIODS",
+          "print_name": "Limit Out Of Bed Sitting To 2 Hour Periods",
+          "description": "Limit patients sitting while out of bed to 2 hour periods to provide remobilization."
+        },
+        {
+          "name": "PU REMOBILIZE-OTHER",
+          "print_name": "Pressure Injury Remobilization-Other",
+          "description": "Pressure Injury remobilization-OTHER-subjective."
+        },
+        {
+          "name": "REPOSITION IN CHAIR",
+          "print_name": "Reposition In Chair When Out Of Bed To Maximize Mobilization",
+          "description": "Reposition in chair when out of bed to maximize mobilization."
+        },
+        {
+          "name": "ROM EXERCISES",
+          "print_name": "Range Of Motion Exercises To Provide Remobilization",
+          "description": "Range of Motion exercises to provide remobilization."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "SKIN ASSESSMENT [C]",
+      "short_name": "SKIN ASSESSMENT",
+      "health_factors": [
+        {
+          "name": "DRAINAGE AMOUNT HEAVY",
+          "print_name": "Heavy Amount Drainage Associated With The Wound",
+          "description": "Heavy amount drainage associated with the wound."
+        },
+        {
+          "name": "DRAINAGE AMOUNT MODERATE",
+          "print_name": "Moderate Amount Drainage Associated With The Wound",
+          "description": "Moderate amount drainage associated with the wound."
+        },
+        {
+          "name": "DRAINAGE AMOUNT NONE",
+          "print_name": "No Drainage Associated With The Wound",
+          "description": "No drainage associated with the wound."
+        },
+        {
+          "name": "DRAINAGE AMOUNT SCANT",
+          "print_name": "Scant Amount Drainage Associated With The Wound",
+          "description": "Scant amount drainage associated with the wound."
+        },
+        {
+          "name": "DRAINAGE AMOUNT SMALL",
+          "print_name": "Small Amount Drainage Associated With The Wound",
+          "description": "Small amount drainage associated with the wound."
+        },
+        {
+          "name": "DRAINAGE APPEARANCE PURULENT",
+          "print_name": "Drainage Of Wound Appears Purulent",
+          "description": "Drainage of wound appears purulent."
+        },
+        {
+          "name": "DRAINAGE APPEARANCE SANGUINEOUS",
+          "print_name": "Drainage Of Wound Appears Sanguineous",
+          "description": "Drainage of wound appears sanguineous."
+        },
+        {
+          "name": "DRAINAGE APPEARANCE SERO-PURULENT",
+          "print_name": "Drainage Of Wound Appears Sero-Purulent",
+          "description": "Drainage of wound appears sero-purulent."
+        },
+        {
+          "name": "DRAINAGE APPEARANCE SEROSANGUINEOUS",
+          "print_name": "Drainage Of Wound Appears Serosanguineous",
+          "description": "Drainage of wound appears serosanguineous."
+        },
+        {
+          "name": "DRAINAGE APPEARANCE SEROUS",
+          "print_name": "Drainage Of Wound Appears Serous",
+          "description": "Drainage of wound appears serous."
+        },
+        {
+          "name": "DRAINAGE APPEARANCE VISCOUS",
+          "print_name": "Drainage Of Wound Appears Viscous",
+          "description": "Drainage of wound appears viscous."
+        },
+        {
+          "name": "DRAINAGE COLOR COLORLESS",
+          "print_name": "Drainage Is Colorless",
+          "description": "Drainage is colorless."
+        },
+        {
+          "name": "DRAINAGE COLOR GREEN",
+          "print_name": "Drainage Is Green",
+          "description": "Drainage is green."
+        },
+        {
+          "name": "DRAINAGE COLOR TAN",
+          "print_name": "Drainage Is Tan",
+          "description": "Drainage is tan."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE AMOUNT HEAVY",
+          "print_name": "Heavy Amount Drainage Associated With The Wound",
+          "description": "Heavy amount drainage associated with the wound."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE AMOUNT MODERATE",
+          "print_name": "Moderate Amount Drainage Associated With The Wound",
+          "description": "Moderate amount drainage associated with the wound."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE AMOUNT NONE",
+          "print_name": "No Drainage Associated With The Wound",
+          "description": "No drainage associated with the wound."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE AMOUNT SCANT",
+          "print_name": "Scant Amount Drainage Associated With The Wound",
+          "description": "Scant amount drainage associated with the wound."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE AMOUNT SMALL",
+          "print_name": "Small Amount Drainage Associated With The Wound",
+          "description": "Small amount drainage associated with the wound."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE COLOR COLORLESS",
+          "print_name": "Drainage Is Colorless",
+          "description": "Drainage is colorless."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE COLOR GREEN",
+          "print_name": "Drainage Is Green",
+          "description": "Drainage is green."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE COLOR TAN",
+          "print_name": "Drainage Is Tan",
+          "description": "Drainage is tan."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE PURULENT",
+          "print_name": "Drainage Of Wound Appears Purulent",
+          "description": "Drainage of wound appears purulent."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE SANGUINEOUS",
+          "print_name": "Drainage Of Wound Appears Sanguineous",
+          "description": "Drainage of wound appears sanguineous."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE SERO-PURULENT",
+          "print_name": "Drainage Of Wound Appears Sero-Purulent",
+          "description": "Drainage of wound appears sero-purulent."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE SEROSANGUINEOUS",
+          "print_name": "Drainage Of Wound Appears Serosanguineous",
+          "description": "Drainage of wound appears serosanguineous."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE SEROUS",
+          "print_name": "Drainage Of Wound Appears Serous",
+          "description": "Drainage of wound appears serous."
+        },
+        {
+          "name": "OTHER WOUND DRAINAGE VISCOUS",
+          "print_name": "Drainage Of Wound Appears Viscous",
+          "description": "Drainage of wound appears viscous."
+        },
+        {
+          "name": "OTHER WOUND WOUND DRAINAGE",
+          "print_name": "Wound Has Drainage",
+          "description": "Wound has drainage."
+        },
+        {
+          "name": "PATIENT BEHAVIORALLY UNSTABLE",
+          "print_name": "Unable To Assess Skin Due To Patient Behaviorally Unstable",
+          "description": "Unable to assess skin due to patient behaviorally unstable."
+        },
+        {
+          "name": "PATIENT MEDICALLY UNSTABLE",
+          "print_name": "Unable To Assess Skin Due To Patient Medically Unstable",
+          "description": "Unable to assess skin due to patient medically unstable."
+        },
+        {
+          "name": "PATIENT OFF FLOOR",
+          "print_name": "Unable To Assess Skin Due To Patient Off Floor",
+          "description": "Unable to assess skin due to patient off floor."
+        },
+        {
+          "name": "PATIENT REFUSAL END OF LIFE",
+          "print_name": "Unable To Assess Skin Due To Patient Refusal At End Of Life",
+          "description": "Unable to assess skin due to patient refusal at end of life."
+        },
+        {
+          "name": "PATIENT REFUSAL PERSONAL",
+          "print_name": "Unable To Assess Skin Due To Patient Refusal Personal",
+          "description": "Unable to assess skin due to patient refusal personal."
+        },
+        {
+          "name": "PI PERI WOUND CREPITUS",
+          "print_name": "Pressure Injury Assessed Skin Status: Crepitus",
+          "description": "Pressure Injury assessed skin status is crepitus (crunchy, crackling upon palpation)."
+        },
+        {
+          "name": "PI PERI WOUND ERYTHEMA",
+          "print_name": "Pressure Injury Assessed Skin Status: Erythema",
+          "description": "Pressure Injury assessed skin status is erythema (blanching or non-blanching)."
+        },
+        {
+          "name": "PI PERI WOUND FLUCTUANCE",
+          "print_name": "Pressure Injury Assessed Skin Status: Fluctuance",
+          "description": "Pressure Injury assessed skin status is fluctuance."
+        },
+        {
+          "name": "PI PERI WOUND INDURATION",
+          "print_name": "Pressure Injury Assessed Skin Status: Indurated",
+          "description": "Pressure Injury assessed skin status is induration (hardness)."
+        },
+        {
+          "name": "PI PERI WOUND INTACT",
+          "print_name": "Peri-Wound Skin - Intact",
+          "description": "Peri-wound skin status is intact."
+        },
+        {
+          "name": "PI PERI WOUND MACERATION",
+          "print_name": "Pressure Injury Assessed Skin Status: Macerated",
+          "description": "Pressure Injury assessed skin status is maceration (water-logged, wrinkled)."
+        },
+        {
+          "name": "PI PERI WOUND SKIN TEMP",
+          "print_name": "Pressure Injury Assessed Skin Status: Temperature",
+          "description": "Pressure Injury assessed skin status: temperature."
+        },
+        {
+          "name": "PI PERI WOUND USUAL FOR ETHNICITY",
+          "print_name": "Pressure Injury Assessed Skin Status: Usual For Ethnicity",
+          "description": "Pressure Injury assessed skin status is usual for ethnicity."
+        },
+        {
+          "name": "PRESENCE OF BONE",
+          "print_name": "Bone Visible",
+          "description": "Presence of bone noted in wound bed."
+        },
+        {
+          "name": "PRESENCE OF CARTILAGE",
+          "print_name": "Cartilage Visible",
+          "description": "Presence of cartilage noted in wound bed."
+        },
+        {
+          "name": "PRESENCE OF TENDON",
+          "print_name": "Tendon Visible",
+          "description": "Presence of tendon noted in wound bed."
+        },
+        {
+          "name": "PRESSURE ULCER",
+          "print_name": "Skin Assessed For Pressure Injury",
+          "description": "Skin assessed for pressure injury."
+        },
+        {
+          "name": "SKIN COLOR",
+          "print_name": "Skin Color Assessed",
+          "description": "Skin color assessed."
+        },
+        {
+          "name": "SKIN INTEGRITY - BITE WOUND",
+          "print_name": "Skin Problem Noted-Bite Wound",
+          "description": "Skin problem noted-bite wound."
+        },
+        {
+          "name": "SKIN INTEGRITY - BLISTER",
+          "print_name": "Skin Problem Noted-Blister",
+          "description": "Skin problem noted; blister."
+        },
+        {
+          "name": "SKIN INTEGRITY - DENUDED",
+          "print_name": "Skin Problem Noted-Denuded Skin",
+          "description": "Skin problem noted-denuded skin."
+        },
+        {
+          "name": "SKIN INTEGRITY - ERYTHEMA",
+          "print_name": "Skin Problem Noted-Erythema",
+          "description": "Skin problem noted-erythema."
+        },
+        {
+          "name": "SKIN INTEGRITY - EXCORIATION",
+          "print_name": "Skin Problem Noted-Excoriation",
+          "description": "Skin problem noted-excoriation."
+        },
+        {
+          "name": "SKIN INTEGRITY - FISSURE",
+          "print_name": "Skin Problem Resulting From A Fissure",
+          "description": "Skin problem resulting from a deep furrow, cleft, or slit."
+        },
+        {
+          "name": "SKIN INTEGRITY - HEMATOMA",
+          "print_name": "Skin Problem Resulting From A Hematoma",
+          "description": "Skin problem resulting from localized mass of extravasated blood that is relatively or completely confined within an organ or tissue, a space, or a potential space; the blood is usually clotted (or partly clotted), and, depending on its duration, may manifest various degrees of organization and decolorization."
+        },
+        {
+          "name": "SKIN INTEGRITY - MACERATION",
+          "print_name": "Skin Problem Noted-Maceration",
+          "description": "Skin problem noted-maceration."
+        },
+        {
+          "name": "SKIN INTEGRITY - MASD",
+          "print_name": "Skin Problem Noted-Moisture Associated Skin Damage",
+          "description": "Skin problem noted-moisture associated skin damage."
+        },
+        {
+          "name": "SKIN INTEGRITY - WOUND",
+          "print_name": "Appearance Of Peri-Wound Skin Assessed",
+          "description": "Appearance of peri-wound skin improving; Appearance of Peri-Wound skin worsening."
+        },
+        {
+          "name": "SKIN INTEGRITY - WOUND ADDITIONAL",
+          "print_name": "Skin Integrity Of Peri-Wound Assessed",
+          "description": "Appearance of peri-wound skin improving; Appearance of Peri-Wound skin worsening."
+        },
+        {
+          "name": "SKIN INTEGRITY - WOUND FIFTH",
+          "print_name": "Appearance Of Peri-Wound Skin Assessed",
+          "description": "Appearance of peri-wound skin improving; Appearance of Peri-Wound skin worsening."
+        },
+        {
+          "name": "SKIN INTEGRITY - WOUND FOURTH",
+          "print_name": "Appearance Of Peri-Wound Skin Assessed",
+          "description": "Appearance of peri-wound skin improving; Appearance of Peri-Wound skin worsening."
+        },
+        {
+          "name": "SKIN INTEGRITY - WOUND SECOND",
+          "print_name": "Appearance Of Peri-Wound Skin Assessed",
+          "description": "Appearance of peri-wound skin improving; Appearance of Peri-Wound skin worsening."
+        },
+        {
+          "name": "SKIN INTEGRITY - WOUND THIRD",
+          "print_name": "Appearance Of Peri-Wound Skin Assessed",
+          "description": "Appearance of peri-wound skin improving; Appearance of peri-wound skin worsening"
+        },
+        {
+          "name": "SKIN MOISTURE",
+          "print_name": "Skin Moisture Assessed",
+          "description": "Skin moisture assessed."
+        },
+        {
+          "name": "SKIN PROBLEM - BRUISING",
+          "print_name": "Skin Problem Noted-Bruising",
+          "description": "Skin problem noted for bruising."
+        },
+        {
+          "name": "SKIN PROBLEM - CHAFING",
+          "print_name": "Skin Problem Resulting From Chafing",
+          "description": "Skin problem resulting from irritation of the skin by friction."
+        },
+        {
+          "name": "SKIN PROBLEM - ERYTHEMIA NONBLANCHABLE",
+          "print_name": "Skin Problem Resulting From Nonblanchable Erythema",
+          "description": "Skin problem resulting from reddening of the skin (or red, blue or purple hues in darkly pigmented skin) that when pressed does not turn white."
+        },
+        {
+          "name": "SKIN PROBLEM - OTHER",
+          "print_name": "Skin Problem Noted-Other",
+          "description": "Skin problem noted for OTHER-subjective."
+        },
+        {
+          "name": "SKIN PROBLEM - RASH",
+          "print_name": "Skin Problem Noted-Rash",
+          "description": "Skin problem noted for rash."
+        },
+        {
+          "name": "SKIN PROBLEM - SCRATCHES",
+          "print_name": "Skin Problem Resulting From Scratch In Skin",
+          "description": "Skin problem resulting from scratch in skin."
+        },
+        {
+          "name": "SKIN PROBLEM - TEAR",
+          "print_name": "Skin Problem Resulting From Tear In Skin",
+          "description": "Skin problem caused by shear, friction, and/or blunt force resulting in separation of skin layers."
+        },
+        {
+          "name": "SKIN PROBLEMS - BURN",
+          "print_name": "Skin Problem Noted-Burn",
+          "description": "Skin problem noted for burn."
+        },
+        {
+          "name": "SKIN TEMPERATURE",
+          "print_name": "Skin Temperature Assessed",
+          "description": "Skin temperature assessed."
+        },
+        {
+          "name": "SKIN TURGOR",
+          "print_name": "Skin Turgor Abnormal",
+          "description": "Skin turgor abnormal."
+        },
+        {
+          "name": "VAAES PI PERI WOUND ERYTHEMA NON-BLANCH",
+          "print_name": "Pressure Injury Surround Tissue Erythemic And Non-Blanchable",
+          "description": "Surrounding tissue of pressure injury erythemic and non-blanchable."
+        },
+        {
+          "name": "VANOD TUNNELING",
+          "print_name": "Wound Has Tunneling",
+          "description": "Wound has tunneling."
+        },
+        {
+          "name": "VANOD UNDERMINING",
+          "print_name": "Wound Has Undermining",
+          "description": "Wound has undermining."
+        },
+        {
+          "name": "VA-VAAES DRAINAGE COLOR AMBER",
+          "print_name": "Drainage Is Amber",
+          "description": "Drainage is amber."
+        },
+        {
+          "name": "VA-VAAES DRAINAGE COLOR RED",
+          "print_name": "Drainage Is Red",
+          "description": "Drainage is red."
+        },
+        {
+          "name": "VA-VAAES INCISION & FLAP ASSESS",
+          "print_name": "Incision And Flap Assessment",
+          "description": "Incision and flap wounds assessment."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 ASSESSED",
+          "print_name": "Incision And Flap  #1 Assessed",
+          "description": "Incision and flap wound #1 assessed ."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 ERYTHEMA",
+          "print_name": "Incision And Flap #1-Surrounding Tissue Erythema",
+          "description": "Incision and flap assessed #1; surrounding tissue with erythema."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 INDURATION",
+          "print_name": "Incision And Flap #1-Surrounding Tissue Induration",
+          "description": "Incision and flap #1 assessed; surrounding tissue with induration."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 INTACT",
+          "print_name": "Incision And Flap #1-Surrounding Tissue-Intact",
+          "description": "Incision and flap #1 assessed; surrounding tissue intact #1."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 MACERATION",
+          "print_name": "Incision And Flap #1-Surrounding Tissue Maceration",
+          "description": "Incision and flap #1 assessed; surrounding tissue with maceration."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 OPEN/DEHISCED",
+          "print_name": "Incision And Flap #1-Wound Open/Dehisced",
+          "description": "Incision and flap #1 assessed; wound open/dehisced."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 TEMP CHANGE",
+          "print_name": "Incision And Flap #1-Surrounding Tissue Temp",
+          "description": "Incision and flap #1 assessed; surrounding tissue surface temperature change."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 UNABLE",
+          "print_name": "Incision And Flap #1-Unable To Visualize",
+          "description": "Incision and flap #1 assessed; unable to visualize."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #1 WELL APPROX",
+          "print_name": "Incision And Flap #1 -Edge Well Approximated",
+          "description": "Incision and flap #1 assessed; wound edges well approximated."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 ASSESSED",
+          "print_name": "Incision And Flap #2 Assessed",
+          "description": "Incision and flap wound #2 assessed."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 ERYTHEMA",
+          "print_name": "Incision And Flap #2-Surrounding Tissue Erythema",
+          "description": "Incision and flap #2 assessed; surrounding tissue with erythema."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 INDURATION",
+          "print_name": "Incision And Flap #2-Surrounding Tissue Induration",
+          "description": "Incision and flap #2 assessed; surrounding tissue with induration."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 INTACT",
+          "print_name": "Incision And Flap #2-Surrounding Tissue-Intact",
+          "description": "Incision and flap #2 assessed; surrounding tissue intact ."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 MACERATION",
+          "print_name": "Incision And Flap #2-Surrounding Tissue Maceration",
+          "description": "Incision and flap #2 assessed; surrounding tissue with maceration."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 OPEN/DEHISCED",
+          "print_name": "Incision And Flap #2-Wound Open/Dehisced",
+          "description": "Incision and flap #2 assessed; wound open/dehisced."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 TEMP CHANGE",
+          "print_name": "Incision And Flap #2-Surrounding Tissue Temp",
+          "description": "Incision and flap #2 assessed; surrounding tissue surface temperature change."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 UNABLE",
+          "print_name": "Incision And Flap #2-Unable To Visualize",
+          "description": "Incision and flap #2 assessed; unable to visualize."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #2 WELL APPROX",
+          "print_name": "Incision And Flap #2-Edge Well Approximated",
+          "description": "Incision and flap #2 assessed; wound edges well approximated."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 ASSESSED",
+          "print_name": "Incision And Flap #3 Assessed",
+          "description": "Incision and flap wound #3 assessed."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 ERYTHEMA",
+          "print_name": "Incision And Flap #3-Surrounding Tissue Erythema",
+          "description": "Incision and flap #3 assessed; surrounding tissue with erythema."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 INDURATION",
+          "print_name": "Incision And Flap #3-Surrounding Tissue Induration",
+          "description": "Incision and flap #3 assessed; surrounding tissue with induration."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 INTACT",
+          "print_name": "Incision And Flap #3-Surrounding Tissue-Intact",
+          "description": "Incision and flap #3 assessed; surrounding tissue intact."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 MACERATION",
+          "print_name": "Incision And Flap #3-Surrounding Tissue Maceration",
+          "description": "Incision and flap #3 assessed; surrounding tissue with maceration."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 OPEN/DEHISCED",
+          "print_name": "Incision And Flap #3-Wound Open/Dehisced",
+          "description": "Incision and flap #3 assessed; wound open/dehisced."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 TEMP CHANGE",
+          "print_name": "Incision And Flap #3-Surrounding Tissue Temp",
+          "description": "Incision and flap #3 assessed; surrounding tissue surface temperature change."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 UNABLE",
+          "print_name": "Incision And Flap #3-Unable To Visualize",
+          "description": "Incision and flap #3 assessed; unable to visualize."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #3 WELL APPROX",
+          "print_name": "Incision And Flap #3-Edge Well Approximated",
+          "description": "Incision and flap #3 assessed; wound edges well approximated."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 ASSESSED",
+          "print_name": "Incision And Flap #4 Assessed",
+          "description": "Incision and flap wound #4 assessed."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 ERYTHEMA",
+          "print_name": "Incision And Flap #4-Surrounding Tissue Erythema",
+          "description": "Incision and flap #4 assessed; surrounding tissue with erythema."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 INDURATION",
+          "print_name": "Incision And Flap #4-Surrounding Tissue Induration",
+          "description": "Incision and flap #4 assessed; surrounding tissue with induration."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 INTACT",
+          "print_name": "Incision And Flap #4-Surrounding Tissue-Intact",
+          "description": "Incision and flap #4 assessed; surrounding tissue intact."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 MACERATION",
+          "print_name": "Incision And Flap #4-Surrounding Tissue Maceration",
+          "description": "Incision and flap #4 assessed; surrounding tissue with maceration."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 OPEN/DEHISCED",
+          "print_name": "Incision And Flap #4-Wound Open/Dehisced",
+          "description": "Incision and flap #4 assessed; wound open/dehisced."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 TEMP CHANGE",
+          "print_name": "Incision And Flap #4-Surrounding Tissue Temp",
+          "description": "Incision and flap #4 assessed; surrounding tissue surface temperature change."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 UNABLE",
+          "print_name": "Incision And Flap #4-UnableTo Visualize",
+          "description": "Incision and flap #4 assessed; unable to visualize."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP #4 WELL APPROX",
+          "print_name": "Incision And Flap #4-Edge Well Approximated",
+          "description": "Incision and flap #4 assessed; wound edges well approximated."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN AMBER",
+          "print_name": "Incision And Flap-Drainage Color Amber",
+          "description": "Incision and flap-drainage color amber."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN COLORLESS",
+          "print_name": "Incision And Flap-Drainage Color Colorless",
+          "description": "Incision and flap assessed; drainage color colorless."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN GREEN",
+          "print_name": "Incision And Flap-Drainage Color Green",
+          "description": "Incision and flap assessed; drainage color green."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN LARGE",
+          "print_name": "Incision And Flap-Drainage Amount Large",
+          "description": "Incision and flap assessed; wound with large amount of drainage."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN MODERATE",
+          "print_name": "Incision And Flap-Drainage Amount Moderate",
+          "description": "Incision and flap assessed; wound with moderate amount of drainage."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN PURULENT",
+          "print_name": "Incision And Flap-Drainage Purulent",
+          "description": "Incision and flap assessed; drainage characteristics purulent."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN RED",
+          "print_name": "Incision And Flap-Drainage Color Red",
+          "description": "Incision and flap assessed; drainage color red."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN SANG",
+          "print_name": "Incision And Flap-Drainage Sanguineous",
+          "description": "Incision and flap assessed; drainage characteristics sanguineous."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN SCANT",
+          "print_name": "Incision And Flap-Drainage Amount Scant",
+          "description": "Incision and flap assessed; wound with scant amount of drainage."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN SERO-PURUL",
+          "print_name": "Incision And Flap-Drainage Sero-Purulent",
+          "description": "Incision and flap assessed; drainage characteristics sero-purulent."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN SEROSANG",
+          "print_name": "Incision And Flap-Drainage Serosanguineous",
+          "description": "Incision and flap assessed; drainage characteristics serosanguineous."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN SEROUS",
+          "print_name": "Incision And Flap-Drainage Serous",
+          "description": "Incision and flap assessed; drainage characteristics serous."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN SMALL",
+          "print_name": "Incision And Flap-Drainage Amount Small",
+          "description": "Incision and flap assessed; wound with small amount of drainage."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN TAN",
+          "print_name": "Incision And Flap-Drainage Color Tan",
+          "description": "Incision and flap assessed; drainage color tan."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAIN VISCOUS",
+          "print_name": "Incision And Flap-Drainage Viscous",
+          "description": "Incision and flap assessed; drainage characteristics viscous."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAINAGE NO",
+          "print_name": "Incision And Flap-No Drainage",
+          "description": "Incision and flap assessed; no wound drainage."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP DRAINAGE YES",
+          "print_name": "Incision And Flap-Yes Drainage",
+          "description": "Incision and flap assessed; wound drainage present."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP FLAP #1 IN PLACE",
+          "print_name": "Incision And Flap-Flap In Place #1",
+          "description": "Incision and flap assessed; wound free flap in place #1."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP FLAP #2 IN PLACE",
+          "print_name": "Incision And Flap-Flap In Place #2",
+          "description": "Incision and flap assessed; wound free flap in place #2."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP FLAP #3 IN PLACE",
+          "print_name": "Incision And Flap-Flap In Place #3",
+          "description": "Incision and flap assessed; wound free flap in place #3."
+        },
+        {
+          "name": "VA-VAAES INCISION/FLAP FLAP #4 IN PLACE",
+          "print_name": "Incision And Flap-Flap In Place #4",
+          "description": "Incision and flap assessed; wound free flap in place #4."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND BED EPITH",
+          "print_name": "Other Wound Bed Tissue Type: Epithelization",
+          "description": "Other wound wound bed tissue type characterized as epithelization tissue."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND BED ESCHAR",
+          "print_name": "Other Wound Bed Tissue Type: Eschar",
+          "description": "Other wound wound bed tissue type characterized as thick, coagulated crust which develops following a thermal burn or chemical or physical cauterization of the skin."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND BED GRANULATION",
+          "print_name": "Other Wound Wound Bed Tissue Type: Granulation",
+          "description": "Other wound wound bed tissue type characterized as the formation of minute, rounded, fleshy connective tissue projections on the surface of a wound, ulcer, or inflamed tissue surface in the process of healing."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND BED NECROTIC",
+          "print_name": "Other Wound Wound Bed Tissue Type: Necrotic",
+          "description": "Other wound wound bed tissue type characterized as anything other than granulation, necrotic, eschar, slough, and/or other."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND BED SLOUGH",
+          "print_name": "Other Wound Wound Bed Tissue Type: Slough",
+          "description": "Other wound wound bed tissue type characterized as slough."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND DRAIN COLOR AMBER",
+          "print_name": "Other Wound Drainage Is Amber",
+          "description": "Other wound drainage is amber."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND DRAIN COLOR RED",
+          "print_name": "Other Wound Drainage Is Red",
+          "description": "Other wound drainage is red."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI CREPITUS",
+          "print_name": "Other Peri-Wound Assessed Skin Status: Crepitus",
+          "description": "Other peri-wound assessed skin status: crepitus (crunchy, crackling upon palpation)."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI ERYTH BLANCH",
+          "print_name": "Other Peri-Wound Assessed Skin Status: Erythema Blanchable",
+          "description": "Other peri-wound assessed skin status: erythema blanchable."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI ERYTH NON-BLAN",
+          "print_name": "Other Peri-Wound Assessed Skin Status: Erythema Non-Blanchable",
+          "description": "Other peri-wound assessed skin status: erythema non-blanchable."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI FLUCTUANCE",
+          "print_name": "Other Peri-Wound Assessed Skin Status: Fluctuance",
+          "description": "Other peri-wound assessed skin status: fluctuance."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI INDURATION",
+          "print_name": "Other Peri-Wound Assessed Skin Status: Induration",
+          "description": "Other peri-wound assessed skin status: induration (hardness)."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI INTACT",
+          "print_name": "Other Peri-Wound Assessed Skin Status: Intact",
+          "description": "Other peri-wound assessed skin status: intact."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI MACERATION",
+          "print_name": "Other Peri-Wound Assessed Skin Status: Maceration",
+          "description": "Other peri-wound assessed skin status: maceration."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI SKIN TEMP",
+          "print_name": "Other Peri-Wound Assessed Skin Temperature",
+          "description": "Other peri-wound assessed skin temperature assessed."
+        },
+        {
+          "name": "VA-VAAES OTHER WOUND PERI USUAL FOR ETH",
+          "print_name": "Other Peri-Wound Assessed Skin Status: Usual For Ethnicity",
+          "description": "Other peri-wound assessed skin status: usual for ethnicity."
+        },
+        {
+          "name": "VA-VAAES SKIN INSPECTION PU/PI NEW",
+          "print_name": "New Pressure Ulcer/Injury Since Previous Assessment",
+          "description": "A new pressure ulcer/injury has been documented since the previous assessment."
+        },
+        {
+          "name": "VA-VAAES SKIN INSPECTION/ASSESSMENT V3.2",
+          "print_name": "VA-VAAES Skin Inspection Assessment V3.2",
+          "description": "VA-VAAES Skin Inspection Assessment v3.2."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY ABRASION",
+          "print_name": "Skin Problem Noted-Abrasion",
+          "description": "Skin problem noted; abrasion."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BITE CANINE",
+          "print_name": "Skin Problem Noted-Canine Bite",
+          "description": "Skin problem noted; canine bite."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BITE FELINE",
+          "print_name": "Skin Problem Noted-Feline Bite",
+          "description": "Skin problem noted; feline bite."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BITE HUMAN",
+          "print_name": "Skin Problem Noted-Human Bite",
+          "description": "Skin problem noted; human bite."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BITE INSECT",
+          "print_name": "Skin Problem Noted-Insect Bite",
+          "description": "Skin problem noted; insect bite."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BITE OTHER",
+          "print_name": "Skin Problem Noted-Other Bite",
+          "description": "Skin problem noted; other bite-subjective."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BITE SNAKE",
+          "print_name": "Skin Problem Noted-Snake Bite",
+          "description": "Skin problem noted; snake bite."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BITE SPIDER",
+          "print_name": "Skin Problem Noted-Spider Bite",
+          "description": "Skin problem noted; spider bite."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BITE TICK",
+          "print_name": "Skin Problem Noted-Tick Bite",
+          "description": "Skin problem noted; tick bite."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BLISTER INTACT",
+          "print_name": "Skin Problem Noted-Blister Intact",
+          "description": "Skin problem noted; blister intact."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BLISTER OTHER",
+          "print_name": "Skin Problem Noted-Blister Other",
+          "description": "Skin problem noted; blister other-subjective."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BLISTER UNROOFED",
+          "print_name": "Skin Problem Noted-Blister Unroofed",
+          "description": "Skin problem noted; blister unroofed."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY BLISTER WEEPING",
+          "print_name": "Skin Problem Noted-Blister Weeping",
+          "description": "Skin problem noted; blister weeping."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY INTACT",
+          "print_name": "Skin Integrity Is Intact",
+          "description": "Skin integrity is intact."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY LACERATION",
+          "print_name": "Skin Problem Noted-Laceration",
+          "description": "Skin problem noted; laceration."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY RASH DIFFUSE",
+          "print_name": "Skin Problem Noted-Rash-Diffuse",
+          "description": "Skin problem noted; diffuse rash."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY RASH GENERALIZED",
+          "print_name": "Skin Problem Noted-Rash-Generalized",
+          "description": "Skin problem noted; generalized rash."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY RASH HIVES",
+          "print_name": "Skin Problem Noted-Rash-Hives",
+          "description": "Skin problem noted; hives rash."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY RASH LOCALIZED",
+          "print_name": "Skin Problem Noted-Rash-Localized",
+          "description": "Skin problem noted; localized rash."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY RASH OTHER",
+          "print_name": "Skin Problem Noted-Rash-Other",
+          "description": "Skin problem noted; other rash."
+        },
+        {
+          "name": "VA-VAAES SKIN INTEGRITY RASH VESICLES",
+          "print_name": "Skin Problem Noted-Rash-Vesicles",
+          "description": "Skin problem noted; vesicle rush."
+        },
+        {
+          "name": "VA-VAAES SKIN PI WOUND BED EPITH",
+          "print_name": "Pressure Injury Wound Bed Tissue Type: Epithelization",
+          "description": "Pressure ulcer/injury wound bed tissue type characterized as epithelization tissue."
+        },
+        {
+          "name": "VA-VAAES SKIN PI WOUND BED ESCHAR",
+          "print_name": "Pressure Injury Wound Bed Tissue Type: Eschar/Slough",
+          "description": "Pressure injury wound bed tissue type characterized as thick, coagulated crust or slough which develops following a thermal burn or chemical or physical cauterization of the skin."
+        },
+        {
+          "name": "VA-VAAES SKIN PI WOUND BED GRANULATION",
+          "print_name": "Pressure Injury Wound Bed Tissue Type: Granulation",
+          "description": "Pressure Injury wound bed tissue type characterized as the formation of minute, rounded, fleshy connective tissue projections on the surface of a wound, ulcer, or inflamed tissue surface in the process of healing."
+        },
+        {
+          "name": "VA-VAAES SKIN PI WOUND BED NECROTIC",
+          "print_name": "Pressure Injury Wound Bed Tissue Type: Necrotic",
+          "description": "Pressure Injury wound bed tissue type characterized as containing necrotic (dead) tissue."
+        },
+        {
+          "name": "VA-VAAES SKIN PI WOUND BED SLOUGH",
+          "print_name": "Pressure Injury Wound Bed Tissue Type: Slough",
+          "description": "Pressure injury wound bed tissue type characterized as yellow white material in the wound bed. Wet or dry, thin or thick with soft texture. Adhered to wound bed as dead cells,"
+        },
+        {
+          "name": "VA-VAAES SKIN TELEHEALTH/VIRTUAL",
+          "print_name": "Skin Inspection/Assessment Completed During Telehealth Visit",
+          "description": "Skin inspection/assessment completed during telehealth/virtual visit."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG ANTI-MC",
+          "print_name": "Incision And Flap-Dressing Antimicrobial",
+          "description": "Incision and flap; dressing antimicrobial."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG CHG PER ORDER",
+          "print_name": "Skin/Wound Dressing Change Per Order",
+          "description": "Skin/wound dressing change per order."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG CLEAN",
+          "print_name": "Skin/Wound Dressing Clean",
+          "description": "Skin/wound dressing clean."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG DRY",
+          "print_name": "Skin/Wound Dressing Dry",
+          "description": "Skin/wound dressing dry."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG FOAM DRSG",
+          "print_name": "Incision And Flap-Dressing Foam Dressing",
+          "description": "Incision and flap; dressing foam dressing."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG GAUZE",
+          "print_name": "Incision And Flap-Dressing Gauze",
+          "description": "Incision and flap; dressing gauze."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG GAUZE WRAP",
+          "print_name": "Incision And Flap-Dressing Gauze Wrap",
+          "description": "Incision and flap; dressing gauze wrap."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG INTACT",
+          "print_name": "Skin/Wound Dressing Intact",
+          "description": "Skin/wound dressing intact."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG LOCATION 1",
+          "print_name": "Skin/Wound Dressing Location #1",
+          "description": "Skin/wound dressing location #1."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG LOCATION 2",
+          "print_name": "Skin/Wound Dressing Location #2",
+          "description": "Skin/wound dressing location #2."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG LOCATION 3",
+          "print_name": "Skin/Wound Dressing Location #3",
+          "description": "Skin/wound dressing location #3."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG LOCATION 4",
+          "print_name": "Skin/Wound Dressing Location #4",
+          "description": "Skin/wound dressing location #4."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG LOCATION 5",
+          "print_name": "Skin/Wound Dressing Location #5",
+          "description": "Skin/wound dressing location #5."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG NEG PRESSURE",
+          "print_name": "Skin/Wound Dressing Negative Pressure",
+          "description": "Skin/wound dressing negative pressure wound therapy."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG NON-ADHERING",
+          "print_name": "Non-Adherent Dressing Used",
+          "description": "Non-adherent dressing used for wound."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG OPEN TO AIR",
+          "print_name": "Incision And Flap-Dressing Open To Air",
+          "description": "Incision and flap; dressing open to air."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG REINFORCED",
+          "print_name": "Skin/Wound Dressing Reinforced",
+          "description": "Skin/wound dressing reinforced."
+        },
+        {
+          "name": "VA-VAAES SKIN/WOUND DRSG TRANSPARENT",
+          "print_name": "Incision And Flap-Dressing Transparent",
+          "description": "Incision and flap; dressing transparent."
+        },
+        {
+          "name": "VA-VAAES WOUND BED BLOOD FILLED",
+          "print_name": "Wound Bed Status Deep Tissue: Blood Filled",
+          "description": "Patients deep tissue wound bed is blood filled blister."
+        },
+        {
+          "name": "VA-VAAES WOUND BED EPIDERMAL SEPARATION",
+          "print_name": "Wound Bed Status Deep Tissue: Epidermal Separation",
+          "description": "Patients deep tissue wound bed has epidermal separation revealing a dark wound bed."
+        },
+        {
+          "name": "VA-VAAES WOUND BED MAROON",
+          "print_name": "Wound Bed Status Deep Tissue: Maroon/Purple",
+          "description": "Patients deep tissue wound bed is maroon/purple discoloration."
+        },
+        {
+          "name": "VA-VAAES WOUND BED NON-BLANCHABLE",
+          "print_name": "Wound Bed Status Deep Tissue: Non-Blanchable",
+          "description": "Patients deep tissue wound bed is non-blanchable and deep red."
+        },
+        {
+          "name": "VA-VAAES WOUND TYPE FULL THICKNESS",
+          "print_name": "Wound Type Full Thickness",
+          "description": "Wound type identified as full thickness; skin loss or damage to, or necrosis of, subcutaneous tissue."
+        },
+        {
+          "name": "VA-VAAES WOUND TYPE PARTIAL THICKNESS",
+          "print_name": "Wound Type Partial Thickness",
+          "description": "Wound type identified as partial thickness: skin loss involves epidermis, dermis, or both."
+        },
+        {
+          "name": "WOUND CLOCKFACE POSITION",
+          "print_name": "Clockface Position Of The Wound",
+          "description": "Clockface position of the wound."
+        },
+        {
+          "name": "WOUND DRAINAGE",
+          "print_name": "Wound Has Drainage",
+          "description": "Wound has drainage."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "SKIN HIGH RISK FACTORS [C]",
+      "short_name": "SKIN HIGH RISK FACTORS",
+      "health_factors": [
+        {
+          "name": "AGE OVER 75",
+          "print_name": "High Risk For Skin Breakdown Due To Age",
+          "description": "High risk for skin breakdown due to age."
+        },
+        {
+          "name": "AMPUTEE",
+          "print_name": "High Risk For Skin Breakdown Due To Amputee Status",
+          "description": "High risk for skin breakdown due to amputee status."
+        },
+        {
+          "name": "MALNUTRITION DIAGNOSIS",
+          "print_name": "High Risk For Skin Breakdown Due To Malnutrition Diagnosis",
+          "description": "High risk for skin breakdown due to malnutrition diagnosis."
+        },
+        {
+          "name": "MED DEVICE PI DEEP TISSUE",
+          "print_name": "Deep Tissue Pressure Injury Caused By A Medical Device",
+          "description": "Deep tissue pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI DEEP TISSUE FIFTH",
+          "print_name": "Fifth Deep Tissue Pressure Injury Caused By A Medical Device",
+          "description": "Fifth deep tissue pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI DEEP TISSUE FOURTH",
+          "print_name": "Fourth Deep Tissue Pressure Injury Caused By A Medical Device",
+          "description": "Fourth deep tissue pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI DEEP TISSUE SECOND",
+          "print_name": "Second Deep Tissue Pressure Injury Caused By A Medical Device",
+          "description": "Second deep tissue pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI DEEP TISSUE THIRD",
+          "print_name": "Third Deep Tissue Pressure Injury Caused By A Medical Device",
+          "description": "Third deep tissue pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI MUCOSAL MEMBRANE",
+          "print_name": "Mucosal Membrane Pressure Injury Caused By A Medical Device",
+          "description": "Mucosal Membrane pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI MUCOSAL MEMBRANE FIFTH",
+          "print_name": "Fifth Mucosal Membrane Pressure Injury Caused By A Med Device",
+          "description": "Fifth mucosal Membrane pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI MUCOSAL MEMBRANE FOURTH",
+          "print_name": "Fourth Mucosal Membrane Pressure Injury Caused By A Med Device",
+          "description": "Fourth mucosal Membrane pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI MUCOSAL MEMBRANE SECOND",
+          "print_name": "Second Mucosal Membrane Pressure Injury Caused By A Med Device",
+          "description": "Second mucosal Membrane pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI MUCOSAL MEMBRANE THIRD",
+          "print_name": "Third Mucosal Membrane Pressure Injury Caused By A Med Device",
+          "description": "Third mucosal Membrane pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 1",
+          "print_name": "Stage One Pressure Injury Caused By A Medical Device",
+          "description": "Stage one pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 1 FIFTH",
+          "print_name": "Fifth Stage One Pressure Injury Caused By A Medical Device",
+          "description": "Fifth stage one pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 1 FOURTH",
+          "print_name": "Fourth Stage One Pressure Injury Caused By A Medical Device",
+          "description": "Fourth stage one pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 1 SECOND",
+          "print_name": "Second Stage One Pressure Injury Caused By A Medical Device",
+          "description": "Second stage one pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 1 THIRD",
+          "print_name": "Third Stage One Pressure Injury Caused By A Medical Device",
+          "description": "Third stage one pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 2",
+          "print_name": "Stage Two Pressure Injury Caused By A Medical Device",
+          "description": "Stage two pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 2 FIFTH",
+          "print_name": "Fifth Stage Two Pressure Injury Caused By A Medical Device",
+          "description": "Fifth stage two pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 2 FOURTH",
+          "print_name": "Fourth Stage Two Pressure Injury Caused By A Medical Device",
+          "description": "Fourth stage two pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 2 SECOND",
+          "print_name": "Second Stage Two Pressure Injury Caused By A Medical Device",
+          "description": "Second stage two pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 2 THIRD",
+          "print_name": "Third Stage Two Pressure Injury Caused By A Medical Device",
+          "description": "Third stage two pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 3",
+          "print_name": "Stage Three Pressure Injury Caused By A Medical Device",
+          "description": "Stage three pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 3 FIFTH",
+          "print_name": "Fifth Stage Three Pressure Injury Caused By A Medical Device",
+          "description": "Fifth stage three pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 3 FOURTH",
+          "print_name": "Fourth Stage Three Pressure Injury Caused By A Medical Device",
+          "description": "Fourth stage three pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 3 SECOND",
+          "print_name": "Second Stage Three Pressure Injury Caused By A Medical Device",
+          "description": "Second stage three pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 3 THIRD",
+          "print_name": "Third Stage Three Pressure Injury Caused By A Medical Device",
+          "description": "Third stage three pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 4",
+          "print_name": "Stage Four Pressure Injury Caused By A Medical Device",
+          "description": "Stage four pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 4 FIFTH",
+          "print_name": "Fifth Stage Four Pressure Injury Caused By A Medical Device",
+          "description": "Fifth stage four pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 4 FOURTH",
+          "print_name": "Fourth Stage Four Pressure Injury Caused By A Medical Device",
+          "description": "Fourth stage four pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 4 SECOND",
+          "print_name": "Second Stage Four Pressure Injury Caused By A Medical Device",
+          "description": "Second stage four pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI STAGE 4 THIRD",
+          "print_name": "Third Stage Four Pressure Injury Caused By A Medical Device",
+          "description": "Third stage four pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI UNSTAGEABLE",
+          "print_name": "Unstageable Pressure Injury Caused By A Medical Device",
+          "description": "Unstageable pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI UNSTAGEABLE FIFTH",
+          "print_name": "Fifth Unstageable Pressure Injury Caused By A Medical Device",
+          "description": "Fifth unstageable pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI UNSTAGEABLE FOURTH",
+          "print_name": "Fourth Unstageable Pressure Injury Caused By A Medical Device",
+          "description": "Fourth unstageable pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI UNSTAGEABLE SECOND",
+          "print_name": "Second Unstageable Pressure Injury Caused By A Medical Device",
+          "description": "Second unstageable pressure injury caused by a medical device."
+        },
+        {
+          "name": "MED DEVICE PI UNSTAGEABLE THIRD",
+          "print_name": "Third Unstageable Pressure Injury Caused By A Medical Device",
+          "description": "Third unstageable pressure injury caused by a medical device."
+        },
+        {
+          "name": "MEDICAL DEVICE",
+          "print_name": "High Risk For Skin Breakdown Due To Medical Device",
+          "description": "High risk for skin breakdown due to medical device."
+        },
+        {
+          "name": "NEUROPATHY",
+          "print_name": "High Risk For Skin Breakdown Due To Neuropathy",
+          "description": "High risk for skin breakdown due to neuropathy."
+        },
+        {
+          "name": "POTENTIAL COMPROMISED NUTRITION",
+          "print_name": "High Risk For Skin Breakdown-Potential Compromised Nutrition",
+          "description": "High risk for skin breakdown due to potential compromised nutrition."
+        },
+        {
+          "name": "SKIN HIGH RISK OTHER",
+          "print_name": "High Risk For Skin Breakdown Due To Other",
+          "description": "High risk for skin breakdown due to other  - subjective."
+        },
+        {
+          "name": "VASCULAR SURGERY OR VASCULAR DISEASE",
+          "print_name": "High Risk For Skin Breakdown Due To Vascular Surgery Or Disease",
+          "description": "High risk for skin breakdown due to vascular surgery or disease."
+        },
+        {
+          "name": "VA-VAAES PI RISK PREVIOUS HISTORY",
+          "print_name": "Pressure Injury Risk: Current Or Previous Pressure Injury/Ulcer",
+          "description": "Patient has previous or current pressure ulcer/injury."
+        },
+        {
+          "name": "VA-VAAES SKIN RISK FACTOR NO",
+          "print_name": "No Skin Risk Factors Identified",
+          "description": "No skin risk factors identified."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VANOD SKIN REMINDER TERMS [C]",
+      "short_name": "VANOD SKIN REMINDER TERMS",
+      "health_factors": [
+        {
+          "name": "VANOD SKIN INITIAL",
+          "print_name": "VA Nursing Outcomes Database-Initial Skin Assessment",
+          "description": "VA Nursing Outcomes Database-Initial skin assessment."
+        },
+        {
+          "name": "VANOD SKIN REASSESSMENT",
+          "print_name": "VA Nursing Outcomes Database-Skin Reassessment",
+          "description": "VA Nursing Outcomes Database-Skin Reassessment."
+        },
+        {
+          "name": "VANOD UNABLE TO ASSESS",
+          "print_name": "Unable To Assess Skin",
+          "description": "Unable to assess skin."
+        },
+        {
+          "name": "VANOD UNABLE TO ASSESS OTHER",
+          "print_name": "Unable To Assess Skin Other",
+          "description": "Unable to assess skin other."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES GASTRO [C]",
+      "short_name": "GASTRO",
+      "health_factors": [
+        {
+          "name": "VA-VAAES GASTRO OST LOCATION",
+          "print_name": "Gi Ostomy Location",
+          "description": "GI Ostomy location write in response."
+        },
+        {
+          "name": "VA-VAAES GASTRO OSTOMY MGN HYGIENE COMP",
+          "print_name": "Gi Ostomy Hygiene Completed",
+          "description": "GI ostomy hygiene completed."
+        },
+        {
+          "name": "VA-VAAES GASTRO OSTOMY MGN POUCH CHANGED",
+          "print_name": "Gi Ostomy Pouch Changed",
+          "description": "GI ostomy pouch changed."
+        },
+        {
+          "name": "VA-VAAES GASTRO OSTOMY MGN WAFER CHANGED",
+          "print_name": "Gi Ostomy Wafer Changed",
+          "description": "GI ostomy wafer changed."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST COLOSTOMY",
+          "print_name": "GI Ostomy Type: Colostomy",
+          "description": "GI ostomy type documented as colostomy."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST ILEOSTOMY",
+          "print_name": "GI Ostomy Type: Ileostomy",
+          "description": "GI Ostomy type documented as ileostomy."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST OSTOMY",
+          "print_name": "GI Ostomy",
+          "description": "Documented gastrointestinal ostomy."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST OTHER",
+          "print_name": "GI Ostomy Type: Other",
+          "description": "GI Ostomy type documented as other write in response."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST PT PERF ASSIST",
+          "print_name": "GI Ostomy Care: With Assistance",
+          "description": "Patient performs GI ostomy care with assistance."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST PT PERF ASST DEV",
+          "print_name": "GI Ostomy Care: With Assistive Device",
+          "description": "Patient performs GI ostomy care with assistive device."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST PT PERF IND",
+          "print_name": "GI Ostomy Care: Independent",
+          "description": "Patient performs GI ostomy care independently."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST PT PERF OTHER",
+          "print_name": "GI Ostomy Care: Other",
+          "description": "Patient performs GI ostomy care other write in response."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST PT PERF TOT ASST",
+          "print_name": "GI Ostomy Care: With Total Assistance",
+          "description": "Patient performs GI ostomy care with total assistance."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST STOMA EST",
+          "print_name": "GI Stoma Is Established",
+          "description": "GI Stoma is documented as established."
+        },
+        {
+          "name": "VA-VAAES GASTRO SUP OST STOMA NEW",
+          "print_name": "GI Stoma Is New",
+          "description": "GI Stoma is documented as new."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES PRESSURE INJURY INTERVENTIONS [C]",
+      "short_name": "PRESSURE INJURY INTERVENTIONS",
+      "health_factors": [
+        {
+          "name": "VA-VAAES PRESSURE INJURY INT NO CHANGE",
+          "print_name": "Pressure Injury Interventions-No Change",
+          "description": "Pressure Injury Interventions-No change."
+        },
+        {
+          "name": "VA-VAAES PRESSURE INJURY INT NOT NEEDED",
+          "print_name": "Pressure Injury Interventions-Not Needed",
+          "description": "Pressure Injury Interventions-Not needed."
+        },
+        {
+          "name": "VA-VAAES PRESSURE INJURY INTERVENTION",
+          "print_name": "Pressure Injury Interventions-New Or Change Interventions",
+          "description": "Pressure Injury Interventions-New or Change interventions."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES URO [C]",
+      "short_name": "URO",
+      "health_factors": [
+        {
+          "name": "VA-VAAES URO ADD OST",
+          "print_name": "GU Ostomy",
+          "description": "Documented genitourinary ostomy (HEADER)."
+        },
+        {
+          "name": "VA-VAAES URO ADD OST CYSTOSTOMY",
+          "print_name": "GU Ostomy Type: Cystostomy",
+          "description": "GU ostomy type documented as cystostomy."
+        },
+        {
+          "name": "VA-VAAES URO ADD OST ILEAL CONDUIT",
+          "print_name": "GU Ostomy Type: Ileal Conduit",
+          "description": "GU ostomy type documented as ileal conduit."
+        },
+        {
+          "name": "VA-VAAES URO ADD OST OTHER",
+          "print_name": "GU Ostomy Type: Other",
+          "description": "GU ostomy type documented as other write in response."
+        },
+        {
+          "name": "VA-VAAES URO ADD OST PT PERF ASSIST",
+          "print_name": "Patient Performs Ostomy Care With Assistance",
+          "description": "Patient performs ostomy care with assistance."
+        },
+        {
+          "name": "VA-VAAES URO ADD OST PT PERF IND",
+          "print_name": "Patient Performs Ostomy Care Independently",
+          "description": "Patient performs ostomy care independently."
+        },
+        {
+          "name": "VA-VAAES URO ADD OST PT PERF OTHER",
+          "print_name": "Patient Ostomy Care Other",
+          "description": "Patient ostomy care other write in response."
+        },
+        {
+          "name": "VA-VAAES URO ADD OST PT PERF TOT ASST",
+          "print_name": "Patient Performs Ostomy Care With Total Assist",
+          "description": "Patient performs ostomy care with total assistance."
+        },
+        {
+          "name": "VA-VAAES URO ADD OST UROSTOMY",
+          "print_name": "GU Ostomy Type: Urostomy",
+          "description": "GU ostomy type documented as urostomy."
+        },
+        {
+          "name": "VA-VAAES URO OST LOCATION",
+          "print_name": "GU Ostomy Location",
+          "description": "GU ostomy location documented as a write in response."
+        },
+        {
+          "name": "VA-VAAES URO OST STOMA EST",
+          "print_name": "GU Ostomy Stoma Is Established",
+          "description": "GU Ostomy stoma is documented established."
+        },
+        {
+          "name": "VA-VAAES URO OST STOMA NEW",
+          "print_name": "GU Ostomy Stoma Is New",
+          "description": "GU Ostomy stoma documented as new."
+        },
+        {
+          "name": "VA-VAAES URO OSTOMY MGN HYGIENE COMP",
+          "print_name": "GU Ostomy Hygiene Completed",
+          "description": "Documented GU ostomy hygiene completed."
+        },
+        {
+          "name": "VA-VAAES URO OSTOMY MGN POUCH CHANGED",
+          "print_name": "GU Ostomy Pouch Changed",
+          "description": "Documented GU Ostomy pouch changed."
+        },
+        {
+          "name": "VA-VAAES URO OSTOMY MGN WAFER CHANGED",
+          "print_name": "GU Ostomy Wafer Changed",
+          "description": "Documented GU ostomy wafer changed."
+        }
+      ]
+    }
+  ]
+}
