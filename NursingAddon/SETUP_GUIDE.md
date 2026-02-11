@@ -415,9 +415,103 @@ mapping from the `ORQQPXRM DIALOG PROMPTS` RPC when the dialog opened).
 5. Call `ORWPCE SAVE` with the complete PCE list
 This is significantly more complex but also more robust and faster.
 
-**Recommended approach:** Start with GUI automation (Tier 2 in the workflows
-section). It's simpler, it's what CPRSBooster does, and it ensures health
-factors are filed correctly because you're letting CPRS handle the data layer.
+**Recommended approach:** GUI automation via companion panel. The addon clicks
+the same checkboxes a nurse would, so CPRS handles the health factor data layer
+correctly. But instead of the nurse scrolling through a 1,251-checkbox form, they
+interact with a compact 28-category panel and let the addon translate their
+selections into checkbox clicks via Win32 `SendMessage(hwnd, BM_CLICK, 0, 0)`.
+
+---
+
+## 4d. VAAES Shift Assessment Structure (From Spreadsheet)
+
+The VAAES Acute Inpatient Nsg Shift Assessment has **28 body system categories**
+containing **1,279 total health factors**. This is why it's so tedious to fill
+out manually — each category expands into dozens of nested checkboxes.
+
+See `NursingAddon/vaaes_shift_assessment_map.json` for the complete mapping
+extracted from the health factors spreadsheet.
+
+| Category | Health Factors | Notes |
+|----------|---------------|-------|
+| MORSE FALL SCALE SCORE | 3 | High/moderate/low risk |
+| POSITIONING | 5 | Lying L/R, prone, sitting, supine |
+| ADL | 62 | Dressing, eating, pericare, toileting, personal care, foot care |
+| CARDIO | 66 | HR/rhythm, pulses, cap refill, edema, embolism prevention, pacing |
+| DRAIN | 45 | Drains/tubes 1-4, types, drainage methods |
+| EDU | 24 | Education methods, provided to, understanding |
+| EDUCATION NEEDS | 17 | Learning barriers, teaching strategies |
+| ENVIRON SAFETY MGMT | 36 | Safety equipment, precautions |
+| FREQ | 44 | Frequent documentation items |
+| GASTRO | 56 | Bowel sounds, diet, tubes, nausea, stool |
+| GEN INFO | 10 | General patient information |
+| ID RISK | 7 | Identification risk factors |
+| LINE | 274 | IV lines 1-8, central lines, PICC, arterial, types, sites |
+| MOB | 100 | Mobility, transfers, bed mobility, ambulation |
+| NEURO | 114 | LOC, orientation, pupils, speech, cranial nerves, motor, sensory |
+| NEURO AVPU | 4 | Alert, verbal, pain, unresponsive |
+| NEURO/EXT | 16 | Extremity neuro assessment |
+| ORAL CARE | 21 | Oral assessment and care |
+| PAIN | 72 | Pain assessment, location, quality, interventions |
+| PSYCH | 1 | Psychosocial header |
+| RESP | 198 | Breath sounds, O2, airway, ventilator, chest tubes, trach |
+| SUICIDE | 6 | Suicide risk screening |
+| URO | 79 | Urinary output, catheter, bladder scan |
+
+Also generated: `vaaes_freq_doc_map.json` (35 categories, 608 HFs) and
+`vaaes_skin_assessment_map.json` (14 categories, 371 HFs).
+
+### Why a Companion Panel, Not Click Automation
+
+Pure click automation (scrolling through and clicking each checkbox) is
+impractical for 1,279 health factors. The dialogue has:
+- Nested elements that only appear when parents are clicked (triggering RPCs)
+- A long scrolling TScrollBox that would need programmatic scrolling
+- Conditional sub-sections that vary by patient
+
+The companion panel approach works differently:
+1. You open the VAAES dialogue in CPRS normally
+2. Your addon shows a compact panel with all 28 categories as buttons
+3. Click **"All WNL"** — the addon clicks all "within normal limits" checkboxes
+   in the CPRS dialogue using `SendMessage(hwnd, BM_CLICK, 0, 0)` which works
+   even for controls scrolled off-screen
+4. Toggle any category to **"Abnormal"** and specify details
+5. Click **"Apply"** — the addon adjusts only the changed sections
+6. You review in CPRS and click Finish yourself
+
+The companion panel doesn't need to know about health factor IENs because it
+lets CPRS handle all the data plumbing. It just needs to know which checkbox
+labels correspond to which body system categories — and that's what the JSON
+config files provide.
+
+### Runtime Control Discovery
+
+The addon discovers checkboxes at runtime by:
+1. Finding the `TfrmRemDlg` window (the reminder dialogue)
+2. Enumerating `TCPRSDialogParentCheckBox` controls in the `TScrollBox`
+3. Reading each checkbox's associated `TDlgFieldPanel` text to determine
+   what it represents (the checkbox's own Caption is cleared to `' '` — the
+   visible text is in the panel, per `uReminders.pas:5750-5754`)
+4. Matching panel text against the body system category names from the JSON config
+
+This means the addon adapts to whatever version of the VAAES dialogue is
+installed — it doesn't hardcode control positions or IDs.
+
+### The Nested Element Problem
+
+When a parent checkbox is clicked, CPRS:
+1. Calls `SetChecked(true)` which calls `GetData` (an RPC to VistA)
+2. Rebuilds the control tree via `BuildControls` to show child elements
+
+The addon handles this by:
+1. Clicking all parent checkboxes first (to expand all sections)
+2. Waiting briefly for RPC responses and control rebuilds (~200ms per section)
+3. Then enumerating the now-visible child controls
+4. Clicking the appropriate "WNL" children
+
+For the "stop and edit" workflow: the addon can apply sections one at a time.
+If you mark RESP as abnormal, the addon skips that section entirely, leaving it
+for you to fill in manually while it handles the other 27 categories.
 
 ---
 
