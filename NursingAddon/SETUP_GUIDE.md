@@ -214,6 +214,213 @@ to import full VA content.
 
 ---
 
+## 4b. VAAES PRD Files -- What's Available for Download
+
+The following VAAES PRD files are publicly available on the FOIA mirror at:
+`https://foia-vista.worldvista.org/Patches_By_Application/PXRM-CLINICAL%20REMINDERS/PRD-Files/`
+
+| PRD File | Content | Size |
+|----------|---------|------|
+| `UPDATE_2_0_102 VAAES SKIN INSPECTION-ASSESSMENT.PRD` | Skin assessment (original) | 607K |
+| `UPDATE_2_0_160 VA-AES ACUTE INPATIENT NSG SHIFT ASSESSMENT.PRD` | Shift assessment + frequent documentation + IV insertion | 3.1M |
+| `UPDATE_2_0_174 VAAES TEMPLATE UPDATES.PRD` | Template revisions | 1.0M |
+| `UPDATE_2_0_195 VAAES SKIN INSPECTION-ASSESSMENT UPDATE.PRD` | Skin assessment update | 911K |
+| `UPDATE_2_0_212 VAAES SHIFT ASSESSMENT BUNDLE.PRD` | Updated shift assessment bundle | 4.1M |
+| `UPDATE_2_0_340 VAAES TEMPLATES.PRD` | Template refresh | 2.0M |
+| `UPDATE_2_0_362 VAAES TEMPLATES UPDATE.PRD` | Another template refresh | 4.0M |
+| `UPDATE_2_0_460 VA-VAAES SKIN INSPECTION-ASSESSMENT UPDATE.PRD` | Skin assessment (latest available) | 1.3M |
+
+Install guides (PDFs) are at the VA VDL:
+- Shift Assessment: https://www.va.gov/vdl/documents/Clinical/CPRS-Clinical_Reminders/Update_2_0_160_IG-508.pdf
+- Skin Assessment: https://www.va.gov/vdl/documents/Clinical/CPRS-Clinical_Reminder_Updates/Update_2_0_460_IG-508.pdf
+
+### Important: Version Lag
+
+The FOIA mirror is **significantly behind** what's deployed at VA facilities.
+The current VAAES Acute Inpatient Nsg Shift Assessment in production is **v2.2**
+but the newest publicly available PRD is from the UPDATE_2_0_212 era (~2022).
+The v2.2 was distributed internally via `vaww.va.gov` (VA intranet only).
+
+For addon development, the older versions are structurally similar enough to
+test automation against. The dialogue layout, checkbox patterns, and health
+factor filing mechanism are the same -- only specific field content differs.
+
+---
+
+## 4c. How Reminder Dialogues Actually Work (Source Code Analysis)
+
+Understanding this is critical for building your addon. Reminder dialogues
+produce **two separate outputs** when you click Finish, and health factors are
+the tricky part.
+
+### The Two Outputs
+
+**Output 1: Note Text** -- purely client-side string assembly. Each checked
+checkbox has display text (`FPNText`/`FText`). CPRS concatenates all checked
+items' text with indentation and inserts it into the note's rich text editor.
+No RPC call. Easy to replicate.
+
+**Output 2: PCE Data (Health Factors, Diagnoses, etc.)** -- structured data
+filed into VistA's encounter database. This is the real clinical data. Health
+factors land in the V HEALTH FACTORS file (9000010.23), referencing the master
+HEALTH FACTORS file (9999999.64 / `^AUTTHF` global).
+
+### Complete Data Flow: Checkbox Click to VistA
+
+Source files (all in `Packages/Order Entry Results Reporting/CPRS/CPRS-Chart/`):
+
+```
+uReminders.pas   -- Core classes: TRemDlgElement, TRemData, TRemPrompt
+fReminderDialog.pas -- UI form with Finish button handler (btnFinishClick)
+rReminders.pas   -- RPC calls to VistA
+uPCE.pas         -- PCE data objects (TPCEHealth for health factors)
+rPCE.pas         -- PCE save RPC (ORWPCE SAVE)
+```
+
+#### Step-by-step flow:
+
+```
+1. User clicks a checkbox in the reminder dialogue
+        |
+        v
+2. TRemDlgElement.cbClicked fires (uReminders.pas:4126)
+        |
+        v
+3. SetChecked(true) called (uReminders.pas:3982)
+        |
+        v
+4. GetData called -- lazy-loads finding definitions from VistA
+   RPC: "ORQQPXRM DIALOG PROMPTS"
+   Returns record type 3 data with finding type code
+   For health factors: piece 4 = 'HF'
+        |
+        v
+5. TRemData objects created with type rdtHealthFactor
+   TRemPrompt objects created (ptComment, ptLevelSeverity, etc.)
+        |
+        v
+6. User clicks FINISH (fReminderDialog.pas:1529 btnFinishClick)
+        |
+        v
+7. Phase 1 -- Validation
+   FinishProblems checks for required items, missing fields
+        |
+        v
+8. Phase 2 -- Text Generation (client-side only)
+   TReminderDialog.AddText builds note text from checked elements
+        |
+        v
+9. Phase 3 -- PCE Data Collection
+   TRemDlgElement.AddData -> TRemData.AddData builds delimited strings:
+
+   For health factors, the format is:
+   HF+^<IEN>^<Category>^<Narrative>^<Level>^<Provider>^<Mag>^<UCUM>^^^<CommentSeq>^<GecRem>
+   COM^<Seq>^<CommentText>
+
+   Example:
+   HF+^305^^TOBACCO USE^M^12345^^^^^^1
+   COM^1^Patient states they smoke 1 pack per day
+        |
+        v
+10. Phase 4 -- PCE Data Routing
+    Each data line is parsed into typed objects by category prefix:
+    Health factors -> TPCEHealth -> PCEObj.SetHealthFactors
+    Diagnoses     -> TPCEDiag   -> PCEObj.SetDiagnoses
+    Procedures    -> TPCEProc   -> PCEObj.SetProcedures
+    Exams         -> TPCEExams  -> PCEObj.SetExams
+    Vitals, orders, MH tests go through separate pathways
+        |
+        v
+11. Phase 5 -- Save to VistA
+    PCEObj.Save builds the complete PCE list:
+      HDR^...
+      VST^DT^<DateTime>
+      VST^PT^<PatientDFN>
+      VST^HL^<LocationIEN>
+      HF+^305^^TOBACCO USE^M^12345^^^^^^1
+      COM^1^Patient states they smoke 1 pack per day
+
+    RPC: "ORWPCE SAVE" sends it all to VistA in one call
+    M routine DATA2PCE files into V HEALTH FACTORS (9000010.23)
+        |
+        v
+12. Phase 6 -- Text Insertion (only after save succeeds)
+    Note text inserted into the TIU note rich text editor
+```
+
+### Key Object Model (uReminders.pas)
+
+```
+TReminderDialog
+  +-- FElements: list of TRemDlgElement
+  +-- FPCEDataObj: TPCEData (the encounter)
+
+TRemDlgElement (one checkbox/item in the dialog)
+  +-- FCheckBox: TORCheckBox (the visual control)
+  +-- FData: list of TRemData (the findings)
+  +-- FPrompts: list of TRemPrompt (comment, severity, etc.)
+  +-- FChecked: boolean
+  +-- FText: string (display/note text)
+
+TRemData (one finding attached to an element)
+  +-- FDataType: rdtHealthFactor, rdtDiagnosis, rdtExam, etc.
+  +-- FPCERoot: shared sync object
+  +-- Code: health factor IEN from file 9999999.64
+
+TRemPrompt (a user input control)
+  +-- PromptType: ptComment, ptLevelSeverity, ptQuantity, etc.
+  +-- FValue: current user entry
+```
+
+Data type codes used in exchange:
+```
+POV = Diagnosis       CPT = Procedure      PED = Patient Education
+XAM = Exam            HF  = Health Factor  IMM = Immunization
+SK  = Skin Test       VIT = Vitals         Q   = Order
+MH  = Mental Health   SC  = Standard Code
+```
+
+### All RPCs Used by Reminder Dialogues
+
+| RPC | When Called | Purpose |
+|-----|-----------|---------|
+| `ORQQPXRM REMINDER DIALOG` | Dialog opens | Loads element definitions |
+| `ORQQPXRM DIALOG PROMPTS` | Element checked (lazy) | Loads finding/prompt data |
+| `ORQQPXRM DIALOG ACTIVE` | Dialog opens | Checks element active status |
+| `ORQQPXRM PROGRESS NOTE HEADER` | Finish clicked | Gets "Clinical Maintenance" header |
+| `ORQQPXRM GEC DIALOG` | Finish (HF only) | Geriatric Extended Care check |
+| **`ORWPCE SAVE`** | **Finish** | **Saves ALL PCE data (health factors, diagnoses, etc.)** |
+| `ORQQPXRM MST UPDATE` | Finish (if MST) | Military Sexual Trauma data |
+| `ORQQPXRM REMINDER EVALUATION` | After save | Re-evaluates reminder status |
+| `PXRMRPCG GENFUPD` | Finish (gen findings) | General findings save |
+| `PXRMRPCG CANCEL` | Cancel clicked | Clears server-side temp data |
+
+### Why This Matters for Your Addon
+
+**If you automate at the GUI level** (clicking checkboxes via AutoHotkey or
+PowerShell UIAutomation), CPRS handles ALL of the above internally. You don't
+need to construct `HF+^...` strings or call `ORWPCE SAVE` yourself. You just:
+1. Click the right checkboxes
+2. Fill in any free-text prompts
+3. Click Finish
+...and CPRS does the rest. Health factors get filed correctly because CPRS
+already knows which checkbox maps to which health factor IEN (it loaded that
+mapping from the `ORQQPXRM DIALOG PROMPTS` RPC when the dialog opened).
+
+**If you automate at the RPC level** (bypassing the GUI), you'd need to:
+1. Call `ORQQPXRM REMINDER DIALOG` to get the dialog structure
+2. Determine which elements to "check" programmatically
+3. Call `ORQQPXRM DIALOG PROMPTS` for each to get health factor IENs
+4. Construct the `HF+^...` PCE data strings yourself
+5. Call `ORWPCE SAVE` with the complete PCE list
+This is significantly more complex but also more robust and faster.
+
+**Recommended approach:** Start with GUI automation (Tier 2 in the workflows
+section). It's simpler, it's what CPRSBooster does, and it ensures health
+factors are filed correctly because you're letting CPRS handle the data layer.
+
+---
+
 ## 5. Addon Architecture: How to Automate CPRS Without Getting Flagged
 
 ### Why CPRSBooster Doesn't Get Flagged
