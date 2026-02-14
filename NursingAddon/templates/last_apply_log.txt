@@ -1,0 +1,57 @@
+﻿Template: C:\Users\amcca\Desktop\cprs\vista-Fork\NursingAddon\templates\Negative Assessment.json
+Top-level parents: 22 template, 22 live, 7 expanded
+Child sub-sections tried: 27, all targets found: YES
+Text items: 24 template, 35 live
+
+=== Template text items (label|occurrence) ===
+  'Unable to detect pressure' occ=0 checked=N
+  'Patchy' occ=0 checked=N
+  'Decreased' occ=0 checked=N
+  'Absent' occ=0 checked=N
+  'Intact' occ=0 checked=Y
+  'Unable to detect pressure' occ=1 checked=N
+  'Patchy' occ=1 checked=N
+  'Decreased' occ=1 checked=N
+  'Absent' occ=1 checked=N
+  'Intact' occ=1 checked=Y
+  'Hot' occ=0 checked=N
+  'Cool' occ=0 checked=N
+  'Cold' occ=0 checked=N
+  'Warm' occ=0 checked=Y
+  'Hot' occ=1 checked=N
+  'Cool' occ=1 checked=N
+  'Cold' occ=1 checked=N
+  'Warm' occ=1 checked=Y
+  'Other: ' occ=0 checked=N
+  'Unable to assess' occ=0 checked=N
+  'Murmur' occ=0 checked=N
+  'Mechanical click' occ=0 checked=N
+  'Distant/muffled' occ=0 checked=N
+  'Normal (S1S2)' occ=0 checked=Y
+
+=== Matching results ===
+  'Unable to detect pressure' occ=0 -> FOUND
+  'Patchy' occ=0 -> FOUND
+  'Decreased' occ=0 -> FOUND
+  'Absent' occ=0 -> FOUND
+  'Intact' occ=0 -> FOUND
+  'Unable to detect pressure' occ=1 -> FOUND
+  'Patchy' occ=1 -> FOUND
+  'Decreased' occ=1 -> FOUND
+  'Absent' occ=1 -> FOUND
+  'Intact' occ=1 -> FOUND
+  'Hot' occ=0 -> FOUND
+  'Cool' occ=0 -> FOUND
+  'Cold' occ=0 -> FOUND
+  'Warm' occ=0 -> FOUND
+  'Hot' occ=1 -> FOUND
+  'Cool' occ=1 -> FOUND
+  'Cold' occ=1 -> FOUND
+  'Warm' occ=1 -> FOUND
+  'Other: ' occ=0 -> FOUND
+  'Unable to assess' occ=0 -> FOUND
+  'Murmur' occ=0 -> FOUND
+  'Mechanical click' occ=0 -> FOUND
+  'Distant/muffled' occ=0 -> FOUND
+  'Normal (S1S2)' occ=0 -> FOUND
+

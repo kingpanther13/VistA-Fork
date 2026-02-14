@@ -1,0 +1,21 @@
+name: "VistA EHR Server"
+description: "VistA Electronic Health Record server with VEHU training database. Connect CPRS from any Windows PC on your network."
+version: "1.0.3"
+slug: "vista-ehr"
+url: "https://github.com/WorldVistA/VistA"
+arch:
+  - amd64
+ports:
+  9430/tcp: 9430
+  8001/tcp: 8001
+  22/tcp: 2222
+  8089/tcp: 8089
+ports_description:
+  9430/tcp: "RPC Broker (CPRS connects here)"
+  8001/tcp: "VistA Web Interface"
+  22/tcp: "SSH Access to VistA"
+  8089/tcp: "YottaDB GUI"
+startup: "application"
+boot: "auto"
+init: false
+timeout: 300
