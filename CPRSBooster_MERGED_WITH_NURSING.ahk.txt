@@ -21707,7 +21707,8 @@ NB_MacroTestPlay:
         return
     }
     Gui, 69:Submit, NoHide
-    MsgBox, 49, %NB_AppTitle%, Test Play will send keystrokes to the ACTIVE window in 3 seconds.`n`nClick the target window after pressing OK.`n`nSteps: %  NB_MacroSteps.Length()%`n`nPress Cancel to abort.
+    nb_stepCount := NB_MacroSteps.Length()
+    MsgBox, 49, %NB_AppTitle%, Test Play will send keystrokes to the ACTIVE window in 3 seconds.`n`nClick the target window after pressing OK.`n`nSteps: %nb_stepCount%`n`nPress Cancel to abort.
     IfMsgBox, Cancel
         return
     Sleep, 3000
