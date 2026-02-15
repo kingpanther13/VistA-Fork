@@ -107,6 +107,10 @@ global NB_BoosterGuiVisible := 1
 global NB_CPRSDetected := 0
 global NB_MacroSteps := []
 global NB_MacroBuilderOpen := 0
+global NB_Recording := 0
+global NB_RecordedSteps := []
+global NB_RecordLastKey := ""
+global NB_RecordLastTime := 0
 
 ;****************AI Folder**************
 AIPath := onedrivelocal . "\AI\"
@@ -701,8 +705,9 @@ Gui, 67:Add, Button, x125 y58 w100 h26 gNB_PanelSkinAssess, Skin Assess
 Gui, 67:Add, Button, x230 y58 w75 h26 gNB_PanelFreqDoc, Freq Doc
 Gui, 67:Add, Button, x310 y58 w70 h26 gNB_PanelCustom1, Custom 1
 Gui, 67:Font, s8 cBlack, Segoe UI
-Gui, 67:Add, Button, x5   y88 w120 h26 gNB_PanelBuildMacro, Build Key Macro
-Gui, 67:Add, Button, x130 y88 w120 h26 gNB_PanelPlayMacro, Play Key Macro
+Gui, 67:Add, Button, x5   y88 w115 h26 gNB_PanelBuildMacro, Build Key Macro
+Gui, 67:Add, Button, x125 y88 w115 h26 gNB_PanelPlayMacro, Play Key Macro
+Gui, 67:Add, Button, x245 y88 w130 h26 gNB_PanelRecordMacro, Record Macro
 Gui, 67:Font, s7 cSilver, Segoe UI
 Gui, 67:Add, Text, x5 y118 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected
 Gui, 67:+AlwaysOnTop -Caption +ToolWindow
@@ -1437,7 +1442,7 @@ modnotelist := "   New Notes   ||  |EDIT LIST BELOW:|   CLICK HERE|  | "  .  not
 gui, 14: Add, DropdownList, gdropdownbutton y0 w100 -Tabstop altsubmit vnotefornow , %modnotelist%
 
 ; --- NursingBooster Dropdown Menu on toolbar ---
-NB_MenuList := "Nursing Booster||Save Template|Load Template|Delete Template|Negative Assessment|Skin Assessment|Freq Doc|Custom 1|Toggle Panel|Dump Dialog|Build Key Macro|Play Key Macro"
+NB_MenuList := "Nursing Booster||Save Template|Load Template|Delete Template|Negative Assessment|Skin Assessment|Freq Doc|Custom 1|Toggle Panel|Dump Dialog|Build Key Macro|Play Key Macro|Record Macro"
 gui, 14: Add, DropdownList, gNB_DropdownAction y0 w130 -Tabstop altsubmit vNB_DropdownChoice , %NB_MenuList%
 
 ; Gui 14: +AlwaysOnTop -Caption HWNDGui_Hwnd  +ToolWindow ;   +LastFound
@@ -19950,6 +19955,8 @@ NB_DropdownAction:
         gosub NB_OpenMacroBuilder
     else if (NB_DropdownChoice = 12) ; Play Key Macro
         gosub NB_PlayMacroSelect
+    else if (NB_DropdownChoice = 13) ; Record Macro
+        gosub NB_StartRecording
     ; Reset dropdown back to header
     GuiControl, 14:Choose, NB_DropdownChoice, 1
 return
@@ -20015,6 +20022,10 @@ return
 
 NB_PanelPlayMacro:
     gosub NB_PlayMacroSelect
+return
+
+NB_PanelRecordMacro:
+    gosub NB_StartRecording
 return
 
 NB_DragPanel:
@@ -21893,6 +21904,303 @@ NB_LogMacroPlay(macroName, steps) {
     footer := "`nTotal keystrokes sent: " . totalKeys . "`n"
     FileAppend, %footer%, %logPath%, UTF-8
 }
+
+
+;############################################################################################
+;############################################################################################
+;###                                                                                      ###
+;###              KEY MACRO RECORDER - Navigation key capture                              ###
+;###                                                                                      ###
+;###  Records ONLY: Tab, Space, Down, Up, Left, Right, Enter, Escape, Home, End           ###
+;###  Does NOT capture letters, numbers, passwords, or any typed text.                    ###
+;###  User-initiated, visually obvious, auto-timeout.                                     ###
+;###                                                                                      ###
+;############################################################################################
+;############################################################################################
+
+
+;============================================================================================
+; RECORDING - START / STOP
+;============================================================================================
+
+NB_StartRecording:
+    global NB_Recording, NB_RecordedSteps, NB_RecordLastKey, NB_RecordLastTime, NB_AppTitle
+
+    if (NB_Recording) {
+        ; Already recording - stop instead
+        gosub NB_StopRecording
+        return
+    }
+
+    MsgBox, 49, %NB_AppTitle% - Record Macro, MACRO RECORDER`n`nThis will capture ONLY navigation keys:`nTab  Space  Arrow keys  Enter  Escape  Home  End`n`nNO letters, numbers, passwords, or typed text are captured.`n`nClick OK, then navigate the CPRS dialog normally.`nPress Ctrl+Shift+R or click Stop to finish recording.
+    IfMsgBox, Cancel
+        return
+
+    NB_RecordedSteps := []
+    NB_RecordLastKey := ""
+    NB_RecordLastTime := 0
+    NB_Recording := 1
+
+    ; Show the recording banner (Gui 72)
+    Gui, 72:Destroy
+    Gui, 72:Color, CC0000
+    Gui, 72:Font, s14 cWhite Bold, Segoe UI
+    Gui, 72:Add, Text, x10 y8 w330 h30 Center BackgroundTrans, RECORDING  -  Nav Keys Only
+    Gui, 72:Font, s9 cWhite, Segoe UI
+    Gui, 72:Add, Text, x10 y40 w330 h18 Center BackgroundTrans vNB_RecStatus, Steps: 0  |  Press Ctrl+Shift+R to stop
+    Gui, 72:Add, Button, x115 y62 w120 h26 gNB_StopRecording cBlack, Stop Recording
+    Gui, 72:+AlwaysOnTop -Caption +ToolWindow +Border
+    Gui, 72:Show, x200 y0 w350 h94 NoActivate, NB_RecordingBanner
+
+    ; Register passthrough hotkeys for navigation keys only
+    ; ~ prefix means the key still goes through to the active app
+    Hotkey, ~Tab, NB_RecKey_Tab, On
+    Hotkey, ~Space, NB_RecKey_Space, On
+    Hotkey, ~Down, NB_RecKey_Down, On
+    Hotkey, ~Up, NB_RecKey_Up, On
+    Hotkey, ~Left, NB_RecKey_Left, On
+    Hotkey, ~Right, NB_RecKey_Right, On
+    Hotkey, ~Enter, NB_RecKey_Enter, On
+    Hotkey, ~Escape, NB_RecKey_Escape, On
+    Hotkey, ~Home, NB_RecKey_Home, On
+    Hotkey, ~End, NB_RecKey_End, On
+
+    ; Auto-timeout: stop recording after 120 seconds of no activity
+    SetTimer, NB_RecordTimeout, 120000
+
+    ToolTip, Recording started - navigate the dialog normally
+    SetTimer, NB_ClearToolTip, -2000
+return
+
+
+NB_StopRecording:
+    global NB_Recording, NB_RecordedSteps, NB_AppTitle
+
+    if (!NB_Recording)
+        return
+
+    NB_Recording := 0
+
+    ; Unregister the hotkeys
+    Hotkey, ~Tab, NB_RecKey_Tab, Off
+    Hotkey, ~Space, NB_RecKey_Space, Off
+    Hotkey, ~Down, NB_RecKey_Down, Off
+    Hotkey, ~Up, NB_RecKey_Up, Off
+    Hotkey, ~Left, NB_RecKey_Left, Off
+    Hotkey, ~Right, NB_RecKey_Right, Off
+    Hotkey, ~Enter, NB_RecKey_Enter, Off
+    Hotkey, ~Escape, NB_RecKey_Escape, Off
+    Hotkey, ~Home, NB_RecKey_Home, Off
+    Hotkey, ~End, NB_RecKey_End, Off
+
+    SetTimer, NB_RecordTimeout, Off
+
+    ; Hide the recording banner
+    Gui, 72:Destroy
+
+    stepCount := NB_RecordedSteps.Length()
+    if (stepCount = 0) {
+        MsgBox, 64, %NB_AppTitle%, No navigation keys were captured.
+        return
+    }
+
+    ; Consolidate consecutive same-key presses into single steps with count > 1
+    consolidated := NB_ConsolidateSteps(NB_RecordedSteps)
+    conCount := consolidated.Length()
+
+    MsgBox, 35, %NB_AppTitle%, Recording complete: %stepCount% key presses consolidated to %conCount% steps.`n`nYes = Load into Macro Builder (edit before saving)`nNo = Save directly as a macro file`nCancel = Discard
+    IfMsgBox, Yes
+    {
+        ; Load into the builder
+        global NB_MacroSteps
+        NB_MacroSteps := consolidated
+        gosub NB_OpenMacroBuilder
+        NB_MacroRefreshList()
+        return
+    }
+    IfMsgBox, No
+    {
+        ; Save directly
+        global NB_MacroDir
+        InputBox, macroName, Save Recorded Macro, Name for this macro:
+        if (ErrorLevel || macroName = "")
+            return
+
+        savePath := NB_MacroDir . "\" . NB_SanitizeFilename(macroName) . ".keymacro"
+        FileDelete, %savePath%
+
+        FormatTime, nowDisp,, yyyy-MM-dd HH:mm
+        header := "; Nursing Booster Key Macro (RECORDED)`n"
+        header .= "; Name: " . macroName . "`n"
+        header .= "; Created: " . nowDisp . "`n"
+        header .= "; User: " . A_UserName . "`n"
+        header .= "; Raw presses: " . stepCount . "  |  Consolidated steps: " . conCount . "`n"
+        header .= ";`n"
+        header .= "; Format: KEY,COUNT,DELAY_MS`n"
+        header .= "; You can edit this file in Notepad to tweak it.`n"
+        header .= ";`n"
+        FileAppend, %header%, %savePath%, UTF-8
+
+        for i, step in consolidated {
+            line := step.key . "," . step.count . "," . step.delay . "`n"
+            FileAppend, %line%, %savePath%, UTF-8
+        }
+        conStepCount := consolidated.Length()
+        ToolTip, Saved "%macroName%" with %conStepCount% steps
+        SetTimer, NB_ClearToolTip, -3000
+        return
+    }
+    IfMsgBox, Cancel
+    {
+        ToolTip, Recording discarded
+        SetTimer, NB_ClearToolTip, -2000
+        return
+    }
+return
+
+
+NB_RecordTimeout:
+    ; Auto-stop after timeout period with no keys
+    SetTimer, NB_RecordTimeout, Off
+    if (NB_Recording) {
+        ToolTip, Recording auto-stopped (timeout)
+        SetTimer, NB_ClearToolTip, -3000
+        gosub NB_StopRecording
+    }
+return
+
+
+;============================================================================================
+; RECORDING - KEY CAPTURE HANDLERS
+; Each handler appends the key to the recorded steps and resets the timeout.
+; The ~ prefix on the hotkey means the key passes through normally.
+;============================================================================================
+
+NB_RecKey_Tab:
+    NB_RecordKeyPress("Tab")
+return
+
+NB_RecKey_Space:
+    NB_RecordKeyPress("Space")
+return
+
+NB_RecKey_Down:
+    NB_RecordKeyPress("Down")
+return
+
+NB_RecKey_Up:
+    NB_RecordKeyPress("Up")
+return
+
+NB_RecKey_Left:
+    NB_RecordKeyPress("Left")
+return
+
+NB_RecKey_Right:
+    NB_RecordKeyPress("Right")
+return
+
+NB_RecKey_Enter:
+    NB_RecordKeyPress("Enter")
+return
+
+NB_RecKey_Escape:
+    NB_RecordKeyPress("Escape")
+return
+
+NB_RecKey_Home:
+    NB_RecordKeyPress("Home")
+return
+
+NB_RecKey_End:
+    NB_RecordKeyPress("End")
+return
+
+
+NB_RecordKeyPress(keyName) {
+    global NB_Recording, NB_RecordedSteps, NB_RecordLastKey, NB_RecordLastTime
+
+    if (!NB_Recording)
+        return
+
+    ; Record the key with timestamp for delay calculation
+    now := A_TickCount
+    if (NB_RecordLastTime > 0)
+        elapsed := now - NB_RecordLastTime
+    else
+        elapsed := 150  ; default for first key
+
+    ; Cap delay at 5 seconds (anything longer is probably a pause, not intentional)
+    if (elapsed > 5000)
+        elapsed := 500
+
+    NB_RecordedSteps.Push({key: keyName, delay: elapsed})
+    NB_RecordLastKey := keyName
+    NB_RecordLastTime := now
+
+    ; Update the recording banner
+    stepCount := NB_RecordedSteps.Length()
+    GuiControl, 72:, NB_RecStatus, Steps: %stepCount%  |  Last: %keyName%  |  Ctrl+Shift+R to stop
+
+    ; Reset the auto-timeout
+    SetTimer, NB_RecordTimeout, 120000
+}
+
+
+;============================================================================================
+; RECORDING - CONSOLIDATE CONSECUTIVE SAME-KEY PRESSES
+; e.g. Tab,Tab,Tab -> Tab x3
+;============================================================================================
+
+NB_ConsolidateSteps(rawSteps) {
+    consolidated := []
+    if (rawSteps.Length() = 0)
+        return consolidated
+
+    currentKey := rawSteps[1].key
+    currentCount := 1
+    ; Use the average delay for consolidated steps
+    totalDelay := rawSteps[1].delay
+    delayCount := 1
+
+    i := 2
+    while (i <= rawSteps.Length()) {
+        step := rawSteps[i]
+        if (step.key = currentKey) {
+            currentCount++
+            totalDelay += step.delay
+            delayCount++
+        } else {
+            avgDelay := Round(totalDelay / delayCount)
+            if (avgDelay < 50)
+                avgDelay := 50
+            consolidated.Push({key: currentKey, count: currentCount, delay: avgDelay})
+            currentKey := step.key
+            currentCount := 1
+            totalDelay := step.delay
+            delayCount := 1
+        }
+        i++
+    }
+    ; Push the last group
+    avgDelay := Round(totalDelay / delayCount)
+    if (avgDelay < 50)
+        avgDelay := 50
+    consolidated.Push({key: currentKey, count: currentCount, delay: avgDelay})
+
+    return consolidated
+}
+
+
+;============================================================================================
+; RECORDING - HOTKEY TO STOP (Ctrl+Shift+R)
+;============================================================================================
+
+^+r::
+    if (NB_Recording) {
+        gosub NB_StopRecording
+    }
+return
 
 
 ;############################################################################################
