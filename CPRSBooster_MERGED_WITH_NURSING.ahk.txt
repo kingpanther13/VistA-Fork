@@ -102,8 +102,11 @@ Global ADPrompts := {}  ; ambient dictation
 global NB_AppTitle := "Nursing Booster"
 global NB_TemplateDir := onedrivelocal . "\NursingTemplates"
 global NB_LogDir := onedrivelocal . "\NursingTemplates\Logs"
+global NB_MacroDir := onedrivelocal . "\NursingTemplates\KeyMacros"
 global NB_BoosterGuiVisible := 1
 global NB_CPRSDetected := 0
+global NB_MacroSteps := []
+global NB_MacroBuilderOpen := 0
 
 ;****************AI Folder**************
 AIPath := onedrivelocal . "\AI\"
@@ -372,6 +375,15 @@ If (driveactive= 0)  ; *************we have NO working drives
 		IfNotExist, %NB_LogDir%
 		{
 			FileCreateDir, %NB_LogDir%
+		}
+	}
+
+	; Make NursingBooster key macro directory
+	try
+	{
+		IfNotExist, %NB_MacroDir%
+		{
+			FileCreateDir, %NB_MacroDir%
 		}
 	}
 ; ------------------- END make directory prn
@@ -688,10 +700,13 @@ Gui, 67:Add, Button, x5   y58 w115 h26 gNB_PanelNegAssess, Negative Assess
 Gui, 67:Add, Button, x125 y58 w100 h26 gNB_PanelSkinAssess, Skin Assess
 Gui, 67:Add, Button, x230 y58 w75 h26 gNB_PanelFreqDoc, Freq Doc
 Gui, 67:Add, Button, x310 y58 w70 h26 gNB_PanelCustom1, Custom 1
+Gui, 67:Font, s8 cBlack, Segoe UI
+Gui, 67:Add, Button, x5   y88 w120 h26 gNB_PanelBuildMacro, Build Key Macro
+Gui, 67:Add, Button, x130 y88 w120 h26 gNB_PanelPlayMacro, Play Key Macro
 Gui, 67:Font, s7 cSilver, Segoe UI
-Gui, 67:Add, Text, x5 y88 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected
+Gui, 67:Add, Text, x5 y118 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected
 Gui, 67:+AlwaysOnTop -Caption +ToolWindow
-Gui, 67:Show, x0 y0 w385 h108 NoActivate, NursingBoosterPanel
+Gui, 67:Show, x0 y0 w385 h138 NoActivate, NursingBoosterPanel
 NB_BoosterGuiVisible := 1
 
 ; --- NursingBooster: Start CPRS detection timer ---
@@ -1422,7 +1437,7 @@ modnotelist := "   New Notes   ||  |EDIT LIST BELOW:|   CLICK HERE|  | "  .  not
 gui, 14: Add, DropdownList, gdropdownbutton y0 w100 -Tabstop altsubmit vnotefornow , %modnotelist%
 
 ; --- NursingBooster Dropdown Menu on toolbar ---
-NB_MenuList := "Nursing Booster||Save Template|Load Template|Delete Template|Negative Assessment|Skin Assessment|Freq Doc|Custom 1|Toggle Panel|Dump Dialog"
+NB_MenuList := "Nursing Booster||Save Template|Load Template|Delete Template|Negative Assessment|Skin Assessment|Freq Doc|Custom 1|Toggle Panel|Dump Dialog|Build Key Macro|Play Key Macro"
 gui, 14: Add, DropdownList, gNB_DropdownAction y0 w130 -Tabstop altsubmit vNB_DropdownChoice , %NB_MenuList%
 
 ; Gui 14: +AlwaysOnTop -Caption HWNDGui_Hwnd  +ToolWindow ;   +LastFound
@@ -19931,6 +19946,10 @@ NB_DropdownAction:
         gosub NB_TogglePanel
     else if (NB_DropdownChoice = 10) ; Dump Dialog
         gosub NB_DumpDialogControls
+    else if (NB_DropdownChoice = 11) ; Build Key Macro
+        gosub NB_OpenMacroBuilder
+    else if (NB_DropdownChoice = 12) ; Play Key Macro
+        gosub NB_PlayMacroSelect
     ; Reset dropdown back to header
     GuiControl, 14:Choose, NB_DropdownChoice, 1
 return
@@ -19988,6 +20007,14 @@ return
 
 NB_PanelCustom1:
     NB_ApplyNamedTemplate("Custom 1")
+return
+
+NB_PanelBuildMacro:
+    gosub NB_OpenMacroBuilder
+return
+
+NB_PanelPlayMacro:
+    gosub NB_PlayMacroSelect
 return
 
 NB_DragPanel:
@@ -21342,6 +21369,530 @@ return
 ^+d::
     gosub NB_DumpDialogControls
 return
+
+
+;############################################################################################
+;############################################################################################
+;###                                                                                      ###
+;###              KEY MACRO SYSTEM - Keyboard sequence builder & player                   ###
+;###                                                                                      ###
+;###  Build macros by manually defining steps (Tab, Space, Down, Up, etc.)                ###
+;###  Play them back to fill out CPRS reminder dialogues via keyboard.                    ###
+;###  No keyboard hooks or recording. Plain text macro files.                             ###
+;###                                                                                      ###
+;############################################################################################
+;############################################################################################
+
+
+;============================================================================================
+; KEY MACRO BUILDER (Gui 69)
+;============================================================================================
+
+NB_OpenMacroBuilder:
+    global NB_MacroSteps, NB_MacroBuilderOpen
+    if (NB_MacroBuilderOpen) {
+        Gui, 69:Show
+        return
+    }
+    NB_MacroSteps := []
+    NB_MacroBuilderOpen := 1
+
+    Gui, 69:Destroy
+    Gui, 69:+AlwaysOnTop +ToolWindow
+    Gui, 69:Font, s9, Segoe UI
+    Gui, 69:Color, F5F5F5
+
+    Gui, 69:Add, Text, x10 y10 w460 cNavy, KEY MACRO BUILDER - Define keyboard steps to replay in CPRS
+    Gui, 69:Add, Text, x10 y30 w460 c666666, Each step sends a key a number of times. Build your sequence then save it.
+
+    ; --- Add Step controls ---
+    Gui, 69:Add, GroupBox, x10 y55 w460 h70, Add a Step
+    Gui, 69:Add, Text, x20 y75, Key:
+    Gui, 69:Add, DropDownList, x50 y72 w110 vNB_MacroKeyChoice altsubmit, Tab|Space|Down|Up|Left|Right|Enter|Escape|Home|End
+    Gui, 69:Add, Text, x170 y75, Count:
+    Gui, 69:Add, Edit, x210 y72 w40 vNB_MacroCountEdit, 1
+    Gui, 69:Add, UpDown, Range1-99, 1
+    Gui, 69:Add, Text, x260 y75, Delay(ms):
+    Gui, 69:Add, Edit, x315 y72 w45 vNB_MacroDelayEdit, 150
+    Gui, 69:Add, Button, x370 y71 w90 h24 gNB_MacroAddStep, Add Step
+
+    ; --- Step list ---
+    Gui, 69:Add, Text, x10 y132, Steps (played top to bottom):
+    Gui, 69:Add, ListView, x10 y150 w460 h200 vNB_MacroLV Grid, #|Key|Count|Delay (ms)
+    LV_ModifyCol(1, 30)
+    LV_ModifyCol(2, 120)
+    LV_ModifyCol(3, 60)
+    LV_ModifyCol(4, 80)
+
+    ; --- Action buttons ---
+    Gui, 69:Add, Button, x10  y358 w70 h28 gNB_MacroMoveUp, Move Up
+    Gui, 69:Add, Button, x85  y358 w70 h28 gNB_MacroMoveDown, Move Down
+    Gui, 69:Add, Button, x160 y358 w85 h28 gNB_MacroDeleteStep, Delete Step
+    Gui, 69:Add, Button, x250 y358 w70 h28 gNB_MacroClearAll, Clear All
+
+    Gui, 69:Add, Text, x10 y395 w460 h1 0x10  ; horizontal line
+
+    ; --- Delay presets ---
+    Gui, 69:Add, Text, x10 y403, Playback speed between steps (ms):
+    Gui, 69:Add, Edit, x220 y400 w50 vNB_MacroGlobalDelay, 150
+    Gui, 69:Add, Text, x275 y403 c999999, (100=fast  200=safe  500=slow)
+
+    ; --- Save / Load / Play / Close ---
+    Gui, 69:Add, Button, x10  y432 w100 h30 gNB_MacroSave, Save Macro
+    Gui, 69:Add, Button, x115 y432 w100 h30 gNB_MacroLoad, Load Macro
+    Gui, 69:Add, Button, x220 y432 w100 h30 gNB_MacroTestPlay, Test Play
+    Gui, 69:Add, Button, x325 y432 w145 h30 gNB_MacroPlayInCPRS Default, Play in CPRS
+    Gui, 69:Add, Button, x400 y8 w70 h22 gNB_MacroBuilderClose, Close
+
+    Gui, 69:Show, w480 h472, Key Macro Builder
+return
+
+69GuiClose:
+NB_MacroBuilderClose:
+    Gui, 69:Hide
+    NB_MacroBuilderOpen := 0
+return
+
+
+;============================================================================================
+; KEY MACRO - ADD / EDIT / REORDER STEPS
+;============================================================================================
+
+NB_MacroAddStep:
+    Gui, 69:Submit, NoHide
+    global NB_MacroSteps
+
+    ; Map dropdown index to key name
+    keyNames := ["Tab", "Space", "Down", "Up", "Left", "Right", "Enter", "Escape", "Home", "End"]
+    if (NB_MacroKeyChoice < 1 || NB_MacroKeyChoice > keyNames.Length()) {
+        MsgBox, 48, %NB_AppTitle%, Select a key first.
+        return
+    }
+    keyName := keyNames[NB_MacroKeyChoice]
+    stepCount := NB_MacroCountEdit + 0
+    if (stepCount < 1)
+        stepCount := 1
+    stepDelay := NB_MacroDelayEdit + 0
+    if (stepDelay < 0)
+        stepDelay := 150
+
+    NB_MacroSteps.Push({key: keyName, count: stepCount, delay: stepDelay})
+    NB_MacroRefreshList()
+return
+
+NB_MacroDeleteStep:
+    Gui, 69:Default
+    row := LV_GetNext(0, "Focused")
+    if (row < 1)
+        return
+    global NB_MacroSteps
+    NB_MacroSteps.RemoveAt(row)
+    NB_MacroRefreshList()
+return
+
+NB_MacroMoveUp:
+    Gui, 69:Default
+    row := LV_GetNext(0, "Focused")
+    if (row < 2)
+        return
+    global NB_MacroSteps
+    temp := NB_MacroSteps[row]
+    NB_MacroSteps[row] := NB_MacroSteps[row - 1]
+    NB_MacroSteps[row - 1] := temp
+    NB_MacroRefreshList()
+    LV_Modify(row - 1, "Focus Select")
+return
+
+NB_MacroMoveDown:
+    Gui, 69:Default
+    row := LV_GetNext(0, "Focused")
+    global NB_MacroSteps
+    if (row < 1 || row >= NB_MacroSteps.Length())
+        return
+    temp := NB_MacroSteps[row]
+    NB_MacroSteps[row] := NB_MacroSteps[row + 1]
+    NB_MacroSteps[row + 1] := temp
+    NB_MacroRefreshList()
+    LV_Modify(row + 1, "Focus Select")
+return
+
+NB_MacroClearAll:
+    global NB_MacroSteps
+    MsgBox, 36, %NB_AppTitle%, Clear all steps?
+    IfMsgBox, Yes
+    {
+        NB_MacroSteps := []
+        NB_MacroRefreshList()
+    }
+return
+
+NB_MacroRefreshList() {
+    global NB_MacroSteps
+    Gui, 69:Default
+    LV_Delete()
+    for i, step in NB_MacroSteps {
+        LV_Add("", i, step.key, step.count, step.delay)
+    }
+}
+
+
+;============================================================================================
+; KEY MACRO - SAVE / LOAD
+;============================================================================================
+
+NB_MacroSave:
+    global NB_MacroSteps, NB_MacroDir, NB_AppTitle
+    if (NB_MacroSteps.Length() = 0) {
+        MsgBox, 48, %NB_AppTitle%, Add some steps first.
+        return
+    }
+    InputBox, macroName, Save Key Macro, Macro name (e.g. "Negative Assessment Keys"):
+    if (ErrorLevel || macroName = "")
+        return
+
+    savePath := NB_MacroDir . "\" . NB_SanitizeFilename(macroName) . ".keymacro"
+    FileDelete, %savePath%
+
+    FormatTime, nowDisp,, yyyy-MM-dd HH:mm
+    header := "; Nursing Booster Key Macro`n"
+    header .= "; Name: " . macroName . "`n"
+    header .= "; Created: " . nowDisp . "`n"
+    header .= "; User: " . A_UserName . "`n"
+    header .= "; Steps: " . NB_MacroSteps.Length() . "`n"
+    header .= ";`n"
+    header .= "; Format: KEY,COUNT,DELAY_MS`n"
+    header .= "; Keys: Tab, Space, Down, Up, Left, Right, Enter, Escape, Home, End`n"
+    header .= "; Edit this file in Notepad if you want to tweak it.`n"
+    header .= ";`n"
+    FileAppend, %header%, %savePath%, UTF-8
+
+    for i, step in NB_MacroSteps {
+        line := step.key . "," . step.count . "," . step.delay . "`n"
+        FileAppend, %line%, %savePath%, UTF-8
+    }
+
+    stepCount := NB_MacroSteps.Length()
+    ToolTip, Saved macro "%macroName%" with %stepCount% steps
+    SetTimer, NB_ClearToolTip, -3000
+return
+
+
+NB_MacroLoad:
+    global NB_MacroSteps, NB_MacroDir, NB_AppTitle
+
+    ; List available macros
+    macroFiles := []
+    Loop, Files, %NB_MacroDir%\*.keymacro
+    {
+        macroFiles.Push(A_LoopFileName)
+    }
+    if (macroFiles.Length() = 0) {
+        MsgBox, 64, %NB_AppTitle%, No saved key macros found.`n`nUse "Build Key Macro" to create one`nor place .keymacro files in:`n%NB_MacroDir%
+        return
+    }
+
+    macroList := ""
+    for k, f in macroFiles {
+        name := StrReplace(f, ".keymacro", "")
+        macroList .= (macroList != "" ? "|" : "") . name
+    }
+
+    Gui, 70:Destroy
+    Gui, 70:+AlwaysOnTop +ToolWindow
+    Gui, 70:Font, s9, Segoe UI
+    Gui, 70:Add, Text,, Select a macro to load:
+    Gui, 70:Add, ListBox, w300 h180 vNB_MacroLoadSelection, %macroList%
+    Gui, 70:Add, Button, y+5 w90 gNB_DoLoadMacro Default, Load
+    Gui, 70:Add, Button, x+5 w90 gNB_DoDeleteMacro, Delete
+    Gui, 70:Add, Button, x+5 w90 gNB_CancelLoadMacro, Cancel
+    Gui, 70:Show,, Load Key Macro
+return
+
+NB_DoLoadMacro:
+    Gui, 70:Submit
+    global NB_MacroSteps, NB_MacroDir
+    if (NB_MacroLoadSelection = "") {
+        MsgBox, 48, %NB_AppTitle%, Select a macro.
+        return
+    }
+    Gui, 70:Destroy
+
+    loadPath := NB_MacroDir . "\" . NB_SanitizeFilename(NB_MacroLoadSelection) . ".keymacro"
+    NB_MacroSteps := NB_ParseMacroFile(loadPath)
+    NB_MacroRefreshList()
+
+    stepCount := NB_MacroSteps.Length()
+    ToolTip, Loaded "%NB_MacroLoadSelection%" - %stepCount% steps
+    SetTimer, NB_ClearToolTip, -2000
+return
+
+NB_DoDeleteMacro:
+    Gui, 70:Submit, NoHide
+    global NB_MacroDir
+    if (NB_MacroLoadSelection = "")
+        return
+    MsgBox, 36, %NB_AppTitle%, Delete macro "%NB_MacroLoadSelection%"?
+    IfMsgBox, Yes
+    {
+        delPath := NB_MacroDir . "\" . NB_SanitizeFilename(NB_MacroLoadSelection) . ".keymacro"
+        FileDelete, %delPath%
+        Gui, 70:Destroy
+        ToolTip, Macro deleted
+        SetTimer, NB_ClearToolTip, -2000
+    }
+return
+
+NB_CancelLoadMacro:
+    Gui, 70:Destroy
+return
+
+
+NB_ParseMacroFile(filePath) {
+    steps := []
+    FileRead, content, %filePath%
+    if (ErrorLevel)
+        return steps
+
+    Loop, Parse, content, `n, `r
+    {
+        line := Trim(A_LoopField)
+        if (line = "" || SubStr(line, 1, 1) = ";")
+            continue
+
+        ; Parse KEY,COUNT,DELAY
+        parts := StrSplit(line, ",")
+        if (parts.Length() < 2)
+            continue
+
+        keyName := Trim(parts[1])
+        stepCount := Trim(parts[2]) + 0
+        stepDelay := parts.Length() >= 3 ? Trim(parts[3]) + 0 : 150
+
+        if (stepCount < 1)
+            stepCount := 1
+        if (stepDelay < 0)
+            stepDelay := 150
+
+        ; Validate key name
+        validKeys := "Tab,Space,Down,Up,Left,Right,Enter,Escape,Home,End"
+        if (!InStr(validKeys, keyName))
+            continue
+
+        steps.Push({key: keyName, count: stepCount, delay: stepDelay})
+    }
+    return steps
+}
+
+
+;============================================================================================
+; KEY MACRO - PLAYBACK
+;============================================================================================
+
+NB_MacroTestPlay:
+    ; Play into whatever window is active (for testing outside CPRS)
+    global NB_MacroSteps, NB_AppTitle
+    if (NB_MacroSteps.Length() = 0) {
+        MsgBox, 48, %NB_AppTitle%, No steps to play. Add some steps first.
+        return
+    }
+    Gui, 69:Submit, NoHide
+    MsgBox, 49, %NB_AppTitle%, Test Play will send keystrokes to the ACTIVE window in 3 seconds.`n`nClick the target window after pressing OK.`n`nSteps: %  NB_MacroSteps.Length()%`n`nPress Cancel to abort.
+    IfMsgBox, Cancel
+        return
+    Sleep, 3000
+    NB_ExecuteMacro(NB_MacroSteps, NB_MacroGlobalDelay)
+return
+
+
+NB_MacroPlayInCPRS:
+    global NB_MacroSteps, NB_AppTitle
+    if (NB_MacroSteps.Length() = 0) {
+        MsgBox, 48, %NB_AppTitle%, No steps to play. Add or load steps first.
+        return
+    }
+
+    ; Find and activate CPRS reminder dialog
+    dlgHwnd := NB_FindActiveDialogWindow()
+    if (!dlgHwnd) {
+        MsgBox, 48, %NB_AppTitle%, Open a reminder dialogue in CPRS first.
+        return
+    }
+
+    Gui, 69:Submit, NoHide
+    stepCount := NB_MacroSteps.Length()
+    MsgBox, 49, %NB_AppTitle%, Play %stepCount% steps into the CPRS dialog?`n`nThe dialog will be activated and keystrokes sent.`nYou can review the result before clicking Finish.`n`nPress Cancel to abort.
+    IfMsgBox, Cancel
+        return
+
+    WinActivate, ahk_id %dlgHwnd%
+    Sleep, 500
+    NB_ExecuteMacro(NB_MacroSteps, NB_MacroGlobalDelay)
+
+    ToolTip, Key macro complete - review the dialog before submitting
+    SetTimer, NB_ClearToolTip, -4000
+return
+
+
+NB_PlayMacroSelect:
+    ; Quick play: pick a saved macro and play it directly into CPRS
+    global NB_MacroDir, NB_AppTitle
+
+    macroFiles := []
+    Loop, Files, %NB_MacroDir%\*.keymacro
+    {
+        macroFiles.Push(A_LoopFileName)
+    }
+    if (macroFiles.Length() = 0) {
+        MsgBox, 64, %NB_AppTitle%, No saved key macros found.`nUse "Build Key Macro" to create one.
+        return
+    }
+
+    dlgHwnd := NB_FindActiveDialogWindow()
+    if (!dlgHwnd) {
+        MsgBox, 48, %NB_AppTitle%, Open a reminder dialogue in CPRS first.
+        return
+    }
+
+    macroList := ""
+    for k, f in macroFiles {
+        name := StrReplace(f, ".keymacro", "")
+        macroList .= (macroList != "" ? "|" : "") . name
+    }
+
+    Gui, 71:Destroy
+    Gui, 71:+AlwaysOnTop +ToolWindow
+    Gui, 71:Font, s9, Segoe UI
+    Gui, 71:Add, Text,, Select a macro to play in CPRS:
+    Gui, 71:Add, ListBox, w300 h180 vNB_PlayMacroSelection, %macroList%
+    Gui, 71:Add, Button, y+5 w140 gNB_DoPlayMacro Default, Play in CPRS
+    Gui, 71:Add, Button, x+5 w100 gNB_CancelPlayMacro, Cancel
+    Gui, 71:Show,, Play Key Macro
+return
+
+NB_DoPlayMacro:
+    Gui, 71:Submit
+    global NB_MacroDir, NB_AppTitle
+    if (NB_PlayMacroSelection = "") {
+        MsgBox, 48, %NB_AppTitle%, Select a macro.
+        return
+    }
+    Gui, 71:Destroy
+
+    loadPath := NB_MacroDir . "\" . NB_SanitizeFilename(NB_PlayMacroSelection) . ".keymacro"
+    playSteps := NB_ParseMacroFile(loadPath)
+
+    if (playSteps.Length() = 0) {
+        MsgBox, 48, %NB_AppTitle%, Macro has no valid steps.
+        return
+    }
+
+    dlgHwnd := NB_FindActiveDialogWindow()
+    if (!dlgHwnd) {
+        MsgBox, 48, %NB_AppTitle%, CPRS dialog no longer found.
+        return
+    }
+
+    stepCount := playSteps.Length()
+    MsgBox, 49, %NB_AppTitle%, Play "%NB_PlayMacroSelection%" (%stepCount% steps) into CPRS?`n`nReview the result before clicking Finish.
+    IfMsgBox, Cancel
+        return
+
+    WinActivate, ahk_id %dlgHwnd%
+    Sleep, 500
+    NB_ExecuteMacro(playSteps, 150)
+
+    ; Log it
+    NB_LogMacroPlay(NB_PlayMacroSelection, playSteps)
+
+    ToolTip, Key macro "%NB_PlayMacroSelection%" complete - review before submitting
+    SetTimer, NB_ClearToolTip, -4000
+return
+
+NB_CancelPlayMacro:
+    Gui, 71:Destroy
+return
+
+
+;============================================================================================
+; KEY MACRO - EXECUTION ENGINE
+;============================================================================================
+
+NB_ExecuteMacro(steps, globalDelay := 150) {
+    global NB_AppTitle
+    totalSteps := steps.Length()
+    for i, step in steps {
+        keyName := step.key
+        stepCount := step.count
+        stepDelay := step.delay > 0 ? step.delay : globalDelay
+
+        ; Map key names to AHK send syntax
+        if (keyName = "Tab")
+            sendKey := "{Tab}"
+        else if (keyName = "Space")
+            sendKey := "{Space}"
+        else if (keyName = "Down")
+            sendKey := "{Down}"
+        else if (keyName = "Up")
+            sendKey := "{Up}"
+        else if (keyName = "Left")
+            sendKey := "{Left}"
+        else if (keyName = "Right")
+            sendKey := "{Right}"
+        else if (keyName = "Enter")
+            sendKey := "{Enter}"
+        else if (keyName = "Escape")
+            sendKey := "{Escape}"
+        else if (keyName = "Home")
+            sendKey := "{Home}"
+        else if (keyName = "End")
+            sendKey := "{End}"
+        else
+            continue
+
+        ; Send the key the specified number of times
+        Loop, %stepCount%
+        {
+            Send, %sendKey%
+            Sleep, %stepDelay%
+        }
+
+        ToolTip, Playing step %i%/%totalSteps%: %keyName% x%stepCount%
+    }
+    ToolTip
+}
+
+
+;============================================================================================
+; KEY MACRO - LOGGING
+;============================================================================================
+
+NB_LogMacroPlay(macroName, steps) {
+    global NB_LogDir
+    FormatTime, nowStamp,, yyyyMMddHHmmss
+    FormatTime, nowDisp,, yyyy-MM-dd HH:mm:ss
+    logPath := NB_LogDir . "\KEYMACRO_" . nowStamp . ".txt"
+
+    stepCount := steps.Length()
+    logText := "============================================================`n"
+    logText .= "  NURSING BOOSTER KEY MACRO PLAY LOG`n"
+    logText .= "============================================================`n"
+    logText .= "Timestamp: " . nowDisp . "`n"
+    logText .= "Macro:     " . macroName . "`n"
+    logText .= "User:      " . A_UserName . "`n"
+    logText .= "Steps:     " . stepCount . "`n"
+    logText .= "============================================================`n`n"
+    FileAppend, %logText%, %logPath%, UTF-8
+
+    totalKeys := 0
+    for i, step in steps {
+        line := "Step " . i . ": " . step.key . " x" . step.count . " (delay " . step.delay . "ms)`n"
+        FileAppend, %line%, %logPath%, UTF-8
+        totalKeys += step.count
+    }
+
+    footer := "`nTotal keystrokes sent: " . totalKeys . "`n"
+    FileAppend, %footer%, %logPath%, UTF-8
+}
 
 
 ;############################################################################################
