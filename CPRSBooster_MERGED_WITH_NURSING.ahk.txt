@@ -107,6 +107,7 @@ global NB_BoosterGuiVisible := 1
 global NB_CPRSDetected := 0
 global NB_MacroSteps := []
 global NB_MacroBuilderOpen := 0
+global NB_MacroKeepSteps := 0
 global NB_Recording := 0
 global NB_RecordedSteps := []
 global NB_RecordLastKey := ""
@@ -21400,12 +21401,16 @@ return
 ;============================================================================================
 
 NB_OpenMacroBuilder:
-    global NB_MacroSteps, NB_MacroBuilderOpen
+    global NB_MacroSteps, NB_MacroBuilderOpen, NB_MacroKeepSteps
     if (NB_MacroBuilderOpen) {
         Gui, 69:Show
+        NB_MacroRefreshList()
         return
     }
-    NB_MacroSteps := []
+    ; Only reset steps if not pre-loaded (e.g. from recording)
+    if (!NB_MacroKeepSteps)
+        NB_MacroSteps := []
+    NB_MacroKeepSteps := 0
     NB_MacroBuilderOpen := 1
 
     Gui, 69:Destroy
@@ -22012,9 +22017,10 @@ NB_StopRecording:
     MsgBox, 35, %NB_AppTitle%, Recording complete: %stepCount% key presses consolidated to %conCount% steps.`n`nYes = Load into Macro Builder (edit before saving)`nNo = Save directly as a macro file`nCancel = Discard
     IfMsgBox, Yes
     {
-        ; Load into the builder
-        global NB_MacroSteps
+        ; Load into the builder — set flag so builder doesn't reset steps
+        global NB_MacroSteps, NB_MacroKeepSteps
         NB_MacroSteps := consolidated
+        NB_MacroKeepSteps := 1
         gosub NB_OpenMacroBuilder
         NB_MacroRefreshList()
         return
