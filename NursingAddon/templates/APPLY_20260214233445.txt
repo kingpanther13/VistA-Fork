@@ -1,0 +1,234 @@
+﻿APPLY 2026-02-14 23:34:45
+Groups: 11
+
+--- Group 1 (3 items) ---
+  [X] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 2 (3 items) ---
+  [X] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 3 (3 items) ---
+  [X] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+--- Group 4 (4 items) ---
+  [X] d0 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 5 (31 items) ---
+  [X] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 6 (44 items) ---
+  [X] d0 PCB (unlabeled)
+  [X] d1 CB  Strong
+  [ ] d1 CB  Moderate
+  [ ] d1 CB  Weak
+  [ ] d1 CB  Unable to grip
+  [ ] d2 PCB (unlabeled)
+  [X] d1 CB  Full strength
+  [ ] d1 CB  Flaccid
+  [ ] d1 CB  Moves against gravity
+  [ ] d1 CB  Moves against some resistance
+  [ ] d2 PCB (unlabeled)
+  [X] d1 CB  Full strength
+  [ ] d1 CB  Flaccid
+  [ ] d1 CB  Moves against gravity
+  [ ] d1 CB  Moves against some resistance
+  [ ] d2 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [X] d1 CB  Intact
+  [ ] d1 CB  Absent
+  [ ] d1 CB  Decreased
+  [ ] d1 CB  Patchy
+  [ ] d1 CB  Unable to detect pressure
+  [ ] d2 PCB (unlabeled)
+  [X] d1 CB  Intact
+  [ ] d1 CB  Absent
+  [ ] d1 CB  Decreased
+  [ ] d1 CB  Patchy
+  [ ] d1 CB  Unable to detect pressure
+  [ ] d2 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [X] d1 CB  Warm
+  [ ] d1 CB  Cold
+  [ ] d1 CB  Cool
+  [ ] d1 CB  Hot
+  [ ] d2 PCB (unlabeled)
+  [X] d1 CB  Warm
+  [ ] d1 CB  Cold
+  [ ] d1 CB  Cool
+  [ ] d1 CB  Hot
+  [ ] d2 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 7 (30 items) ---
+  [X] d0 PCB (unlabeled)
+  [ ] d0 CB  Normal (S1S2)
+  [ ] d0 CB  Distant/muffled
+  [ ] d0 CB  Mechanical click
+  [ ] d0 CB  Murmur
+  [ ] d0 CB  Unable to assess
+  [ ] d0 CB  Other:
+  [X] d0 PCB (unlabeled)
+  [X] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [X] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [X] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d1 PCB (unlabeled)
+  [X] d2 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 8 (29 items) ---
+  [X] d0 PCB (unlabeled)
+  [X] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [ ] d0 CB  Anterior and posterior
+  [ ] d0 CB  Anterior only
+  [ ] d0 CB  Posterior only
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 9 (28 items) ---
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 CB  Continent
+  [ ] d0 CB  Incontinent
+  [ ] d0 CB  Ostomy
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 CB  Soft
+  [ ] d0 CB  Non-tender
+  [ ] d0 CB  Firm
+  [ ] d0 CB  Guarding
+  [ ] d0 CB  Other:
+  [X] d0 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 10 (23 items) ---
+  [X] d0 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [X] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)
+--- Group 11 (22 items) ---
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [X] d1 PCB (unlabeled)
+  [X] d2 PCB (unlabeled)
+  [X] d3 PCB (unlabeled)
+  [ ] d3 PCB (unlabeled)
+  [ ] d3 PCB (unlabeled)
+  [ ] d3 PCB (unlabeled)
+  [ ] d3 PCB (unlabeled)
+  [ ] d3 PCB (unlabeled)
+  [ ] d3 PCB (unlabeled)
+  [ ] d3 PCB (unlabeled)
+  [ ] d3 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d2 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d1 PCB (unlabeled)
+  [ ] d0 PCB (unlabeled)

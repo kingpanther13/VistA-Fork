@@ -13,6 +13,15 @@
 ;   4. Next shift, open the same dialogue, click "Load Template" -> apply
 ;   5. Review the dialogue in CPRS, make any changes, THEN click Finish
 ;
+; MATCHING: Two-track structural matching.
+;   - Top-level section parents: matched by position (1st, 2nd, 3rd, etc.)
+;   - After expanding sections, each creates a TGroupBox with sub-controls.
+;     Sub-controls are matched by their local enumeration index within
+;     their TGroupBox (stable because same section = same internal structure).
+;   - Leaf checkboxes (TCPRSDialogCheckBox): also matched by label text
+;     as a verification layer.
+;   Works with ANY CPRS reminder dialog type.
+;
 ; SAFETY: Clicking checkboxes only. Never clicks OK, Finish, or Submit.
 ; The nurse always reviews and submits manually.
 ;
@@ -46,20 +55,15 @@ BuildToolbar() {
     BoosterGui.SetFont("s9", "Segoe UI")
     BoosterGui.BackColor := "1a1a2e"
 
-    ; Title bar (draggable)
     titleBar := BoosterGui.AddText("xm ym w560 h22 Center cWhite Background1a1a2e",
         "  Nursing Booster  |  Ctrl+Shift+B to toggle")
-    titleBar.OnEvent("Click", (*) => PostMessage(0xA1, 2,,, BoosterGui))  ; drag
+    titleBar.OnEvent("Click", (*) => PostMessage(0xA1, 2,,, BoosterGui))
 
-    ; --- Row 1: Template Actions ---
     BoosterGui.AddButton("xm y+4 w130 h28", "Save Template").OnEvent("Click", BtnSaveCurrentState)
     BoosterGui.AddButton("x+4 w130 h28", "Load Template").OnEvent("Click", BtnLoadSavedTemplate)
     BoosterGui.AddButton("x+4 w130 h28", "Delete Template").OnEvent("Click", BtnDeleteTemplate)
     BoosterGui.AddButton("x+4 w130 h28", "Advanced Panel").OnEvent("Click", BtnOpenAdvancedPanel)
 
-    ; --- Row 2: Quick template buttons (user-assignable) ---
-    ; These map to saved templates by name. If the template doesn't exist
-    ; yet, clicking the button tells you how to create it.
     BoosterGui.AddButton("xm y+4 w130 h28", "Negative Assessment").OnEvent("Click",
         (*) => ApplyNamedTemplate("Negative Assessment"))
     BoosterGui.AddButton("x+4 w130 h28", "Skin Assessment").OnEvent("Click",
@@ -69,13 +73,10 @@ BuildToolbar() {
     BoosterGui.AddButton("x+4 w130 h28", "Custom 1").OnEvent("Click",
         (*) => ApplyNamedTemplate("Custom 1"))
 
-    ; --- Status ---
     BoosterGui.AddText("xm y+6 w560 h18 vToolbarStatus cSilver Background1a1a2e Center",
         "Ready | CPRS: Not detected")
 
     BoosterGui.Show("x0 y0 NoActivate")
-
-    ; Periodically check for CPRS
     SetTimer(CheckCPRS, 2000)
 }
 
@@ -88,7 +89,7 @@ CheckCPRS() {
     if cprsHwnd {
         title := WinGetTitle(cprsHwnd)
         dlg := FindActiveDialogWindow()
-        status := dlg ? "Template detected" : "CPRS: " SubStr(title, 1, 50)
+        status := dlg ? "Dialog detected" : "CPRS: " SubStr(title, 1, 50)
         BoosterGui["ToolbarStatus"].Text := "Ready | " status
     } else {
         BoosterGui["ToolbarStatus"].Text := "Ready | CPRS: Not detected"
@@ -96,45 +97,30 @@ CheckCPRS() {
 }
 
 ; ===========================================================================
-; DIALOG/TEMPLATE WINDOW DETECTION
-;
-; Finds any CPRS window containing checkboxes - not just reminder dialogs.
-; Checks known dialog classes first, then falls back to scanning all CPRS
-; child windows for TORCheckBox or TCPRSDialogParentCheckBox controls.
+; DIALOG WINDOW DETECTION
 ; ===========================================================================
 
 FindActiveDialogWindow() {
-    ; Priority 1: Reminder Dialog as separate window
     hwnd := WinExist("ahk_class TfrmRemDlg")
     if hwnd
         return hwnd
-
-    ; Priority 2: Template Dialog as separate window
     hwnd := WinExist("ahk_class TfrmTemplateDialog")
     if hwnd
         return hwnd
-
-    ; Priority 3: Check all CPRS windows (including main frame) for
-    ; embedded reminder dialogs or any window with checkbox controls
     for wnd in WinGetList("ahk_exe CPRSChart.exe") {
         try {
             cls := WinGetClass(wnd)
-            ; Check non-main windows for checkboxes
             if (cls != "TCPRSChart" && cls != "TfrmFrame") {
                 if HasCheckboxControls(wnd)
                     return wnd
             }
         }
     }
-
-    ; Priority 4: Check inside the main CPRS frame for embedded dialogs
-    ; (reminder dialogs can be docked inside the main window)
     mainHwnd := WinExist("ahk_class TfrmFrame")
     if !mainHwnd
         mainHwnd := WinExist("ahk_exe CPRSChart.exe")
     if mainHwnd && HasCheckboxControls(mainHwnd)
         return mainHwnd
-
     return 0
 }
 
@@ -160,9 +146,6 @@ _CheckForCheckboxes(hwnd, lParam) {
 
 ; ===========================================================================
 ; NAMED TEMPLATE BUTTONS
-;
-; Each button on row 2 maps to a template file by name. If the template
-; exists, it gets applied. If not, the user gets instructions to create it.
 ; ===========================================================================
 
 ApplyNamedTemplate(templateName) {
@@ -172,7 +155,6 @@ ApplyNamedTemplate(templateName) {
         SetTimer(ClearToolTip, -2000)
         return
     }
-
     templatePath := TemplateDir "\" SanitizeFilename(templateName) ".json"
     if FileExist(templatePath) {
         WinActivate(dlgHwnd)
@@ -192,14 +174,119 @@ ApplyNamedTemplate(templateName) {
 }
 
 ; ===========================================================================
-; TEMPLATE APPLICATION
+; SAVE TEMPLATE (format v3 - structural matching)
 ;
-; Scans the live CPRS dialogue for all checkboxes, matches them to the
-; saved template by label text, and clicks any that need to change state.
+; Records:
+;   1. topLevelParents - which TL sections are expanded (by position)
+;   2. groups[] - for each TGroupBox in the scrollbox, all descendant
+;      checkboxes by their local enumeration index within that TGroupBox
+;   3. Labels are recorded for verification/debugging but matching uses
+;      the structural position (group index + local index)
+; ===========================================================================
+
+BtnSaveCurrentState(ctrl, *) {
+    dlgHwnd := FindActiveDialogWindow()
+    if !dlgHwnd {
+        MsgBox("Open a template or reminder dialogue in CPRS first.", AppTitle, "Icon!")
+        return
+    }
+
+    result := InputBox("Template name:`n`n"
+        "Use a descriptive name like 'Negative Assessment' or 'Skin WNL'.`n"
+        "Naming it the same as a toolbar button links it to that button.",
+        "Save Template",, "")
+    if result.Result = "Cancel" || result.Value = ""
+        return
+    templateName := result.Value
+
+    ToolTip("Scanning dialog...")
+    WaitForStableCheckboxCount(dlgHwnd)
+
+    ; Get scrollbox and top-level parents
+    scrollBox := FindVisibleScrollBox(dlgHwnd)
+    if !scrollBox {
+        MsgBox("Could not find dialog scroll area.", AppTitle, "Icon!")
+        return
+    }
+
+    tlParents := EnumTopLevelParents(scrollBox)
+    if tlParents.Length = 0 {
+        MsgBox("No sections found in dialog.", AppTitle, "Icon!")
+        return
+    }
+
+    ; Get all TGroupBoxes that are direct children of the scrollbox
+    allGroupBoxes := EnumScrollBoxGroupBoxes(scrollBox)
+
+    ; Build JSON
+    json := '{'
+    json .= '`n  "name": ' EscJson(templateName) ','
+    json .= '`n  "format": 3,'
+    json .= '`n  "created": "' FormatTime(, "yyyy-MM-dd HH:mm") '",'
+    json .= '`n  "source_dialogue": ' EscJson(WinGetTitle(dlgHwnd)) ','
+
+    ; Top-level parent states
+    json .= '`n  "topLevelParents": ['
+    for i, tlp in tlParents {
+        if i > 1
+            json .= ", "
+        json .= tlp.checked ? "true" : "false"
+    }
+    json .= '],'
+
+    ; Groups: each TGroupBox with its descendant checkboxes
+    json .= '`n  "groups": ['
+    totalChecked := 0
+    totalControls := 0
+    for gi, gbHwnd in allGroupBoxes {
+        if gi > 1
+            json .= ","
+        json .= '`n    {"checkboxes": ['
+
+        ; Enumerate all descendant checkboxes within this TGroupBox
+        descendants := EnumDescendantCheckboxes(gbHwnd)
+        for ci, cb in descendants {
+            if ci > 1
+                json .= ","
+            json .= '`n      {"idx": ' (ci - 1) ', "cls": ' EscJson(cb.className)
+                . ', "checked": ' (cb.checked ? "true" : "false")
+                . ', "depth": ' cb.depth
+            if cb.label != ""
+                json .= ', "label": ' EscJson(cb.label)
+            json .= '}'
+            totalControls++
+            if cb.checked
+                totalChecked++
+        }
+        json .= '`n    ]}'
+    }
+    json .= '`n  ]'
+    json .= '`n}'
+
+    filePath := TemplateDir "\" SanitizeFilename(templateName) ".json"
+    f := FileOpen(filePath, "w", "UTF-8")
+    f.Write(json)
+    f.Close()
+
+    ; Log every checkbox state
+    _LogCheckboxStates("SAVE", allGroupBoxes)
+
+    ToolTip('Saved "' templateName '": ' totalChecked "/" totalControls
+        " checked across " allGroupBoxes.Length " groups")
+    SetTimer(ClearToolTip, -3000)
+}
+
+; ===========================================================================
+; APPLY TEMPLATE (format v3 - structural matching)
 ;
-; Only clicks checkboxes and dismisses intermediate "OK to continue" popups.
-; NEVER clicks the final Finish/Submit button that files the note.
-; The nurse always reviews the dialogue and submits manually.
+; Phase 1: Expand/collapse top-level sections to match template.
+; Phase 2: For each TGroupBox, match descendant checkboxes by local
+;          enumeration index and set their states.
+;
+; This works because:
+;   - Same TL parent expanded = same TGroupBox created
+;   - Same TGroupBox = same internal structure = same enumeration order
+;   - Local index within a TGroupBox is stable (unlike global ClassNN)
 ; ===========================================================================
 
 ApplyTemplate(templatePath) {
@@ -207,7 +294,6 @@ ApplyTemplate(templatePath) {
     if !dlgHwnd
         return
 
-    ; Load the template
     try {
         content := FileRead(templatePath, "UTF-8")
     } catch {
@@ -215,381 +301,578 @@ ApplyTemplate(templatePath) {
         return
     }
 
-    ; Parse template items and top-level parent states
-    items := ParseTemplateItems(content)
-    if items.Length = 0 {
-        MsgBox("Template has no items.", AppTitle, "Icon!")
-        return
-    }
-
-    tlpStates := ParseTopLevelParents(content)
-    if tlpStates.Length = 0 {
-        MsgBox("This template needs to be re-saved with the updated Nursing Booster.`n`n"
-            . "1. Open the reminder dialog in CPRS and fill it out`n"
-            . "2. Click 'Save Template' to overwrite it`n`n"
-            . "The new format tracks which sections to expand.",
+    ; Require format v3
+    if !(InStr(content, '"format": 3') || InStr(content, '"format":3')) {
+        MsgBox("This template must be re-saved with the updated Nursing Booster.`n`n"
+            "1. Open the reminder dialog in CPRS and fill it out`n"
+            "2. Click 'Save Template' to create a new version`n`n"
+            "Old templates (format 1/2) are not compatible.",
             AppTitle, "Icon!")
         return
     }
 
-    ; Extract template text items (TCPRSDialogCheckBox with readable labels)
-    ; and compute occurrence index for each (handles duplicate labels like
-    ; "Full strength", "Intact", "Warm" appearing in multiple sections)
-    textItems := []
-    tplLabelCounts := Map()
-    for item in items {
-        if item.cls = "TCPRSDialogCheckBox" && item.label != "" && item.label != " " && Trim(item.label) != "" {
-            key := item.label
-            occ := 0
-            if tplLabelCounts.Has(key)
-                occ := tplLabelCounts[key]
-            tplLabelCounts[key] := occ + 1
-            textItems.Push({label: item.label, checked: item.checked, occurrence: occ})
-        }
-    }
+    ; Parse template
+    tlpStates := ParseTopLevelParents(content)
+    templateGroups := ParseGroups(content)
 
-    ; Wait for dialog to finish initial load
-    ToolTip("Waiting for dialog to load...")
-    WaitForStableCheckboxCount(dlgHwnd)
-
-    ; === PHASE 1: Expand only the sections that were expanded in the template ===
-    ; On a fresh dialog, all checkboxes are top-level parents. We match them
-    ; by position to the template's topLevelParents array and click only the
-    ; ones that were checked (expanded) when the template was saved.
-    scrollBox := FindVisibleScrollBox(dlgHwnd)
-    if !scrollBox {
-        MsgBox("Could not find the dialog scroll area.", AppTitle, "Icon!")
+    if templateGroups.Length = 0 {
+        MsgBox("Template has no groups.", AppTitle, "Icon!")
         return
     }
 
-    liveTopParents := EnumTopLevelParents(scrollBox)
+    ; Wait for dialog to load
+    ToolTip("Waiting for dialog to load...")
+    WaitForStableCheckboxCount(dlgHwnd)
+
+    scrollBox := FindVisibleScrollBox(dlgHwnd)
+    if !scrollBox {
+        MsgBox("Could not find dialog scroll area.", AppTitle, "Icon!")
+        return
+    }
+
+    ; === PHASE 1: Expand/collapse top-level sections ===
     expandCount := 0
-    limit := Min(tlpStates.Length, liveTopParents.Length)
+    if tlpStates.Length > 0 {
+        liveTopParents := EnumTopLevelParents(scrollBox)
+        limit := Min(tlpStates.Length, liveTopParents.Length)
 
-    ToolTip("Expanding " limit " sections selectively...")
-    loop limit {
-        if !tlpStates[A_Index]
-            continue  ; this section was not expanded in the template
-        liveCb := liveTopParents[A_Index]
-        currentState := SendMessage(0x00F0, 0, 0, liveCb.hwnd)
-        if !currentState {
-            PostMessage(0x00F5, 0, 0, liveCb.hwnd)
-            expandCount++
-            Sleep(500)
-            DismissIntermediatePopups()
+        ToolTip("Setting up " limit " sections...")
+        loop limit {
+            liveCb := liveTopParents[A_Index]
+            currentState := SendMessage(0x00F0, 0, 0, liveCb.hwnd) ? true : false
+            desired := tlpStates[A_Index]
+
+            if currentState != desired {
+                try PostMessage(0x00F5, 0, 0, liveCb.hwnd)
+                expandCount++
+                Sleep(500)
+                DismissIntermediatePopups()
+            }
+        }
+
+        if expandCount > 0 {
+            ToolTip("Expanded " expandCount " sections, waiting for controls...")
+            WaitForStableCheckboxCount(dlgHwnd)
         }
     }
 
-    if expandCount > 0 {
-        ToolTip("Expanded " expandCount " sections, waiting for controls...")
-        WaitForStableCheckboxCount(dlgHwnd)
+    ; === PHASE 2: Match groups, expand, apply states ===
+    liveGroupBoxes := EnumScrollBoxGroupBoxes(scrollBox)
+
+    totalApplied := 0
+    totalNotFound := 0
+    totalExpanded := 0
+    groupsMatched := Min(templateGroups.Length, liveGroupBoxes.Length)
+
+    ; --- Step 1: Match groups BEFORE expansion using label overlap ---
+    ; Collect labels from each live group's base items (pre-expansion).
+    ; Match to template groups that contain those same labels.
+    ; This must happen before expansion to avoid corrupting group structure.
+    groupMap := Map()  ; live index (1-based) → template index (1-based)
+    usedTpl := Map()
+    usedLive := Map()
+
+    ; Build template label sets
+    tplLabelSets := []
+    for tplGroup in templateGroups {
+        labels := Map()
+        for tplCb in tplGroup {
+            if tplCb.label != ""
+                labels[tplCb.label] := true
+        }
+        tplLabelSets.Push(labels)
     }
 
-    ; === PHASE 1b: Selective child parent expansion ===
-    ; After top-level expansion, sub-section parent checkboxes must be clicked
-    ; to reveal TCPRSDialogCheckBox options. We expand them one at a time and
-    ; track which target items appear. Stop as soon as all targets are found.
-    ; Parents that don't reveal any target items are unchecked to keep the
-    ; note clean.
-    tlpHwnds := Map()
-    for tlp in liveTopParents
-        tlpHwnds[tlp.hwnd] := true
-
-    ; Build set of target keys we need to find
-    targetKeys := Map()
-    for item in textItems
-        targetKeys[item.label "|" item.occurrence] := true
-    targetCount := textItems.Length
-
-    totalChildExpanded := 0
-    allTargetsFound := false
-
-    loop 3 {  ; max 3 depth rounds
-        checkboxes := FindAllCheckboxes(dlgHwnd)
-        uncheckedParents := []
-        for cb in checkboxes {
-            if cb.className != "TCPRSDialogParentCheckBox"
-                continue
-            if tlpHwnds.Has(cb.hwnd)
-                continue
-            if !SendMessage(0x00F0, 0, 0, cb.hwnd)
-                uncheckedParents.Push(cb)
+    ; Build live base label sets and base fingerprints
+    liveLabelSets := []
+    liveFPs := []
+    loop liveGroupBoxes.Length {
+        desc := EnumDescendantCheckboxes(liveGroupBoxes[A_Index])
+        labels := Map()
+        for cb in desc {
+            if cb.label != ""
+                labels[cb.label] := true
         }
+        liveLabelSets.Push(labels)
+        liveFPs.Push(_GroupFingerprint(desc))
+    }
 
-        if uncheckedParents.Length = 0
+    ; Build template base fingerprints (for non-label groups)
+    tplFPs := []
+    for tplGroup in templateGroups {
+        tplFPs.Push(_GroupFingerprint(tplGroup))
+    }
+
+    ; Pass 1: Match groups that have labels by label overlap
+    loop liveLabelSets.Length {
+        liveIdx := A_Index
+        liveLabels := liveLabelSets[liveIdx]
+        liveHasLabels := false
+        for _ in liveLabels {
+            liveHasLabels := true
             break
+        }
+        if !liveHasLabels
+            continue
 
-        expandedThisRound := []
-        for cp in uncheckedParents {
-            ; Count targets BEFORE clicking
-            beforeCount := _CountVisibleTargets(dlgHwnd, targetKeys)
+        bestTpl := 0
+        bestOverlap := 0
+        matchCount := 0
+        loop tplLabelSets.Length {
+            tplIdx := A_Index
+            if usedTpl.Has(tplIdx)
+                continue
+            ; Count how many live labels appear in this template group
+            overlap := 0
+            for lbl in liveLabels {
+                if tplLabelSets[tplIdx].Has(lbl)
+                    overlap++
+            }
+            if overlap > bestOverlap {
+                bestOverlap := overlap
+                bestTpl := tplIdx
+                matchCount := 1
+            } else if overlap = bestOverlap && overlap > 0 {
+                matchCount++
+            }
+        }
+        if bestTpl > 0 && matchCount = 1 {
+            groupMap[liveIdx] := bestTpl
+            usedTpl[bestTpl] := true
+            usedLive[liveIdx] := true
+        }
+    }
 
-            PostMessage(0x00F5, 0, 0, cp.hwnd)
-            totalChildExpanded++
-            Sleep(200)
-            DismissIntermediatePopups()
+    ; Pass 2: Match remaining groups by fingerprint (count + depth profile)
+    loop liveFPs.Length {
+        liveIdx := A_Index
+        if usedLive.Has(liveIdx)
+            continue
+        matches := []
+        loop tplFPs.Length {
+            tplIdx := A_Index
+            if !usedTpl.Has(tplIdx) && liveFPs[liveIdx] = tplFPs[tplIdx]
+                matches.Push(tplIdx)
+        }
+        if matches.Length = 1 {
+            groupMap[liveIdx] := matches[1]
+            usedTpl[matches[1]] := true
+            usedLive[liveIdx] := true
+        }
+    }
 
-            ; Count targets AFTER clicking
-            afterCount := _CountVisibleTargets(dlgHwnd, targetKeys)
+    ; Pass 3: Remaining unmatched groups by relative Y-position
+    unmatchedTpl := []
+    loop tplFPs.Length {
+        if !usedTpl.Has(A_Index)
+            unmatchedTpl.Push(A_Index)
+    }
+    unmatchedLive := []
+    loop liveFPs.Length {
+        if !usedLive.Has(A_Index)
+            unmatchedLive.Push(A_Index)
+    }
+    posLimit := Min(unmatchedTpl.Length, unmatchedLive.Length)
+    loop posLimit {
+        groupMap[unmatchedLive[A_Index]] := unmatchedTpl[A_Index]
+    }
 
-            if afterCount > beforeCount {
-                ; This parent revealed target items - keep it
-                expandedThisRound.Push({hwnd: cp.hwnd, keep: true})
-            } else {
-                ; No new targets - uncheck it to keep note clean
-                expandedThisRound.Push({hwnd: cp.hwnd, keep: false})
-                PostMessage(0x00F5, 0, 0, cp.hwnd)  ; toggle back
-                Sleep(100)
+    ; --- Step 2: Expansion pass (using correct group mapping) ---
+    loop liveGroupBoxes.Length {
+        liveIdx := A_Index
+        if !groupMap.Has(liveIdx)
+            continue
+        tplIdx := groupMap[liveIdx]
+        gbHwnd := liveGroupBoxes[liveIdx]
+        tplGroup := templateGroups[tplIdx]
+
+        ToolTip("Expanding group " liveIdx "/" liveGroupBoxes.Length "...")
+
+        loop 8 {
+            liveDesc := EnumDescendantCheckboxes(gbHwnd)
+            if liveDesc.Length >= tplGroup.Length
+                break
+
+            expandedAny := false
+            currentDepth := 0
+
+            while currentDepth <= 4 && !expandedAny {
+                tplAtDepth := []
+                for tplCb in tplGroup {
+                    if tplCb.depth = currentDepth && tplCb.cls = "TCPRSDialogParentCheckBox"
+                        tplAtDepth.Push(tplCb)
+                }
+
+                liveAtDepth := []
+                for liveCb in liveDesc {
+                    if liveCb.depth = currentDepth && liveCb.className = "TCPRSDialogParentCheckBox"
+                        liveAtDepth.Push(liveCb)
+                }
+
+                limit := Min(tplAtDepth.Length, liveAtDepth.Length)
+                loop limit {
+                    i := A_Index
+                    if tplAtDepth[i].checked && !liveAtDepth[i].checked {
+                        try {
+                            if DllCall("IsWindow", "Ptr", liveAtDepth[i].hwnd)
+                                PostMessage(0x00F5, 0, 0, liveAtDepth[i].hwnd)
+                        }
+                        expandedAny := true
+                        totalExpanded++
+                        Sleep(500)
+                        DismissIntermediatePopups()
+                    }
+                }
+                currentDepth++
             }
 
-            ToolTip("Expanding sub-sections... " afterCount "/" targetCount " items found")
-
-            if afterCount >= targetCount {
-                allTargetsFound := true
+            if !expandedAny
                 break
-            }
 
-            if totalChildExpanded >= 80
-                break
+            Sleep(600)
+        }
+    }
+
+    ; --- Step 3: Apply checkbox states (label-first matching) ---
+    loop liveGroupBoxes.Length {
+        liveIdx := A_Index
+        if !groupMap.Has(liveIdx)
+            continue
+        tplIdx := groupMap[liveIdx]
+        gbHwnd := liveGroupBoxes[liveIdx]
+        tplGroup := templateGroups[tplIdx]
+
+        ToolTip("Applying group " liveIdx " (tpl " tplIdx ")...")
+
+        liveDescendants := EnumDescendantCheckboxes(gbHwnd)
+
+        ; Build per-depth arrays for template
+        tplByDepth := Map()
+        for tplCb in tplGroup {
+            d := tplCb.depth
+            if !tplByDepth.Has(d)
+                tplByDepth[d] := []
+            tplByDepth[d].Push(tplCb)
         }
 
-        if allTargetsFound || totalChildExpanded >= 80
-            break
+        ; Build per-depth arrays for live
+        liveByDepth := Map()
+        for liveCb in liveDescendants {
+            d := liveCb.depth
+            if !liveByDepth.Has(d)
+                liveByDepth[d] := []
+            liveByDepth[d].Push(liveCb)
+        }
 
-        ; Wait for controls to stabilize before next depth round
+        ; Match items at each depth level using label-first strategy
+        for d, tplItems in tplByDepth {
+            if !liveByDepth.Has(d) {
+                totalNotFound += tplItems.Length
+                continue
+            }
+            liveItems := liveByDepth[d]
+            claimed := Map()  ; live indices already matched
+
+            ; Pass 1: Match all labeled template items by label text
+            for tplCb in tplItems {
+                if tplCb.label = ""
+                    continue
+                for liveJ, liveCb in liveItems {
+                    if claimed.Has(liveJ)
+                        continue
+                    if liveCb.label = tplCb.label {
+                        if liveCb.checked != tplCb.checked {
+                            try {
+                                if DllCall("IsWindow", "Ptr", liveCb.hwnd)
+                                    PostMessage(0x00F5, 0, 0, liveCb.hwnd)
+                            }
+                            totalApplied++
+                            Sleep(100)
+                        }
+                        claimed[liveJ] := true
+                        break
+                    }
+                }
+            }
+
+            ; Pass 2: Match unlabeled template items to unclaimed live items
+            unclaimedLive := []
+            for liveJ, liveCb in liveItems {
+                if !claimed.Has(liveJ)
+                    unclaimedLive.Push(liveCb)
+            }
+            unlabeledTpl := []
+            for tplCb in tplItems {
+                if tplCb.label = ""
+                    unlabeledTpl.Push(tplCb)
+            }
+            posLimit := Min(unlabeledTpl.Length, unclaimedLive.Length)
+            loop posLimit {
+                i := A_Index
+                if unclaimedLive[i].checked != unlabeledTpl[i].checked {
+                    try {
+                        if DllCall("IsWindow", "Ptr", unclaimedLive[i].hwnd)
+                            PostMessage(0x00F5, 0, 0, unclaimedLive[i].hwnd)
+                    }
+                    totalApplied++
+                    Sleep(100)
+                }
+            }
+
+            ; Count unmatched
+            claimedCount := 0
+            for _ in claimed
+                claimedCount++
+            totalMatched := claimedCount + posLimit
+            if tplItems.Length > totalMatched
+                totalNotFound += tplItems.Length - totalMatched
+
+            if Mod(totalApplied, 8) = 0
+                DismissIntermediatePopups()
+        }
+
         DismissIntermediatePopups()
-        Sleep(500)
     }
 
-    ; === PHASE 2: Match TCPRSDialogCheckBox by label + occurrence ===
-    ; After expanding all sections/subsections, duplicate labels like
-    ; "Full strength" appear in the same order. We match the Nth
-    ; occurrence in the template to the Nth occurrence in the live dialog.
-    checkboxes := FindAllCheckboxes(dlgHwnd)
+    ; Count unmatched groups
+    if templateGroups.Length > liveGroupBoxes.Length
+        totalNotFound += templateGroups.Length - liveGroupBoxes.Length
 
-    ; Build occurrence-indexed map of live TCPRSDialogCheckBox items
-    liveLabelCounts := Map()
-    liveByLabelOcc := Map()
-    for cb in checkboxes {
-        if cb.className != "TCPRSDialogCheckBox"
-            continue
-        if cb.label = "" || cb.label = " " || Trim(cb.label) = ""
-            continue
-        key := cb.label
-        occ := 0
-        if liveLabelCounts.Has(key)
-            occ := liveLabelCounts[key]
-        liveLabelCounts[key] := occ + 1
-        liveByLabelOcc[key "|" occ] := cb
-    }
+    ; Log every checkbox state after apply
+    _LogCheckboxStates("APPLY", liveGroupBoxes)
 
-    ; Write diagnostic log
-    logPath := TemplateDir "\last_apply_log.txt"
-    try {
-        logFile := FileOpen(logPath, "w", "UTF-8")
-        logFile.Write("Template: " templatePath "`n")
-        logFile.Write("Top-level parents: " tlpStates.Length " template, " liveTopParents.Length " live, " expandCount " expanded`n")
-        logFile.Write("Child sub-sections tried: " totalChildExpanded ", all targets found: " (allTargetsFound ? "YES" : "NO") "`n")
-        logFile.Write("Text items: " textItems.Length " template, " liveByLabelOcc.Count " live`n`n")
-        logFile.Write("=== Template text items (label|occurrence) ===`n")
-        for item in textItems {
-            logFile.Write("  '" item.label "' occ=" item.occurrence " checked=" (item.checked ? "Y" : "N") "`n")
-        }
-        logFile.Write("`n=== Matching results ===`n")
-        for item in textItems {
-            lookupKey := item.label "|" item.occurrence
-            found := liveByLabelOcc.Has(lookupKey) ? "FOUND" : "MISSING"
-            logFile.Write("  '" item.label "' occ=" item.occurrence " -> " found "`n")
-        }
-        logFile.Write("`n")
-        logFile.Close()
-    }
-
-    ; Apply: toggle checkboxes that differ from template
-    ToolTip("Applying " textItems.Length " selections...")
-    applied := 0
-    skipped := 0
-    notFound := 0
-
-    for item in textItems {
-        lookupKey := item.label "|" item.occurrence
-        if !liveByLabelOcc.Has(lookupKey) {
-            notFound++
-            continue
-        }
-
-        targetCb := liveByLabelOcc[lookupKey]
-        if !DllCall("IsWindow", "Ptr", targetCb.hwnd)
-            continue
-
-        currentState := SendMessage(0x00F0, 0, 0, targetCb.hwnd) ? true : false
-        if currentState = item.checked {
-            skipped++
-            continue
-        }
-
-        ; Click to toggle
-        PostMessage(0x00F5, 0, 0, targetCb.hwnd)
-        applied++
-        Sleep(200)
-
-        if Mod(applied, 5) = 0
-            DismissIntermediatePopups()
-    }
-
-    DismissIntermediatePopups()
-
-    ToolTip("Done: " applied " applied, " skipped " already set, " notFound " not found. Review before Finish.")
+    ToolTip("Done: " totalApplied " toggled, " totalNotFound " not found. Review before Finish.")
     SetTimer(ClearToolTip, -5000)
 }
 
-; ---------------------------------------------------------------------------
-; Dismiss intermediate popup dialogues that CPRS spawns mid-form.
-;
-; These are small modal windows with a single OK button - informational
-; messages or "Press OK to continue" confirmations. They are child windows
-; of CPRS (owned by CPRSChart.exe) with standard Delphi form classes.
-;
-; We ONLY dismiss popups that match ALL of these criteria:
-;   1. Owned by CPRSChart.exe
-;   2. Small window (not the main CPRS window or the reminder dialogue)
-;   3. Contains an "OK" button but NOT "Finish", "Submit", or "Sign"
-;   4. Does NOT have a text input field (not a data entry form)
-;
-; This is deliberately conservative. If a popup doesn't match, it stays
-; open and the nurse handles it manually.
-; ---------------------------------------------------------------------------
-DismissIntermediatePopups() {
-    ; Give CPRS a moment to spawn the popup
-    Sleep(150)
+; ===========================================================================
+; CHECKBOX STATE LOGGING
+; ===========================================================================
 
-    ; Look for popup windows owned by CPRS
-    loop 3 {  ; check up to 3 times (chained popups)
-        found := false
-        for wnd in WinGetList("ahk_exe CPRSChart.exe") {
-            try {
-                cls := WinGetClass(wnd)
-                title := WinGetTitle(wnd)
-
-                ; Skip the main CPRS window and any dialog/template windows
-                if cls = "TfrmRemDlg" || cls = "TCPRSChart" || cls = "TfrmFrame"
-                    || cls = "TfrmTemplateDialog"
-                    continue
-
-                ; Must be a small Delphi form (popup-sized)
-                WinGetPos(,, &w, &h, wnd)
-                if w > 500 || h > 400
-                    continue  ; too big - probably not a simple OK popup
-
-                ; Check for dangerous buttons we must NEVER click
-                if HasDangerousButton(wnd)
-                    continue
-
-                ; Look for an OK button to click
-                okHwnd := FindOKButton(wnd)
-                if okHwnd {
-                    PostMessage(0x00F5, 0, 0, okHwnd)  ; BM_CLICK the OK button
-                    Sleep(200)
-                    found := true
-                }
+; Writes a timestamped log of every checkbox in every group.
+; Called on both Save and Apply so the two logs can be diffed.
+; action = "SAVE" or "APPLY"
+_LogCheckboxStates(action, groupBoxHwnds) {
+    logPath := TemplateDir "\" action "_" A_Now ".txt"
+    try {
+        f := FileOpen(logPath, "w", "UTF-8")
+        f.Write(action " " FormatTime(, "yyyy-MM-dd HH:mm:ss") "`n")
+        f.Write("Groups: " groupBoxHwnds.Length "`n`n")
+        for gi, gbHwnd in groupBoxHwnds {
+            descendants := EnumDescendantCheckboxes(gbHwnd)
+            f.Write("--- Group " gi " (" descendants.Length " items) ---`n")
+            for ci, cb in descendants {
+                state := cb.checked ? "[X]" : "[ ]"
+                cls := cb.className = "TCPRSDialogParentCheckBox" ? "PCB" : "CB "
+                lbl := cb.label != "" ? cb.label : "(unlabeled)"
+                f.Write("  " state " d" cb.depth " " cls " " lbl "`n")
             }
         }
-        if !found
-            break
+        f.Close()
     }
 }
 
-; Check if a window contains buttons we must never auto-click
-HasDangerousButton(windowHwnd) {
-    global _hasDangerous := false
+; ===========================================================================
+; GROUP FINGERPRINTING
+; ===========================================================================
 
-    enumDangerous := CallbackCreate(_CheckDangerousCallback, "Fast", 2)
-    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumDangerous, "Ptr", 0)
-    CallbackFree(enumDangerous)
-
-    return _hasDangerous
+; Build a fingerprint string for a group of checkboxes.
+; Combines sorted label set + depth profile so groups with different content
+; get different fingerprints. Works with both template items (.label, .depth)
+; and live items (.label, .depth).
+_GroupFingerprint(items) {
+    labels := []
+    depthCounts := Map()
+    for item in items {
+        if item.label != ""
+            labels.Push(item.label)
+        d := item.depth
+        if !depthCounts.Has(d)
+            depthCounts[d] := 0
+        depthCounts[d] := depthCounts[d] + 1
+    }
+    ; Sort labels alphabetically (insertion sort)
+    if labels.Length > 1 {
+        loop labels.Length - 1 {
+            i := A_Index + 1
+            key := labels[i]
+            j := i - 1
+            while j >= 1 && StrCompare(labels[j], key) > 0 {
+                labels[j + 1] := labels[j]
+                j--
+            }
+            labels[j + 1] := key
+        }
+    }
+    ; Sort depth keys
+    depthKeys := []
+    for k in depthCounts
+        depthKeys.Push(k)
+    if depthKeys.Length > 1 {
+        loop depthKeys.Length - 1 {
+            i := A_Index + 1
+            key := depthKeys[i]
+            j := i - 1
+            while j >= 1 && depthKeys[j] > key {
+                depthKeys[j + 1] := depthKeys[j]
+                j--
+            }
+            depthKeys[j + 1] := key
+        }
+    }
+    fp := items.Length "|"
+    for lbl in labels
+        fp .= lbl ","
+    fp .= "|"
+    for dk in depthKeys
+        fp .= dk ":" depthCounts[dk] ","
+    return fp
 }
 
-_CheckDangerousCallback(hwnd, lParam) {
-    global _hasDangerous
+; ===========================================================================
+; CHECKBOX ENUMERATION
+; ===========================================================================
 
+; Enumerate all TGroupBox direct children of the scrollbox, sorted by
+; screen Y position (visual top-to-bottom order). Z-order is unreliable
+; because it reflects creation order, which differs between save and apply.
+EnumScrollBoxGroupBoxes(scrollBoxHwnd) {
+    raw := []
+    child := DllCall("GetWindow", "Ptr", scrollBoxHwnd, "UInt", 5, "Ptr")  ; GW_CHILD
+    while child {
+        buf := Buffer(256, 0)
+        DllCall("GetClassName", "Ptr", child, "Ptr", buf, "Int", 256)
+        className := StrGet(buf)
+        if className = "TGroupBox" {
+            rect := Buffer(16)
+            DllCall("GetWindowRect", "Ptr", child, "Ptr", rect)
+            y := NumGet(rect, 4, "Int")  ; RECT.top = screen Y
+            raw.Push({hwnd: child, y: y})
+        }
+        child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")  ; GW_HWNDNEXT
+    }
+    ; Sort by Y position (insertion sort - typically <10 items)
+    if raw.Length > 1 {
+        loop raw.Length - 1 {
+            i := A_Index + 1
+            key := raw[i]
+            j := i - 1
+            while j >= 1 && raw[j].y > key.y {
+                raw[j + 1] := raw[j]
+                j--
+            }
+            raw[j + 1] := key
+        }
+    }
+    ; Return HWNDs in visual order
+    sorted := []
+    for item in raw
+        sorted.Push(item.hwnd)
+    return sorted
+}
+
+; Enumerate ALL descendant checkboxes within a container (via EnumChildWindows)
+; Returns them sorted by screen Y position (with X tiebreaker) for consistent
+; ordering regardless of z-order. Each item also has a depth field counting
+; how many TGroupBox ancestors are between it and the container.
+EnumDescendantCheckboxes(containerHwnd) {
+    results := []
+    global _descCBResults := results
+    enumCB := CallbackCreate(_EnumDescCBCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", containerHwnd, "Ptr", enumCB, "Ptr", 0)
+    CallbackFree(enumCB)
+
+    ; Compute nesting depth for each checkbox (TGroupBox ancestor count)
+    for item in results {
+        depth := 0
+        p := DllCall("GetParent", "Ptr", item.hwnd, "Ptr")
+        while p && p != containerHwnd {
+            pBuf := Buffer(256, 0)
+            DllCall("GetClassName", "Ptr", p, "Ptr", pBuf, "Int", 256)
+            if StrGet(pBuf) = "TGroupBox"
+                depth++
+            p := DllCall("GetParent", "Ptr", p, "Ptr")
+        }
+        item.depth := depth
+    }
+
+    ; Sort by screen Y position (with X tiebreaker) for consistent ordering.
+    ; Z-order varies between save and apply because nested TGroupBoxes are
+    ; created in different orders. Y-position gives visual top-to-bottom order.
+    if results.Length > 1 {
+        loop results.Length - 1 {
+            i := A_Index + 1
+            key := results[i]
+            j := i - 1
+            while j >= 1 && (results[j].y > key.y
+                || (results[j].y = key.y && results[j].x > key.x)) {
+                results[j + 1] := results[j]
+                j--
+            }
+            results[j + 1] := key
+        }
+    }
+
+    return results
+}
+
+_EnumDescCBCallback(hwnd, lParam) {
+    global _descCBResults
     buf := Buffer(256, 0)
     DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
     className := StrGet(buf)
-
-    ; If it has text input fields, it's a data entry form - don't auto-dismiss
-    if InStr(className, "TEdit") || InStr(className, "TMemo") || InStr(className, "TRichEdit") {
-        _hasDangerous := true
-        return 0
-    }
-
-    ; Check button text for dangerous labels
-    if InStr(className, "TButton") || InStr(className, "TBitBtn") {
-        len := SendMessage(0x000E, 0, 0, hwnd)
-        if len > 0 {
-            textBuf := Buffer((len + 1) * 2, 0)
-            SendMessage(0x000D, len + 1, textBuf, hwnd)
-            text := StrGet(textBuf)
-            textUpper := StrUpper(text)
-
-            ; These are the buttons that file/sign/submit the note
-            if InStr(textUpper, "FINISH") || InStr(textUpper, "SUBMIT")
-                || InStr(textUpper, "SIGN") || InStr(textUpper, "FILE")
-                || InStr(textUpper, "COMPLETE") || InStr(textUpper, "SAVE")
-                || InStr(textUpper, "DELETE") || InStr(textUpper, "REMOVE") {
-                _hasDangerous := true
-                return 0
-            }
-        }
-    }
-
-    return 1
-}
-
-; Find an OK button in a window
-FindOKButton(windowHwnd) {
-    global _foundOKHwnd := 0
-
-    enumOK := CallbackCreate(_FindOKCallback, "Fast", 2)
-    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumOK, "Ptr", 0)
-    CallbackFree(enumOK)
-
-    return _foundOKHwnd
-}
-
-_FindOKCallback(hwnd, lParam) {
-    global _foundOKHwnd
-
-    buf := Buffer(256, 0)
-    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
-    className := StrGet(buf)
-
-    if !(InStr(className, "TButton") || InStr(className, "TBitBtn"))
+    if !(className = "TCPRSDialogParentCheckBox" || className = "TCPRSDialogCheckBox" || className = "TORCheckBox")
         return 1
 
-    len := SendMessage(0x000E, 0, 0, hwnd)
-    if len > 0 {
-        textBuf := Buffer((len + 1) * 2, 0)
-        SendMessage(0x000D, len + 1, textBuf, hwnd)
-        text := StrGet(textBuf)
-        textUpper := StrUpper(text)
+    checked := SendMessage(0x00F0, 0, 0, hwnd) ? true : false
 
-        ; Only dismiss OK, Continue, Yes - never anything that files/signs
-        if textUpper = "OK" || textUpper = "&OK" || textUpper = "CONTINUE"
-            || textUpper = "&CONTINUE" || textUpper = "YES" || textUpper = "&YES" {
-            _foundOKHwnd := hwnd
-            return 0
+    ; Get screen position for Y-sorting
+    rect := Buffer(16)
+    DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", rect)
+    y := NumGet(rect, 4, "Int")
+    x := NumGet(rect, 0, "Int")
+
+    ; Read label for TCPRSDialogCheckBox (they have readable window text)
+    label := ""
+    if className = "TCPRSDialogCheckBox" || className = "TORCheckBox" {
+        tLen := SendMessage(0x000E, 0, 0, hwnd)
+        if tLen > 0 {
+            tBuf := Buffer((tLen + 1) * 2, 0)
+            SendMessage(0x000D, tLen + 1, tBuf, hwnd)
+            label := Trim(StrGet(tBuf))
         }
     }
 
+    _descCBResults.Push({hwnd: hwnd, className: className, checked: checked, label: label, y: y, x: x})
     return 1
 }
 
-; Wait until the checkbox count stops changing (dialog finished loading)
+; Lightweight count-only enumeration for stability checks
+FindAllCheckboxes(dlgHwnd) {
+    results := []
+    global _findCBResults := results
+    enumCB := CallbackCreate(_EnumCBCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", dlgHwnd, "Ptr", enumCB, "Ptr", 0)
+    CallbackFree(enumCB)
+    return results
+}
+
+_EnumCBCallback(hwnd, lParam) {
+    global _findCBResults
+    buf := Buffer(256, 0)
+    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
+    className := StrGet(buf)
+    if !(className = "TORCheckBox" || className = "TCPRSDialogParentCheckBox" || className = "TCPRSDialogCheckBox")
+        return 1
+    _findCBResults.Push({hwnd: hwnd, className: className})
+    return 1
+}
+
+; Wait until checkbox count stops changing
 WaitForStableCheckboxCount(dlgHwnd) {
     prevCount := 0
     stableRounds := 0
-    loop 20 {  ; max 10 seconds
+    loop 20 {
         cbs := FindAllCheckboxes(dlgHwnd)
         count := cbs.Length
         if count > 0 && count = prevCount {
@@ -605,113 +888,104 @@ WaitForStableCheckboxCount(dlgHwnd) {
     return prevCount
 }
 
-LabelsMatch(liveLabel, templateLabel) {
-    ; Exact match
-    if liveLabel = templateLabel
-        return true
-    ; Case-insensitive contains (for minor wording differences between versions)
-    if StrLen(templateLabel) > 10 && InStr(liveLabel, templateLabel)
-        return true
-    if StrLen(liveLabel) > 10 && InStr(templateLabel, liveLabel)
-        return true
-    return false
-}
-
 ; ===========================================================================
-; SAVE TEMPLATE - Scan the current dialogue and save checkbox states
+; DISMISS INTERMEDIATE POPUPS
 ; ===========================================================================
 
-BtnSaveCurrentState(ctrl, *) {
-    dlgHwnd := FindActiveDialogWindow()
-    if !dlgHwnd {
-        MsgBox("Open a template or reminder dialogue in CPRS first.", AppTitle, "Icon!")
-        return
-    }
-
-    ; Prompt for name
-    result := InputBox("Template name:`n`n"
-        "Use a descriptive name like 'Negative Assessment' or 'Skin WNL'.`n"
-        "Naming it the same as a toolbar button links it to that button.",
-        "Save Template",, "")
-    if result.Result = "Cancel" || result.Value = ""
-        return
-
-    templateName := result.Value
-
-    ; Wait for dialog to be fully loaded before scanning
-    ToolTip("Waiting for dialog to stabilize...")
-    prevCount := 0
-    stableRounds := 0
-    loop 20 {
-        cbs := FindAllCheckboxes(dlgHwnd)
-        count := cbs.Length
-        if count > 0 && count = prevCount {
-            stableRounds++
-            if stableRounds >= 3
-                break
-        } else {
-            stableRounds := 0
+DismissIntermediatePopups() {
+    Sleep(150)
+    loop 3 {
+        found := false
+        for wnd in WinGetList("ahk_exe CPRSChart.exe") {
+            try {
+                cls := WinGetClass(wnd)
+                if cls = "TfrmRemDlg" || cls = "TCPRSChart" || cls = "TfrmFrame"
+                    || cls = "TfrmTemplateDialog"
+                    continue
+                WinGetPos(,, &w, &h, wnd)
+                if w > 500 || h > 400
+                    continue
+                if HasDangerousButton(wnd)
+                    continue
+                okHwnd := FindOKButton(wnd)
+                if okHwnd {
+                    try PostMessage(0x00F5, 0, 0, okHwnd)
+                    Sleep(200)
+                    found := true
+                }
+            }
         }
-        prevCount := count
-        Sleep(500)
+        if !found
+            break
     }
+}
 
-    ; Scan all checkboxes and their current states
-    checkboxes := FindAllCheckboxes(dlgHwnd)
+HasDangerousButton(windowHwnd) {
+    global _hasDangerous := false
+    enumDangerous := CallbackCreate(_CheckDangerousCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumDangerous, "Ptr", 0)
+    CallbackFree(enumDangerous)
+    return _hasDangerous
+}
 
-    ; Identify top-level parents (for selective expansion during apply)
-    scrollBox := FindVisibleScrollBox(dlgHwnd)
-    tlParents := scrollBox ? EnumTopLevelParents(scrollBox) : []
-
-    ; Build template JSON
-    json := '{'
-    json .= '`n  "name": ' EscJson(templateName) ','
-    json .= '`n  "created": "' FormatTime(, "yyyy-MM-dd HH:mm") '",'
-    json .= '`n  "source_dialogue": ' EscJson(WinGetTitle(dlgHwnd)) ','
-    json .= '`n  "checkbox_count": ' checkboxes.Length ','
-
-    ; Top-level parent checked states (for selective expansion)
-    json .= '`n  "topLevelParents": ['
-    for i, tlp in tlParents {
-        if i > 1
-            json .= ", "
-        json .= tlp.checked ? "true" : "false"
+_CheckDangerousCallback(hwnd, lParam) {
+    global _hasDangerous
+    buf := Buffer(256, 0)
+    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
+    className := StrGet(buf)
+    if InStr(className, "TEdit") || InStr(className, "TMemo") || InStr(className, "TRichEdit") {
+        _hasDangerous := true
+        return 0
     }
-    json .= '],'
-
-    json .= '`n  "items": ['
-
-    itemCount := 0
-    for idx, cb in checkboxes {
-        isChecked := SendMessage(0x00F0, 0, 0, cb.hwnd)  ; BM_GETCHECK
-        if itemCount > 0
-            json .= ","
-        json .= '`n    {"index": ' (idx - 1) ', "label": ' EscJson(cb.label)
-            . ', "checked": ' (isChecked ? "true" : "false")
-            . ', "class": ' EscJson(cb.className) '}'
-        itemCount++
+    if InStr(className, "TButton") || InStr(className, "TBitBtn") {
+        len := SendMessage(0x000E, 0, 0, hwnd)
+        if len > 0 {
+            textBuf := Buffer((len + 1) * 2, 0)
+            SendMessage(0x000D, len + 1, textBuf, hwnd)
+            textUpper := StrUpper(StrGet(textBuf))
+            if InStr(textUpper, "FINISH") || InStr(textUpper, "SUBMIT")
+                || InStr(textUpper, "SIGN") || InStr(textUpper, "FILE")
+                || InStr(textUpper, "COMPLETE") || InStr(textUpper, "SAVE")
+                || InStr(textUpper, "DELETE") || InStr(textUpper, "REMOVE") {
+                _hasDangerous := true
+                return 0
+            }
+        }
     }
+    return 1
+}
 
-    json .= '`n  ]'
-    json .= '`n}'
+FindOKButton(windowHwnd) {
+    global _foundOKHwnd := 0
+    enumOK := CallbackCreate(_FindOKCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumOK, "Ptr", 0)
+    CallbackFree(enumOK)
+    return _foundOKHwnd
+}
 
-    filePath := TemplateDir "\" SanitizeFilename(templateName) ".json"
-    f := FileOpen(filePath, "w", "UTF-8")
-    f.Write(json)
-    f.Close()
-
-    checkedCount := 0
-    for cb in checkboxes {
-        if SendMessage(0x00F0, 0, 0, cb.hwnd)
-            checkedCount++
+_FindOKCallback(hwnd, lParam) {
+    global _foundOKHwnd
+    buf := Buffer(256, 0)
+    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
+    className := StrGet(buf)
+    if !(InStr(className, "TButton") || InStr(className, "TBitBtn"))
+        return 1
+    len := SendMessage(0x000E, 0, 0, hwnd)
+    if len > 0 {
+        textBuf := Buffer((len + 1) * 2, 0)
+        SendMessage(0x000D, len + 1, textBuf, hwnd)
+        textUpper := StrUpper(StrGet(textBuf))
+        if textUpper = "OK" || textUpper = "&OK" || textUpper = "CONTINUE"
+            || textUpper = "&CONTINUE" || textUpper = "YES" || textUpper = "&YES" {
+            _foundOKHwnd := hwnd
+            return 0
+        }
     }
-
-    ToolTip('Template "' templateName '" saved: ' checkedCount "/" itemCount " checked")
-    SetTimer(ClearToolTip, -3000)
+    return 1
 }
 
 ; ===========================================================================
-; LOAD TEMPLATE - Pick from saved templates and apply
+; LOAD / DELETE / ADVANCED PANEL
 ; ===========================================================================
 
 BtnLoadSavedTemplate(ctrl, *) {
@@ -720,12 +994,10 @@ BtnLoadSavedTemplate(ctrl, *) {
             AppTitle, "Icon!")
         return
     }
-
     templates := []
     loop files TemplateDir "\*.json" {
         templates.Push(A_LoopFileFullPath)
     }
-
     if templates.Length = 0 {
         MsgBox("No saved templates found.`n`n"
             "To create one:`n"
@@ -735,22 +1007,17 @@ BtnLoadSavedTemplate(ctrl, *) {
             AppTitle, "Iconi")
         return
     }
-
-    ; Build selection GUI
     selGui := Gui("+Owner" BoosterGui.Hwnd " +AlwaysOnTop", "Load Template")
     selGui.SetFont("s9", "Segoe UI")
     selGui.AddText(, "Select a template to apply:")
     lb := selGui.AddListBox("w300 h200")
-
     for path in templates {
         name := RegExReplace(path, ".*\\(.*)\.json$", "$1")
         lb.Add([name])
     }
-
     selGui.AddButton("y+5 w120 Default", "Apply").OnEvent("Click", DoLoad)
     selGui.AddButton("x+5 w120", "Cancel").OnEvent("Click", (*) => selGui.Destroy())
     selGui.Show()
-
     DoLoad(btn, *) {
         selected := lb.Text
         if selected = "" {
@@ -770,43 +1037,31 @@ BtnLoadSavedTemplate(ctrl, *) {
     }
 }
 
-; ===========================================================================
-; DELETE TEMPLATE
-; ===========================================================================
-
 BtnDeleteTemplate(ctrl, *) {
     templates := []
     loop files TemplateDir "\*.json" {
         templates.Push(A_LoopFileName)
     }
-
     if templates.Length = 0 {
         MsgBox("No saved templates to delete.", AppTitle, "Iconi")
         return
     }
-
-    ; Build numbered list
     list := ""
-    for i, f in templates {
+    for i, f in templates
         list .= i ": " StrReplace(f, ".json", "") "`n"
-    }
-
     result := InputBox("Enter the number of the template to delete:`n`n" list,
         "Delete Template",, "1")
     if result.Result = "Cancel" || result.Value = ""
         return
-
     try idx := Integer(result.Value)
     catch {
         MsgBox("Enter a number.", AppTitle, "Icon!")
         return
     }
-
     if idx < 1 || idx > templates.Length {
         MsgBox("Invalid selection.", AppTitle, "Icon!")
         return
     }
-
     name := StrReplace(templates[idx], ".json", "")
     answer := MsgBox('Delete template "' name '"?', AppTitle, "YesNo Icon?")
     if answer = "Yes" {
@@ -815,10 +1070,6 @@ BtnDeleteTemplate(ctrl, *) {
         SetTimer(ClearToolTip, -2000)
     }
 }
-
-; ===========================================================================
-; ADVANCED PANEL - Launch the full NursingPanel.ahk with scan/preview
-; ===========================================================================
 
 BtnOpenAdvancedPanel(ctrl, *) {
     panelPath := A_ScriptDir "\NursingPanel.ahk"
@@ -829,272 +1080,20 @@ BtnOpenAdvancedPanel(ctrl, *) {
 }
 
 ; ===========================================================================
-; WIN32 CHECKBOX DISCOVERY
-;
-; Enumerates all child controls of the CPRS reminder dialogue, finds
-; TORCheckBox and TCPRSDialogParentCheckBox controls, and reads their
-; label text from adjacent TDlgFieldPanel/TLabel siblings.
-; ===========================================================================
-
-FindAllCheckboxes(dlgHwnd) {
-    results := []
-    global _findCBResults := results
-
-    enumCB := CallbackCreate(_EnumCBCallback, "Fast", 2)
-    DllCall("EnumChildWindows", "Ptr", dlgHwnd, "Ptr", enumCB, "Ptr", 0)
-    CallbackFree(enumCB)
-
-    return results
-}
-
-_EnumCBCallback(hwnd, lParam) {
-    global _findCBResults
-
-    buf := Buffer(256, 0)
-    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
-    className := StrGet(buf)
-
-    if !(className = "TORCheckBox" || className = "TCPRSDialogParentCheckBox" || className = "TCPRSDialogCheckBox")
-        return 1
-
-    ; TCPRSDialogCheckBox has readable text directly via WM_GETTEXT.
-    ; TCPRSDialogParentCheckBox has ' ' (space) - use sibling search.
-    label := ""
-    tLen := SendMessage(0x000E, 0, 0, hwnd)
-    if tLen > 0 {
-        tBuf := Buffer((tLen + 1) * 2, 0)
-        SendMessage(0x000D, tLen + 1, tBuf, hwnd)
-        label := StrGet(tBuf)
-    }
-    if (label = "" || label = " " || Trim(label) = "") && className != "TCPRSDialogCheckBox"
-        label := GetCBLabel(hwnd)
-
-    ; Get parent control's class name
-    parentHwnd := DllCall("GetParent", "Ptr", hwnd, "Ptr")
-    pBuf := Buffer(256, 0)
-    parentCls := ""
-    if parentHwnd {
-        DllCall("GetClassName", "Ptr", parentHwnd, "Ptr", pBuf, "Int", 256)
-        parentCls := StrGet(pBuf)
-    }
-
-    _findCBResults.Push({hwnd: hwnd, label: label, className: className, parentClass: parentCls})
-    return 1
-}
-
-GetCBLabel(cbHwnd) {
-    ; Try the checkbox's own caption first
-    len := SendMessage(0x000E, 0, 0, cbHwnd)  ; WM_GETTEXTLENGTH
-    if len > 1 {
-        buf := Buffer((len + 1) * 2, 0)
-        SendMessage(0x000D, len + 1, buf, cbHwnd)  ; WM_GETTEXT
-        text := StrGet(buf)
-        if text != " " && text != "" && Trim(text) != ""
-            return text
-    }
-
-    ; CPRS clears checkbox captions and puts visible text in adjacent panels.
-    ; Strategy: navigate sibling windows directly using GetWindow. CPRS creates
-    ; checkbox + label panel as sibling pairs. This works regardless of scroll
-    ; position (unlike coordinate-based search which fails off-screen).
-
-    ; Try next sibling (most common: panel comes right after checkbox)
-    nextSib := DllCall("GetWindow", "Ptr", cbHwnd, "UInt", 2, "Ptr")  ; GW_HWNDNEXT
-    if nextSib {
-        text := _ExtractTextFromSibling(nextSib)
-        if text != ""
-            return text
-    }
-
-    ; Try previous sibling (in case panel is before checkbox)
-    prevSib := DllCall("GetWindow", "Ptr", cbHwnd, "UInt", 3, "Ptr")  ; GW_HWNDPREV
-    if prevSib {
-        text := _ExtractTextFromSibling(prevSib)
-        if text != ""
-            return text
-    }
-
-    ; Fallback: scan all siblings of parent for any label/panel with text
-    parentHwnd := DllCall("GetParent", "Ptr", cbHwnd, "Ptr")
-    if parentHwnd {
-        child := DllCall("GetWindow", "Ptr", parentHwnd, "UInt", 5, "Ptr")  ; GW_CHILD
-        while child {
-            if child != cbHwnd && child != nextSib && child != prevSib {
-                text := _ExtractTextFromSibling(child)
-                if text != ""
-                    return text
-            }
-            child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")  ; GW_HWNDNEXT
-        }
-    }
-
-    return ""
-}
-
-; Try to extract label text from a sibling control (panel or direct label)
-_ExtractTextFromSibling(hwnd) {
-    buf := Buffer(256, 0)
-    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
-    className := StrGet(buf)
-
-    ; Skip other checkboxes - they're not labels
-    if className = "TORCheckBox" || className = "TCPRSDialogParentCheckBox"
-        return ""
-
-    ; Direct text from label controls
-    if InStr(className, "TLabel") || InStr(className, "TVA508") || InStr(className, "Static") {
-        tLen := SendMessage(0x000E, 0, 0, hwnd)
-        if tLen > 0 {
-            tBuf := Buffer((tLen + 1) * 2, 0)
-            SendMessage(0x000D, tLen + 1, tBuf, hwnd)
-            text := Trim(StrGet(tBuf))
-            if text != "" && text != " "
-                return text
-        }
-    }
-
-    ; Panel with child labels - extract text from children
-    if InStr(className, "Panel") || InStr(className, "TDlgFieldPanel") {
-        combined := _ExtractChildLabelText(hwnd)
-        if combined != ""
-            return combined
-    }
-
-    return ""
-}
-
-; Extract combined text from all label children of a panel
-_ExtractChildLabelText(panelHwnd) {
-    texts := []
-    global _panelTexts := texts
-    enumPanelChild := CallbackCreate(_EnumPanelTextCallback, "Fast", 2)
-    DllCall("EnumChildWindows", "Ptr", panelHwnd, "Ptr", enumPanelChild, "Ptr", 0)
-    CallbackFree(enumPanelChild)
-
-    combined := ""
-    for t in texts {
-        if t != "" && t != " " {
-            if combined != ""
-                combined .= " "
-            combined .= t
-        }
-    }
-    return Trim(combined)
-}
-
-_EnumPanelTextCallback(hwnd, lParam) {
-    global _panelTexts
-
-    buf := Buffer(256, 0)
-    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
-    className := StrGet(buf)
-
-    if InStr(className, "TLabel") || InStr(className, "TVA508") || InStr(className, "Static") {
-        len := SendMessage(0x000E, 0, 0, hwnd)
-        if len > 0 {
-            textBuf := Buffer((len + 1) * 2, 0)
-            SendMessage(0x000D, len + 1, textBuf, hwnd)
-            text := StrGet(textBuf)
-            if text != "" && text != " "
-                _panelTexts.Push(text)
-        }
-    }
-    return 1
-}
-
-; ===========================================================================
-; TEMPLATE JSON PARSING
-; ===========================================================================
-
-ParseTemplateItems(jsonContent) {
-    items := []
-    pos := InStr(jsonContent, '"items"')
-    if !pos
-        return items
-
-    closeBracket := InStr(jsonContent, "]",, pos)
-
-    while pos := InStr(jsonContent, "{",, pos + 1) {
-        if pos > closeBracket
-            break
-        itemEnd := InStr(jsonContent, "}",, pos)
-        if !itemEnd
-            break
-        itemStr := SubStr(jsonContent, pos, itemEnd - pos + 1)
-
-        label := ""
-        if RegExMatch(itemStr, '"label":\s*"((?:[^"\\]|\\.)*)"', &m)
-            label := m[1]
-
-        checked := InStr(itemStr, '"checked": true') ? true : false
-
-        ; Parse index field if present
-        idx := -1
-        if RegExMatch(itemStr, '"index":\s*(\d+)', &idxM)
-            idx := Integer(idxM[1])
-
-        ; Parse class field if present
-        cls := ""
-        if RegExMatch(itemStr, '"class":\s*"([^"]*)"', &clsM)
-            cls := clsM[1]
-
-        item := {label: label, checked: checked, cls: cls}
-        if idx >= 0
-            item.index := idx
-
-        items.Push(item)
-        ; Set implicit position (1-based) for templates without explicit index
-        item._pos := items.Length
-
-        pos := itemEnd
-    }
-    return items
-}
-
-; ===========================================================================
 ; TOP-LEVEL PARENT DISCOVERY
-;
-; Walks the TScrollBox's direct children (via GetWindow sibling chain)
-; to find the top-level parent checkboxes. These are:
-;   - TCPRSDialogParentCheckBox directly under TScrollBox
-;   - TCPRSDialogParentCheckBox inside a static TGroupBox at the end
-; Dynamic TGroupBox sections (from expanded parents) come BEFORE the
-; direct parents in z-order and are skipped.
 ; ===========================================================================
-
-; Count how many of the target TCPRSDialogCheckBox items are currently visible.
-; targetKeys is a Map of "label|occurrence" => true for items we need.
-_CountVisibleTargets(dlgHwnd, targetKeys) {
-    checkboxes := FindAllCheckboxes(dlgHwnd)
-    labelCounts := Map()
-    found := 0
-    for cb in checkboxes {
-        if cb.className != "TCPRSDialogCheckBox"
-            continue
-        if cb.label = "" || cb.label = " " || Trim(cb.label) = ""
-            continue
-        occ := 0
-        if labelCounts.Has(cb.label)
-            occ := labelCounts[cb.label]
-        labelCounts[cb.label] := occ + 1
-        if targetKeys.Has(cb.label "|" occ)
-            found++
-    }
-    return found
-}
 
 FindVisibleScrollBox(dlgHwnd) {
-    child := DllCall("GetWindow", "Ptr", dlgHwnd, "UInt", 5, "Ptr")  ; GW_CHILD
+    child := DllCall("GetWindow", "Ptr", dlgHwnd, "UInt", 5, "Ptr")
     while child {
         buf := Buffer(256, 0)
         DllCall("GetClassName", "Ptr", child, "Ptr", buf, "Int", 256)
-        className := StrGet(buf)
-        if className = "TScrollBox" {
+        if StrGet(buf) = "TScrollBox" {
             style := DllCall("GetWindowLong", "Ptr", child, "Int", -16, "Int")
-            if style & 0x10000000  ; WS_VISIBLE
+            if style & 0x10000000
                 return child
         }
-        child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")  ; GW_HWNDNEXT
+        child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")
     }
     return 0
 }
@@ -1102,36 +1101,35 @@ FindVisibleScrollBox(dlgHwnd) {
 EnumTopLevelParents(scrollBoxHwnd) {
     parents := []
     seenDirectParent := false
-
-    child := DllCall("GetWindow", "Ptr", scrollBoxHwnd, "UInt", 5, "Ptr")  ; GW_CHILD
+    child := DllCall("GetWindow", "Ptr", scrollBoxHwnd, "UInt", 5, "Ptr")
     while child {
         buf := Buffer(256, 0)
         DllCall("GetClassName", "Ptr", child, "Ptr", buf, "Int", 256)
         className := StrGet(buf)
-
         if className = "TCPRSDialogParentCheckBox" {
             seenDirectParent := true
             checked := SendMessage(0x00F0, 0, 0, child)
             parents.Push({hwnd: child, checked: checked ? true : false})
         } else if className = "TGroupBox" && seenDirectParent {
-            ; Static TGroupBox after direct parents - enumerate its parents
             gbChild := DllCall("GetWindow", "Ptr", child, "UInt", 5, "Ptr")
             while gbChild {
                 gbBuf := Buffer(256, 0)
                 DllCall("GetClassName", "Ptr", gbChild, "Ptr", gbBuf, "Int", 256)
-                gbClass := StrGet(gbBuf)
-                if gbClass = "TCPRSDialogParentCheckBox" {
+                if StrGet(gbBuf) = "TCPRSDialogParentCheckBox" {
                     checked := SendMessage(0x00F0, 0, 0, gbChild)
                     parents.Push({hwnd: gbChild, checked: checked ? true : false})
                 }
                 gbChild := DllCall("GetWindow", "Ptr", gbChild, "UInt", 2, "Ptr")
             }
         }
-
-        child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")  ; GW_HWNDNEXT
+        child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")
     }
     return parents
 }
+
+; ===========================================================================
+; TEMPLATE PARSING
+; ===========================================================================
 
 ParseTopLevelParents(jsonContent) {
     states := []
@@ -1149,7 +1147,7 @@ ParseTopLevelParents(jsonContent) {
         if SubStr(chunk, 1, 4) = "true" {
             states.Push(true)
             searchPos += 4
-        } else if chunk = "false" || SubStr(chunk, 1, 5) = "false" {
+        } else if SubStr(chunk, 1, 5) = "false" {
             states.Push(false)
             searchPos += 5
         } else {
@@ -1157,6 +1155,194 @@ ParseTopLevelParents(jsonContent) {
         }
     }
     return states
+}
+
+; Parse groups array from format-3 JSON
+; Returns array of arrays: groups[i] = array of {idx, cls, checked, label}
+ParseGroups(jsonContent) {
+    groups := []
+
+    ; Find the "groups" array
+    gPos := InStr(jsonContent, '"groups"')
+    if !gPos
+        return groups
+
+    ; Find the opening [ of groups array
+    gArrStart := InStr(jsonContent, "[",, gPos)
+    if !gArrStart
+        return groups
+
+    ; Find matching ] using depth counting
+    depth := 1
+    scanPos := gArrStart + 1
+    gArrEnd := 0
+    while scanPos <= StrLen(jsonContent) && depth > 0 {
+        ch := SubStr(jsonContent, scanPos, 1)
+        if ch = "["
+            depth++
+        else if ch = "]"
+            depth--
+        if depth = 0
+            gArrEnd := scanPos
+        scanPos++
+    }
+    if !gArrEnd
+        return groups
+
+    ; Find each group object (contains "checkboxes" array)
+    searchPos := gArrStart
+    while true {
+        ; Find next "checkboxes" keyword
+        cbPos := InStr(jsonContent, '"checkboxes"', , searchPos + 1)
+        if !cbPos || cbPos > gArrEnd
+            break
+
+        ; Find the [ of this checkboxes array
+        cbArrStart := InStr(jsonContent, "[",, cbPos)
+        if !cbArrStart || cbArrStart > gArrEnd
+            break
+
+        ; Find matching ]
+        cbDepth := 1
+        cbScan := cbArrStart + 1
+        cbArrEnd := 0
+        while cbScan <= StrLen(jsonContent) && cbDepth > 0 {
+            c := SubStr(jsonContent, cbScan, 1)
+            if c = "["
+                cbDepth++
+            else if c = "]"
+                cbDepth--
+            if cbDepth = 0
+                cbArrEnd := cbScan
+            cbScan++
+        }
+        if !cbArrEnd
+            break
+
+        ; Parse checkbox items within this group
+        groupItems := []
+        itemPos := cbArrStart
+        while itemPos := InStr(jsonContent, "{",, itemPos + 1) {
+            if itemPos > cbArrEnd
+                break
+            itemEnd := InStr(jsonContent, "}",, itemPos)
+            if !itemEnd
+                break
+            itemStr := SubStr(jsonContent, itemPos, itemEnd - itemPos + 1)
+
+            idx := 0
+            if RegExMatch(itemStr, '"idx":\s*(\d+)', &idxM)
+                idx := Integer(idxM[1])
+
+            cls := ""
+            if RegExMatch(itemStr, '"cls":\s*"([^"]*)"', &clsM)
+                cls := clsM[1]
+
+            checked := (InStr(itemStr, '"checked": true') || InStr(itemStr, '"checked":true'))
+                ? true : false
+
+            depth := 0
+            if RegExMatch(itemStr, '"depth":\s*(\d+)', &depM)
+                depth := Integer(depM[1])
+
+            label := ""
+            if RegExMatch(itemStr, '"label":\s*"((?:[^"\\]|\\.)*)"', &lblM)
+                label := lblM[1]
+
+            groupItems.Push({idx: idx, cls: cls, checked: checked, label: label, depth: depth})
+            itemPos := itemEnd
+        }
+
+        groups.Push(groupItems)
+        searchPos := cbArrEnd
+    }
+
+    return groups
+}
+
+; ===========================================================================
+; DIALOG DUMP - Debug tool
+; Press Ctrl+Shift+D with a CPRS dialog open.
+; ===========================================================================
+
+DumpDialogControls() {
+    dlgHwnd := FindActiveDialogWindow()
+    if !dlgHwnd {
+        MsgBox("Open a reminder dialogue in CPRS first.", AppTitle, "Icon!")
+        return
+    }
+    dumpPath := TemplateDir "\dialog_dump_" A_Now ".txt"
+    f := FileOpen(dumpPath, "w", "UTF-8")
+    f.Write("=== CPRS Dialog Control Dump ===`n")
+    f.Write("Time: " FormatTime(, "yyyy-MM-dd HH:mm:ss") "`n")
+    f.Write("Dialog Title: " WinGetTitle(dlgHwnd) "`n")
+    f.Write("Dialog Class: " WinGetClass(dlgHwnd) "`n")
+    f.Write("Dialog HWND: " dlgHwnd "`n`n")
+
+    global _dumpFile := f
+    global _dumpDlgHwnd := dlgHwnd
+    global _dumpCount := 0
+    global _dumpCBCount := 0
+
+    enumDump := CallbackCreate(_DumpCallback, "Fast", 2)
+    DllCall("EnumChildWindows", "Ptr", dlgHwnd, "Ptr", enumDump, "Ptr", 0)
+    CallbackFree(enumDump)
+
+    f.Write("`n=== Summary ===`n")
+    f.Write("Total controls: " _dumpCount "`n")
+    f.Write("Checkboxes: " _dumpCBCount "`n")
+    f.Close()
+
+    MsgBox("Dump written to:`n" dumpPath "`n`n" _dumpCount " controls, " _dumpCBCount " checkboxes.", AppTitle, "Iconi")
+}
+
+_DumpCallback(hwnd, lParam) {
+    global _dumpFile, _dumpDlgHwnd, _dumpCount, _dumpCBCount
+    _dumpCount++
+
+    buf := Buffer(256, 0)
+    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
+    className := StrGet(buf)
+
+    text := ""
+    tLen := SendMessage(0x000E, 0, 0, hwnd)
+    if tLen > 0 {
+        tBuf := Buffer((tLen + 1) * 2, 0)
+        SendMessage(0x000D, tLen + 1, tBuf, hwnd)
+        text := StrGet(tBuf)
+    }
+
+    depth := 0
+    p := hwnd
+    loop {
+        p := DllCall("GetParent", "Ptr", p, "Ptr")
+        if !p || p = _dumpDlgHwnd
+            break
+        depth++
+    }
+
+    parentHwnd := DllCall("GetParent", "Ptr", hwnd, "Ptr")
+    parentBuf := Buffer(256, 0)
+    if parentHwnd
+        DllCall("GetClassName", "Ptr", parentHwnd, "Ptr", parentBuf, "Int", 256)
+    parentClass := parentHwnd ? StrGet(parentBuf) : "none"
+
+    extra := ""
+    if className = "TORCheckBox" || className = "TCPRSDialogParentCheckBox" || className = "TCPRSDialogCheckBox" {
+        checked := SendMessage(0x00F0, 0, 0, hwnd)
+        extra := " CHECKED=" (checked ? "YES" : "NO")
+        _dumpCBCount++
+    }
+
+    style := DllCall("GetWindowLong", "Ptr", hwnd, "Int", -16, "Int")
+    visible := (style & 0x10000000) ? "Y" : "N"
+
+    indent := ""
+    loop depth
+        indent .= "  "
+
+    _dumpFile.Write(indent className " hwnd=" hwnd " text='" text "' vis=" visible " parent=" parentClass extra "`n")
+    return 1
 }
 
 ; ===========================================================================
@@ -1181,119 +1367,9 @@ EscJson(str) {
 }
 
 ; ===========================================================================
-; DIALOG DUMP - Write the complete control tree to a file for debugging
-; Press Ctrl+Shift+D with a CPRS dialog open. Do it twice:
-;   1. On a FILLED OUT dialog (before saving a template)
-;   2. On a FRESH dialog (before applying)
-; Then share the dump files.
-; ===========================================================================
-
-DumpDialogControls() {
-    dlgHwnd := FindActiveDialogWindow()
-    if !dlgHwnd {
-        MsgBox("Open a reminder dialogue in CPRS first.", AppTitle, "Icon!")
-        return
-    }
-
-    dumpPath := TemplateDir "\dialog_dump_" A_Now ".txt"
-
-    f := FileOpen(dumpPath, "w", "UTF-8")
-    f.Write("=== CPRS Dialog Control Dump ===`n")
-    f.Write("Time: " FormatTime(, "yyyy-MM-dd HH:mm:ss") "`n")
-    f.Write("Dialog Title: " WinGetTitle(dlgHwnd) "`n")
-    f.Write("Dialog Class: " WinGetClass(dlgHwnd) "`n")
-    f.Write("Dialog HWND: " dlgHwnd "`n`n")
-
-    ; Enumerate every child control
-    global _dumpFile := f
-    global _dumpDlgHwnd := dlgHwnd
-    global _dumpCount := 0
-    global _dumpCBCount := 0
-
-    enumDump := CallbackCreate(_DumpCallback, "Fast", 2)
-    DllCall("EnumChildWindows", "Ptr", dlgHwnd, "Ptr", enumDump, "Ptr", 0)
-    CallbackFree(enumDump)
-
-    f.Write("`n=== Summary ===`n")
-    f.Write("Total controls: " _dumpCount "`n")
-    f.Write("Checkboxes: " _dumpCBCount "`n")
-    f.Close()
-
-    MsgBox("Dump written to:`n" dumpPath "`n`n" _dumpCount " controls, " _dumpCBCount " checkboxes.", AppTitle, "Iconi")
-}
-
-_DumpCallback(hwnd, lParam) {
-    global _dumpFile, _dumpDlgHwnd, _dumpCount, _dumpCBCount
-    _dumpCount++
-
-    ; Class name
-    buf := Buffer(256, 0)
-    DllCall("GetClassName", "Ptr", hwnd, "Ptr", buf, "Int", 256)
-    className := StrGet(buf)
-
-    ; Text via WM_GETTEXT
-    text := ""
-    tLen := SendMessage(0x000E, 0, 0, hwnd)
-    if tLen > 0 {
-        tBuf := Buffer((tLen + 1) * 2, 0)
-        SendMessage(0x000D, tLen + 1, tBuf, hwnd)
-        text := StrGet(tBuf)
-    }
-
-    ; Depth (count parents up to dialog)
-    depth := 0
-    p := hwnd
-    loop {
-        p := DllCall("GetParent", "Ptr", p, "Ptr")
-        if !p || p = _dumpDlgHwnd
-            break
-        depth++
-    }
-
-    ; Parent HWND and parent class
-    parentHwnd := DllCall("GetParent", "Ptr", hwnd, "Ptr")
-    parentBuf := Buffer(256, 0)
-    if parentHwnd
-        DllCall("GetClassName", "Ptr", parentHwnd, "Ptr", parentBuf, "Int", 256)
-    parentClass := parentHwnd ? StrGet(parentBuf) : "none"
-
-    ; Check state for checkboxes
-    extra := ""
-    if className = "TORCheckBox" || className = "TCPRSDialogParentCheckBox" || className = "TCPRSDialogCheckBox" {
-        checked := SendMessage(0x00F0, 0, 0, hwnd)
-        extra := " CHECKED=" (checked ? "YES" : "NO")
-        _dumpCBCount++
-
-        ; Also try to get label via next sibling
-        nextSib := DllCall("GetWindow", "Ptr", hwnd, "UInt", 2, "Ptr")
-        sibLabel := ""
-        if nextSib {
-            sibBuf := Buffer(256, 0)
-            DllCall("GetClassName", "Ptr", nextSib, "Ptr", sibBuf, "Int", 256)
-            sibClass := StrGet(sibBuf)
-            sibLabel := " nextSib=" sibClass
-        }
-        extra .= sibLabel
-    }
-
-    ; Visible state
-    style := DllCall("GetWindowLong", "Ptr", hwnd, "Int", -16, "Int")  ; GWL_STYLE
-    visible := (style & 0x10000000) ? "Y" : "N"  ; WS_VISIBLE
-
-    ; Indent by depth
-    indent := ""
-    loop depth
-        indent .= "  "
-
-    _dumpFile.Write(indent className " hwnd=" hwnd " text='" text "' vis=" visible " parent=" parentClass extra "`n")
-    return 1
-}
-
-; ===========================================================================
 ; HOTKEYS
 ; ===========================================================================
 
-; Ctrl+Shift+B - Toggle toolbar visibility
 ^+b:: {
     if WinExist(AppTitle) {
         if DllCall("IsWindowVisible", "Ptr", BoosterGui.Hwnd)
@@ -1303,12 +1379,10 @@ _DumpCallback(hwnd, lParam) {
     }
 }
 
-; Ctrl+Shift+D - Dump dialog controls to file
 ^+d:: {
     DumpDialogControls()
 }
 
-; Ctrl+Shift+N - Quick apply "Negative Assessment" template
 ^+n:: {
     ApplyNamedTemplate("Negative Assessment")
 }
