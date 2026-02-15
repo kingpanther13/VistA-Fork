@@ -674,6 +674,26 @@ WinGetPos , X0, Y0, Width0, Height0, CPRS ; starting positions of CPRS prior to 
 
 ;  deactivate this for now---SetTimer, MonitorForSpecificWindows, 1000
 
+; --- NursingBooster: Build floating panel (Gui 67) ---
+Gui, 67:Destroy
+Gui, 67:Color, 1a1a2e
+Gui, 67:Font, s9 cWhite, Segoe UI
+Gui, 67:Add, Text, x5 y4 w370 h20 Center BackgroundTrans vNB_PanelTitle gNB_DragPanel, Nursing Booster  |  Ctrl+Shift+B to toggle
+Gui, 67:Font, s8 cBlack, Segoe UI
+Gui, 67:Add, Button, x5   y28 w90 h26 gNB_PanelSave, Save Template
+Gui, 67:Add, Button, x100 y28 w90 h26 gNB_PanelLoad, Load Template
+Gui, 67:Add, Button, x195 y28 w95 h26 gNB_PanelDelete, Delete Template
+Gui, 67:Add, Button, x295 y28 w85 h26 gNB_PanelDump, Dump Dialog
+Gui, 67:Add, Button, x5   y58 w115 h26 gNB_PanelNegAssess, Negative Assess
+Gui, 67:Add, Button, x125 y58 w100 h26 gNB_PanelSkinAssess, Skin Assess
+Gui, 67:Add, Button, x230 y58 w75 h26 gNB_PanelFreqDoc, Freq Doc
+Gui, 67:Add, Button, x310 y58 w70 h26 gNB_PanelCustom1, Custom 1
+Gui, 67:Font, s7 cSilver, Segoe UI
+Gui, 67:Add, Text, x5 y88 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected
+Gui, 67:+AlwaysOnTop -Caption +ToolWindow
+Gui, 67:Show, x0 y0 w385 h108 NoActivate, NursingBoosterPanel
+NB_BoosterGuiVisible := 1
+
 ; --- NursingBooster: Start CPRS detection timer ---
 SetTimer, NB_CheckCPRS, 3000
 
@@ -19923,12 +19943,56 @@ return
 NB_TogglePanel:
     if (NB_BoosterGuiVisible = 1)
     {
-        Gui, 67:Show, NoActivate
+        Gui, 67:Hide
+        NB_BoosterGuiVisible := 0
     }
     else
     {
-        Gui, 67:Hide
+        Gui, 67:Show, NoActivate
+        NB_BoosterGuiVisible := 1
     }
+return
+
+
+;============================================================================================
+; NURSING BOOSTER PANEL BUTTON HANDLERS
+;============================================================================================
+
+NB_PanelSave:
+    gosub NB_BtnSaveCurrentState
+return
+
+NB_PanelLoad:
+    gosub NB_BtnLoadSavedTemplate
+return
+
+NB_PanelDelete:
+    gosub NB_BtnDeleteTemplate
+return
+
+NB_PanelDump:
+    gosub NB_DumpDialogControls
+return
+
+NB_PanelNegAssess:
+    NB_ApplyNamedTemplate("Negative Assessment")
+return
+
+NB_PanelSkinAssess:
+    NB_ApplyNamedTemplate("Skin Assessment")
+return
+
+NB_PanelFreqDoc:
+    NB_ApplyNamedTemplate("Freq Doc")
+return
+
+NB_PanelCustom1:
+    NB_ApplyNamedTemplate("Custom 1")
+return
+
+NB_DragPanel:
+    ; Allow dragging the panel by clicking the title bar text
+    PostMessage, 0xA1, 2, 0,, NursingBoosterPanel
 return
 
 
@@ -19941,10 +20005,19 @@ NB_CheckCPRS:
     IfWinExist, ahk_exe CPRSChart.exe
     {
         NB_CPRSDetected := 1
+        dlgCheck := NB_FindActiveDialogWindow()
+        if (dlgCheck) {
+            GuiControl, 67:, NB_PanelStatus, Ready | Dialog detected
+        } else {
+            WinGetTitle, cprsTitle, ahk_exe CPRSChart.exe
+            StringLeft, cprsShort, cprsTitle, 50
+            GuiControl, 67:, NB_PanelStatus, Ready | CPRS: %cprsShort%
+        }
     }
     else
     {
         NB_CPRSDetected := 0
+        GuiControl, 67:, NB_PanelStatus, Ready | CPRS: Not detected
     }
 return
 
@@ -21263,16 +21336,7 @@ NB_EscJson(str) {
 ;============================================================================================
 
 ^+b::
-    ; Toggle Nursing Booster visibility tooltip
-    if (NB_BoosterGuiVisible) {
-        NB_BoosterGuiVisible := 0
-        ToolTip, Nursing Booster: Use dropdown on toolbar
-        SetTimer, NB_ClearToolTip, -2000
-    } else {
-        NB_BoosterGuiVisible := 1
-        ToolTip, Nursing Booster: Active
-        SetTimer, NB_ClearToolTip, -2000
-    }
+    gosub NB_TogglePanel
 return
 
 ^+d::
