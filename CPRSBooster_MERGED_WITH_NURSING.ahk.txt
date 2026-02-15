@@ -101,6 +101,7 @@ Global ADPrompts := {}  ; ambient dictation
 ;############################################################################################
 global NB_AppTitle := "Nursing Booster"
 global NB_TemplateDir := onedrivelocal . "\NursingTemplates"
+global NB_LogDir := onedrivelocal . "\NursingTemplates\Logs"
 global NB_BoosterGuiVisible := 1
 global NB_CPRSDetected := 0
 
@@ -362,6 +363,15 @@ If (driveactive= 0)  ; *************we have NO working drives
 		IfNotExist, %NB_TemplateDir%
 		{
 			FileCreateDir, %NB_TemplateDir%
+		}
+	}
+
+	; Make NursingBooster log directory
+	try
+	{
+		IfNotExist, %NB_LogDir%
+		{
+			FileCreateDir, %NB_LogDir%
 		}
 	}
 ; ------------------- END make directory prn
@@ -20107,7 +20117,7 @@ NB_BtnSaveCurrentState:
     f.Close()
 
     ; Log every checkbox state
-    NB__LogCheckboxStates("SAVE", allGroupBoxes)
+    NB__LogCheckboxStates("SAVE", allGroupBoxes, templateName, dlgTitle, totalChecked, totalControls)
 
     groupCount := allGroupBoxes.Length()
     ToolTip, Saved "%templateName%": %totalChecked%/%totalControls% checked across %groupCount% groups
@@ -20474,7 +20484,8 @@ NB_ApplyTemplate(templatePath) {
         totalNotFound += templateGroups.Length() - liveGroupBoxes.Length()
 
     ; Log every checkbox state after apply
-    NB__LogCheckboxStates("APPLY", liveGroupBoxes)
+    WinGetTitle, applyDlgTitle, ahk_id %dlgHwnd%
+    NB__LogCheckboxStates("APPLY", liveGroupBoxes, templatePath, applyDlgTitle, totalApplied, totalNotFound)
 
     ToolTip, Done: %totalApplied% toggled - %totalNotFound% not found. Review before Finish.
     SetTimer, NB_ClearToolTip, -5000
@@ -20485,28 +20496,58 @@ NB_ApplyTemplate(templatePath) {
 ; NURSING BOOSTER - CHECKBOX STATE LOGGING
 ;============================================================================================
 
-NB__LogCheckboxStates(action, groupBoxHwnds) {
-    global NB_TemplateDir
+NB__LogCheckboxStates(action, groupBoxHwnds, templateNameOrPath := "", dialogTitle := "", statA := 0, statB := 0) {
+    global NB_LogDir
     FormatTime, nowStamp,, yyyyMMddHHmmss
-    logPath := NB_TemplateDir . "\" . action . "_" . nowStamp . ".txt"
-    FileDelete, %logPath%
     FormatTime, nowDisp,, yyyy-MM-dd HH:mm:ss
+    logPath := NB_LogDir . "\" . action . "_" . nowStamp . ".txt"
+    FileDelete, %logPath%
+
     groupCount := groupBoxHwnds.Length()
-    logHeader := action . " " . nowDisp . "`nGroups: " . groupCount . "`n`n"
-    FileAppend, %logHeader%, %logPath%, UTF-8
+
+    ; --- Header with summary info ---
+    logText := "============================================================`n"
+    logText .= "  NURSING BOOSTER " . action . " LOG`n"
+    logText .= "============================================================`n"
+    logText .= "Timestamp:    " . nowDisp . "`n"
+    logText .= "Action:       " . action . "`n"
+    logText .= "Template:     " . templateNameOrPath . "`n"
+    logText .= "Dialog:       " . dialogTitle . "`n"
+    logText .= "User:         " . A_UserName . "`n"
+    logText .= "Groups found: " . groupCount . "`n"
+    if (action = "SAVE")
+        logText .= "Checked/Total: " . statA . "/" . statB . "`n"
+    else if (action = "APPLY")
+        logText .= "Toggled: " . statA . "  |  Not found: " . statB . "`n"
+    logText .= "============================================================`n`n"
+    FileAppend, %logText%, %logPath%, UTF-8
+
+    ; --- Per-group checkbox detail ---
+    totalCBs := 0
+    totalChecked := 0
     for gi, gbHwnd in groupBoxHwnds {
         descendants := NB_EnumDescendantCheckboxes(gbHwnd)
         descCount := descendants.Length()
-        groupLine := "--- Group " . gi . " (" . descCount . " items) ---`n"
+        groupLine := "--- Group " . gi . "/" . groupCount . " (" . descCount . " checkboxes) ---`n"
         FileAppend, %groupLine%, %logPath%, UTF-8
         for ci, cb in descendants {
             state := cb.checked ? "[X]" : "[ ]"
-            cls := cb.className = "TCPRSDialogParentCheckBox" ? "PCB" : "CB "
+            cls := cb.className = "TCPRSDialogParentCheckBox" ? "PARENT" : "LEAF  "
             lbl := cb.label != "" ? cb.label : "(unlabeled)"
-            cbLine := "  " . state . " d" . cb.depth . " " . cls . " " . lbl . "`n"
+            cbLine := "  " . state . " depth=" . cb.depth . " " . cls . " " . lbl . "`n"
             FileAppend, %cbLine%, %logPath%, UTF-8
+            totalCBs++
+            if (cb.checked)
+                totalChecked++
         }
+        FileAppend, `n, %logPath%, UTF-8
     }
+
+    ; --- Footer summary ---
+    footerText := "============================================================`n"
+    footerText .= "TOTALS: " . totalChecked . " checked out of " . totalCBs . " checkboxes in " . groupCount . " groups`n"
+    footerText .= "============================================================`n"
+    FileAppend, %footerText%, %logPath%, UTF-8
 }
 
 
@@ -21109,7 +21150,7 @@ NB_DumpDialogControls:
         return
     }
     FormatTime, nowStamp,, yyyyMMddHHmmss
-    dumpPath := NB_TemplateDir . "\dialog_dump_" . nowStamp . ".txt"
+    dumpPath := NB_LogDir . "\dialog_dump_" . nowStamp . ".txt"
     FileDelete, %dumpPath%
     FormatTime, nowDisp,, yyyy-MM-dd HH:mm:ss
     WinGetTitle, dlgTitle, ahk_id %dlgHwnd%
