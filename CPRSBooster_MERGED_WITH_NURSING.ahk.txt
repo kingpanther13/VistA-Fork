@@ -112,6 +112,7 @@ global NB_Recording := 0
 global NB_RecordedSteps := []
 global NB_RecordLastKey := ""
 global NB_RecordLastTime := 0
+global NB_EditStepRow := 0
 
 ;****************AI Folder**************
 AIPath := onedrivelocal . "\AI\"
@@ -21424,7 +21425,7 @@ NB_OpenMacroBuilder:
     ; --- Add Step controls ---
     Gui, 69:Add, GroupBox, x10 y55 w460 h70, Add a Step
     Gui, 69:Add, Text, x20 y75, Key:
-    Gui, 69:Add, DropDownList, x50 y72 w110 vNB_MacroKeyChoice altsubmit, Tab|Space|Down|Up|Left|Right|Enter|Escape|Home|End
+    Gui, 69:Add, DropDownList, x50 y72 w110 vNB_MacroKeyChoice altsubmit, Tab|Shift+Tab|Space|Down|Up|Left|Right|Enter|Escape|Home|End
     Gui, 69:Add, Text, x170 y75, Count:
     Gui, 69:Add, Edit, x210 y72 w40 vNB_MacroCountEdit, 1
     Gui, 69:Add, UpDown, Range1-99, 1
@@ -21433,8 +21434,8 @@ NB_OpenMacroBuilder:
     Gui, 69:Add, Button, x370 y71 w90 h24 gNB_MacroAddStep, Add Step
 
     ; --- Step list ---
-    Gui, 69:Add, Text, x10 y132, Steps (played top to bottom):
-    Gui, 69:Add, ListView, x10 y150 w460 h200 vNB_MacroLV Grid, #|Key|Count|Delay (ms)
+    Gui, 69:Add, Text, x10 y132, Steps (played top to bottom — double-click to edit):
+    Gui, 69:Add, ListView, x10 y150 w460 h200 vNB_MacroLV gNB_MacroLVAction Grid, #|Key|Count|Delay (ms)
     LV_ModifyCol(1, 30)
     LV_ModifyCol(2, 120)
     LV_ModifyCol(3, 60)
@@ -21445,6 +21446,7 @@ NB_OpenMacroBuilder:
     Gui, 69:Add, Button, x85  y358 w70 h28 gNB_MacroMoveDown, Move Down
     Gui, 69:Add, Button, x160 y358 w85 h28 gNB_MacroDeleteStep, Delete Step
     Gui, 69:Add, Button, x250 y358 w70 h28 gNB_MacroClearAll, Clear All
+    Gui, 69:Add, Button, x325 y358 w70 h28 gNB_MacroEditStep, Edit Step
 
     Gui, 69:Add, Text, x10 y395 w460 h1 0x10  ; horizontal line
 
@@ -21479,7 +21481,7 @@ NB_MacroAddStep:
     global NB_MacroSteps
 
     ; Map dropdown index to key name
-    keyNames := ["Tab", "Space", "Down", "Up", "Left", "Right", "Enter", "Escape", "Home", "End"]
+    keyNames := ["Tab", "Shift+Tab", "Space", "Down", "Up", "Left", "Right", "Enter", "Escape", "Home", "End"]
     if (NB_MacroKeyChoice < 1 || NB_MacroKeyChoice > keyNames.Length()) {
         MsgBox, 48, %NB_AppTitle%, Select a key first.
         return
@@ -21542,6 +21544,75 @@ NB_MacroClearAll:
     }
 return
 
+; --- ListView double-click handler ---
+NB_MacroLVAction:
+    if (A_GuiEvent = "DoubleClick") {
+        gosub NB_MacroEditStep
+    }
+return
+
+; --- Edit Step dialog (Gui 73) ---
+NB_MacroEditStep:
+    Gui, 69:Default
+    global NB_MacroSteps, NB_AppTitle, NB_EditStepRow
+    NB_EditStepRow := LV_GetNext(0, "Focused")
+    if (NB_EditStepRow < 1) {
+        MsgBox, 48, %NB_AppTitle%, Select a step to edit first.
+        return
+    }
+    step := NB_MacroSteps[NB_EditStepRow]
+    editKey := step.key
+    editCount := step.count
+    editDelay := step.delay
+
+    Gui, 73:Destroy
+    Gui, 73:+AlwaysOnTop +ToolWindow +Owner69
+    Gui, 73:Font, s9, Segoe UI
+    Gui, 73:Color, F5F5F5
+
+    nb_editRow := NB_EditStepRow
+    Gui, 73:Add, Text, x10 y10, Editing step #%nb_editRow%
+
+    Gui, 73:Add, Text, x10 y38, Key:
+    keyList := "Tab|Shift+Tab|Space|Down|Up|Left|Right|Enter|Escape|Home|End"
+    Gui, 73:Add, DropDownList, x70 y35 w120 vNB_EditKeyChoice, %keyList%
+    ; Select the current key
+    GuiControl, 73:ChooseString, NB_EditKeyChoice, %editKey%
+
+    Gui, 73:Add, Text, x10 y68, Count:
+    Gui, 73:Add, Edit, x70 y65 w50 vNB_EditCountVal, %editCount%
+    Gui, 73:Add, UpDown, Range1-99, %editCount%
+
+    Gui, 73:Add, Text, x10 y98, Delay (ms):
+    Gui, 73:Add, Edit, x70 y95 w50 vNB_EditDelayVal, %editDelay%
+
+    Gui, 73:Add, Button, x10 y130 w80 h28 gNB_EditStepSave Default, OK
+    Gui, 73:Add, Button, x100 y130 w80 h28 gNB_EditStepCancel, Cancel
+
+    Gui, 73:Show, w200 h168, Edit Step
+return
+
+NB_EditStepSave:
+    Gui, 73:Submit
+    global NB_MacroSteps, NB_EditStepRow
+    newKey := NB_EditKeyChoice
+    newCount := NB_EditCountVal + 0
+    if (newCount < 1)
+        newCount := 1
+    newDelay := NB_EditDelayVal + 0
+    if (newDelay < 0)
+        newDelay := 150
+    NB_MacroSteps[NB_EditStepRow] := {key: newKey, count: newCount, delay: newDelay}
+    Gui, 73:Destroy
+    NB_MacroRefreshList()
+return
+
+NB_EditStepCancel:
+73GuiClose:
+73GuiEscape:
+    Gui, 73:Destroy
+return
+
 NB_MacroRefreshList() {
     global NB_MacroSteps
     Gui, 69:Default
@@ -21577,7 +21648,7 @@ NB_MacroSave:
     header .= "; Steps: " . NB_MacroSteps.Length() . "`n"
     header .= ";`n"
     header .= "; Format: KEY,COUNT,DELAY_MS`n"
-    header .= "; Keys: Tab, Space, Down, Up, Left, Right, Enter, Escape, Home, End`n"
+    header .= "; Keys: Tab, Shift+Tab, Space, Down, Up, Left, Right, Enter, Escape, Home, End`n"
     header .= "; Edit this file in Notepad if you want to tweak it.`n"
     header .= ";`n"
     FileAppend, %header%, %savePath%, UTF-8
@@ -21690,7 +21761,7 @@ NB_ParseMacroFile(filePath) {
             stepDelay := 150
 
         ; Validate key name
-        validKeys := "Tab,Space,Down,Up,Left,Right,Enter,Escape,Home,End"
+        validKeys := "Tab,Shift+Tab,Space,Down,Up,Left,Right,Enter,Escape,Home,End"
         if (!InStr(validKeys, keyName))
             continue
 
@@ -21845,6 +21916,8 @@ NB_ExecuteMacro(steps, globalDelay := 150) {
         ; Map key names to AHK send syntax
         if (keyName = "Tab")
             sendKey := "{Tab}"
+        else if (keyName = "Shift+Tab")
+            sendKey := "+{Tab}"
         else if (keyName = "Space")
             sendKey := "{Space}"
         else if (keyName = "Down")
@@ -21938,7 +22011,7 @@ NB_StartRecording:
         return
     }
 
-    MsgBox, 49, %NB_AppTitle% - Record Macro, MACRO RECORDER`n`nThis will capture ONLY navigation keys:`nTab  Space  Arrow keys  Enter  Escape  Home  End`n`nNO letters, numbers, passwords, or typed text are captured.`n`nClick OK, then navigate the CPRS dialog normally.`nPress Ctrl+Shift+R or click Stop to finish recording.
+    MsgBox, 49, %NB_AppTitle% - Record Macro, MACRO RECORDER`n`nThis will capture ONLY navigation keys:`nTab  Shift+Tab  Space  Arrow keys  Enter  Home  End`n`nNO letters, numbers, passwords, or typed text are captured.`n`nClick OK, then navigate the CPRS dialog normally.`nPress Escape, Ctrl+Shift+R, or click Stop to finish recording.
     IfMsgBox, Cancel
         return
 
@@ -21953,7 +22026,7 @@ NB_StartRecording:
     Gui, 72:Font, s14 cWhite Bold, Segoe UI
     Gui, 72:Add, Text, x10 y8 w330 h30 Center BackgroundTrans, RECORDING  -  Nav Keys Only
     Gui, 72:Font, s9 cWhite, Segoe UI
-    Gui, 72:Add, Text, x10 y40 w330 h18 Center BackgroundTrans vNB_RecStatus, Steps: 0  |  Press Ctrl+Shift+R to stop
+    Gui, 72:Add, Text, x10 y40 w330 h18 Center BackgroundTrans vNB_RecStatus, Steps: 0  |  Press Escape or Ctrl+Shift+R to stop
     Gui, 72:Add, Button, x115 y62 w120 h26 gNB_StopRecording cBlack, Stop Recording
     Gui, 72:+AlwaysOnTop -Caption +ToolWindow +Border
     Gui, 72:Show, x200 y0 w350 h94 NoActivate, NB_RecordingBanner
@@ -21961,15 +22034,17 @@ NB_StartRecording:
     ; Register passthrough hotkeys for navigation keys only
     ; ~ prefix means the key still goes through to the active app
     Hotkey, ~Tab, NB_RecKey_Tab, On
+    Hotkey, ~+Tab, NB_RecKey_ShiftTab, On
     Hotkey, ~Space, NB_RecKey_Space, On
     Hotkey, ~Down, NB_RecKey_Down, On
     Hotkey, ~Up, NB_RecKey_Up, On
     Hotkey, ~Left, NB_RecKey_Left, On
     Hotkey, ~Right, NB_RecKey_Right, On
     Hotkey, ~Enter, NB_RecKey_Enter, On
-    Hotkey, ~Escape, NB_RecKey_Escape, On
     Hotkey, ~Home, NB_RecKey_Home, On
     Hotkey, ~End, NB_RecKey_End, On
+    ; Escape stops recording (not captured as a step)
+    Hotkey, Escape, NB_StopRecording, On
 
     ; Auto-timeout: stop recording after 120 seconds of no activity
     SetTimer, NB_RecordTimeout, 120000
@@ -21989,15 +22064,16 @@ NB_StopRecording:
 
     ; Unregister the hotkeys
     Hotkey, ~Tab, NB_RecKey_Tab, Off
+    Hotkey, ~+Tab, NB_RecKey_ShiftTab, Off
     Hotkey, ~Space, NB_RecKey_Space, Off
     Hotkey, ~Down, NB_RecKey_Down, Off
     Hotkey, ~Up, NB_RecKey_Up, Off
     Hotkey, ~Left, NB_RecKey_Left, Off
     Hotkey, ~Right, NB_RecKey_Right, Off
     Hotkey, ~Enter, NB_RecKey_Enter, Off
-    Hotkey, ~Escape, NB_RecKey_Escape, Off
     Hotkey, ~Home, NB_RecKey_Home, Off
     Hotkey, ~End, NB_RecKey_End, Off
+    Hotkey, Escape, NB_StopRecording, Off
 
     SetTimer, NB_RecordTimeout, Off
 
@@ -22087,6 +22163,10 @@ NB_RecKey_Tab:
     NB_RecordKeyPress("Tab")
 return
 
+NB_RecKey_ShiftTab:
+    NB_RecordKeyPress("Shift+Tab")
+return
+
 NB_RecKey_Space:
     NB_RecordKeyPress("Space")
 return
@@ -22109,10 +22189,6 @@ return
 
 NB_RecKey_Enter:
     NB_RecordKeyPress("Enter")
-return
-
-NB_RecKey_Escape:
-    NB_RecordKeyPress("Escape")
 return
 
 NB_RecKey_Home:
@@ -22147,7 +22223,7 @@ NB_RecordKeyPress(keyName) {
 
     ; Update the recording banner
     stepCount := NB_RecordedSteps.Length()
-    GuiControl, 72:, NB_RecStatus, Steps: %stepCount%  |  Last: %keyName%  |  Ctrl+Shift+R to stop
+    GuiControl, 72:, NB_RecStatus, Steps: %stepCount%  |  Last: %keyName%  |  Esc to stop
 
     ; Reset the auto-timeout
     SetTimer, NB_RecordTimeout, 120000
