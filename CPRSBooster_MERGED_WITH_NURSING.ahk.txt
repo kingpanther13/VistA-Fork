@@ -21464,19 +21464,14 @@ NB_OpenMacroBuilder:
 
     Gui, 69:Add, Text, x10 y472 w460 h1 0x10  ; horizontal line
 
-    ; --- Delay presets ---
-    Gui, 69:Add, Text, x10 y480, Playback speed between steps (ms):
-    Gui, 69:Add, Edit, x220 y477 w50 vNB_MacroGlobalDelay, 150
-    Gui, 69:Add, Text, x275 y480 c999999, (100=fast  200=safe  500=slow)
-
     ; --- Save / Load / Play / Close ---
-    Gui, 69:Add, Button, x10  y509 w100 h30 gNB_MacroSave, Save Macro
-    Gui, 69:Add, Button, x115 y509 w100 h30 gNB_MacroLoad, Load Macro
-    Gui, 69:Add, Button, x220 y509 w100 h30 gNB_MacroTestPlay, Test Play
-    Gui, 69:Add, Button, x325 y509 w145 h30 gNB_MacroPlayInCPRS Default, Play in CPRS
+    Gui, 69:Add, Button, x10  y480 w100 h30 gNB_MacroSave, Save Macro
+    Gui, 69:Add, Button, x115 y480 w100 h30 gNB_MacroLoad, Load Macro
+    Gui, 69:Add, Button, x220 y480 w100 h30 gNB_MacroTestPlay, Test Play
+    Gui, 69:Add, Button, x325 y480 w145 h30 gNB_MacroPlayInCPRS Default, Play in CPRS
     Gui, 69:Add, Button, x400 y8 w70 h22 gNB_MacroBuilderClose, Close
 
-    Gui, 69:Show, w480 h550, Key Macro Builder
+    Gui, 69:Show, w480 h520, Key Macro Builder
 return
 
 69GuiClose:
@@ -21883,7 +21878,7 @@ NB_MacroTestPlay:
     IfMsgBox, Cancel
         return
     Sleep, 3000
-    NB_ExecuteMacro(NB_MacroSteps, NB_MacroGlobalDelay)
+    NB_ExecuteMacro(NB_MacroSteps)
 return
 
 
@@ -21909,7 +21904,7 @@ NB_MacroPlayInCPRS:
 
     WinActivate, ahk_id %dlgHwnd%
     Sleep, 500
-    NB_ExecuteMacro(NB_MacroSteps, NB_MacroGlobalDelay)
+    NB_ExecuteMacro(NB_MacroSteps)
 
     ToolTip, Key macro complete - review the dialog before submitting
     SetTimer, NB_ClearToolTip, -4000
