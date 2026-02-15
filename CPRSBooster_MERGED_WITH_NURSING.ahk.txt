@@ -21908,7 +21908,14 @@ return
 NB_ExecuteMacro(steps, globalDelay := 150) {
     global NB_AppTitle
     totalSteps := steps.Length()
+    aborted := 0
     for i, step in steps {
+        ; Check for Escape abort between steps
+        if (GetKeyState("Escape", "P")) {
+            aborted := 1
+            break
+        }
+
         keyName := step.key
         stepCount := step.count
         stepDelay := step.delay > 0 ? step.delay : globalDelay
@@ -21939,16 +21946,26 @@ NB_ExecuteMacro(steps, globalDelay := 150) {
         else
             continue
 
+        ToolTip, Playing step %i%/%totalSteps%: %keyName% x%stepCount%  |  Esc to abort
+
         ; Send the key the specified number of times
         Loop, %stepCount%
         {
+            if (GetKeyState("Escape", "P")) {
+                aborted := 1
+                break
+            }
             Send, %sendKey%
             Sleep, %stepDelay%
         }
-
-        ToolTip, Playing step %i%/%totalSteps%: %keyName% x%stepCount%
+        if (aborted)
+            break
     }
     ToolTip
+    if (aborted) {
+        ToolTip, Playback aborted at step %i%/%totalSteps%
+        SetTimer, NB_ClearToolTip, -3000
+    }
 }
 
 
