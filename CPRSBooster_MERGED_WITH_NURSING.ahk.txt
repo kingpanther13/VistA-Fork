@@ -21435,7 +21435,7 @@ NB_OpenMacroBuilder:
 
     ; --- Step list ---
     Gui, 69:Add, Text, x10 y132, Steps (played top to bottom — double-click to edit):
-    Gui, 69:Add, ListView, x10 y150 w460 h200 vNB_MacroLV gNB_MacroLVAction Grid, #|Key|Count|Delay (ms)
+    Gui, 69:Add, ListView, x10 y150 w460 h200 vNB_MacroLV gNB_MacroLVAction Grid Multi, #|Key|Count|Delay (ms)
     LV_ModifyCol(1, 30)
     LV_ModifyCol(2, 120)
     LV_ModifyCol(3, 60)
@@ -21447,22 +21447,36 @@ NB_OpenMacroBuilder:
     Gui, 69:Add, Button, x160 y358 w85 h28 gNB_MacroDeleteStep, Delete Step
     Gui, 69:Add, Button, x250 y358 w70 h28 gNB_MacroClearAll, Clear All
     Gui, 69:Add, Button, x325 y358 w70 h28 gNB_MacroEditStep, Edit Step
+    Gui, 69:Add, Text, x10 y388 c999999, (Ctrl+A = select all  |  Ctrl+click or Shift+click = multi-select)
 
-    Gui, 69:Add, Text, x10 y395 w460 h1 0x10  ; horizontal line
+    ; --- Bulk edit selected ---
+    Gui, 69:Add, GroupBox, x10 y405 w460 h60, Apply to Selected Steps
+    Gui, 69:Add, Text, x20 y425, Delay:
+    Gui, 69:Add, Edit, x55 y422 w50 vNB_BulkDelay, 150
+    Gui, 69:Add, Button, x110 y421 w70 h24 gNB_BulkSetDelay, Set Delay
+    Gui, 69:Add, Text, x190 y425, Count:
+    Gui, 69:Add, Edit, x230 y422 w40 vNB_BulkCount, 1
+    Gui, 69:Add, UpDown, Range1-99, 1
+    Gui, 69:Add, Button, x275 y421 w72 h24 gNB_BulkSetCount, Set Count
+    Gui, 69:Add, Text, x355 y425, Key:
+    Gui, 69:Add, DropDownList, x382 y421 w85 vNB_BulkKey altsubmit, Tab|Shift+Tab|Space|Down|Up|Left|Right|Enter|Escape|Home|End
+    Gui, 69:Add, Button, x355 y443 w112 h18 gNB_BulkSetKey, Set Key
+
+    Gui, 69:Add, Text, x10 y472 w460 h1 0x10  ; horizontal line
 
     ; --- Delay presets ---
-    Gui, 69:Add, Text, x10 y403, Playback speed between steps (ms):
-    Gui, 69:Add, Edit, x220 y400 w50 vNB_MacroGlobalDelay, 150
-    Gui, 69:Add, Text, x275 y403 c999999, (100=fast  200=safe  500=slow)
+    Gui, 69:Add, Text, x10 y480, Playback speed between steps (ms):
+    Gui, 69:Add, Edit, x220 y477 w50 vNB_MacroGlobalDelay, 150
+    Gui, 69:Add, Text, x275 y480 c999999, (100=fast  200=safe  500=slow)
 
     ; --- Save / Load / Play / Close ---
-    Gui, 69:Add, Button, x10  y432 w100 h30 gNB_MacroSave, Save Macro
-    Gui, 69:Add, Button, x115 y432 w100 h30 gNB_MacroLoad, Load Macro
-    Gui, 69:Add, Button, x220 y432 w100 h30 gNB_MacroTestPlay, Test Play
-    Gui, 69:Add, Button, x325 y432 w145 h30 gNB_MacroPlayInCPRS Default, Play in CPRS
+    Gui, 69:Add, Button, x10  y509 w100 h30 gNB_MacroSave, Save Macro
+    Gui, 69:Add, Button, x115 y509 w100 h30 gNB_MacroLoad, Load Macro
+    Gui, 69:Add, Button, x220 y509 w100 h30 gNB_MacroTestPlay, Test Play
+    Gui, 69:Add, Button, x325 y509 w145 h30 gNB_MacroPlayInCPRS Default, Play in CPRS
     Gui, 69:Add, Button, x400 y8 w70 h22 gNB_MacroBuilderClose, Close
 
-    Gui, 69:Show, w480 h472, Key Macro Builder
+    Gui, 69:Show, w480 h550, Key Macro Builder
 return
 
 69GuiClose:
@@ -21611,6 +21625,87 @@ NB_EditStepCancel:
 73GuiClose:
 73GuiEscape:
     Gui, 73:Destroy
+return
+
+; --- Bulk edit: set delay on all selected steps ---
+NB_BulkSetDelay:
+    Gui, 69:Submit, NoHide
+    Gui, 69:Default
+    global NB_MacroSteps, NB_AppTitle
+    newDelay := NB_BulkDelay + 0
+    if (newDelay < 0)
+        newDelay := 150
+    changed := 0
+    row := 0
+    Loop {
+        row := LV_GetNext(row)
+        if (row = 0)
+            break
+        NB_MacroSteps[row].delay := newDelay
+        changed++
+    }
+    if (changed = 0) {
+        MsgBox, 48, %NB_AppTitle%, No steps selected. Select rows first (Ctrl+A for all).
+        return
+    }
+    NB_MacroRefreshList()
+    ToolTip, Set delay to %newDelay% ms on %changed% steps
+    SetTimer, NB_ClearToolTip, -2000
+return
+
+; --- Bulk edit: set count on all selected steps ---
+NB_BulkSetCount:
+    Gui, 69:Submit, NoHide
+    Gui, 69:Default
+    global NB_MacroSteps, NB_AppTitle
+    newCount := NB_BulkCount + 0
+    if (newCount < 1)
+        newCount := 1
+    changed := 0
+    row := 0
+    Loop {
+        row := LV_GetNext(row)
+        if (row = 0)
+            break
+        NB_MacroSteps[row].count := newCount
+        changed++
+    }
+    if (changed = 0) {
+        MsgBox, 48, %NB_AppTitle%, No steps selected. Select rows first (Ctrl+A for all).
+        return
+    }
+    NB_MacroRefreshList()
+    ToolTip, Set count to %newCount% on %changed% steps
+    SetTimer, NB_ClearToolTip, -2000
+return
+
+; --- Bulk edit: set key on all selected steps ---
+NB_BulkSetKey:
+    Gui, 69:Submit, NoHide
+    Gui, 69:Default
+    global NB_MacroSteps, NB_AppTitle
+    keyNames := ["Tab", "Shift+Tab", "Space", "Down", "Up", "Left", "Right", "Enter", "Escape", "Home", "End"]
+    if (NB_BulkKey < 1 || NB_BulkKey > keyNames.Length()) {
+        MsgBox, 48, %NB_AppTitle%, Pick a key from the dropdown first.
+        return
+    }
+    newKey := keyNames[NB_BulkKey]
+    changed := 0
+    row := 0
+    Loop {
+        row := LV_GetNext(row)
+        if (row = 0)
+            break
+        NB_MacroSteps[row].key := newKey
+        changed++
+    }
+    if (changed = 0) {
+        MsgBox, 48, %NB_AppTitle%, No steps selected. Select rows first (Ctrl+A for all).
+        return
+    }
+    NB_MacroRefreshList()
+    ToolTip, Set key to %newKey% on %changed% steps
+    SetTimer, NB_ClearToolTip, -2000
 return
 
 NB_MacroRefreshList() {
