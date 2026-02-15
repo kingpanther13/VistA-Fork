@@ -20180,12 +20180,13 @@ NB_ApplyTemplate(templatePath) {
         Loop, %limit%
         {
             liveCb := liveTopParents[A_Index]
-            SendMessage, 0x00F0, 0, 0,, ahk_id % liveCb.hwnd
+            nb_tmpHwnd := liveCb.hwnd
+            SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
             currentState := ErrorLevel ? true : false
             desired := tlpStates[A_Index]
 
             if (currentState != desired) {
-                PostMessage, 0x00F5, 0, 0,, ahk_id % liveCb.hwnd
+                PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
                 expandCount++
                 Sleep, 500
                 NB_DismissIntermediatePopups()
@@ -20362,8 +20363,9 @@ NB_ApplyTemplate(templatePath) {
                 {
                     i := A_Index
                     if (tplAtDepth[i].checked && !liveAtDepth[i].checked) {
-                        if (DllCall("IsWindow", "Ptr", liveAtDepth[i].hwnd))
-                            PostMessage, 0x00F5, 0, 0,, % "ahk_id " . liveAtDepth[i].hwnd
+                        nb_tmpHwnd := liveAtDepth[i].hwnd
+                        if (DllCall("IsWindow", "Ptr", nb_tmpHwnd))
+                            PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
                         expandedAny := true
                         totalExpanded++
                         Sleep, 500
@@ -20430,8 +20432,9 @@ NB_ApplyTemplate(templatePath) {
                         continue
                     if (liveCb.label = tplCb.label) {
                         if (liveCb.checked != tplCb.checked) {
-                            if (DllCall("IsWindow", "Ptr", liveCb.hwnd))
-                                PostMessage, 0x00F5, 0, 0,, % "ahk_id " . liveCb.hwnd
+                            nb_tmpHwnd := liveCb.hwnd
+                            if (DllCall("IsWindow", "Ptr", nb_tmpHwnd))
+                                PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
                             totalApplied++
                             Sleep, 100
                         }
@@ -20457,8 +20460,9 @@ NB_ApplyTemplate(templatePath) {
             {
                 i := A_Index
                 if (unclaimedLive[i].checked != unlabeledTpl[i].checked) {
-                    if (DllCall("IsWindow", "Ptr", unclaimedLive[i].hwnd))
-                        PostMessage, 0x00F5, 0, 0,, % "ahk_id " . unclaimedLive[i].hwnd
+                    nb_tmpHwnd := unclaimedLive[i].hwnd
+                    if (DllCall("IsWindow", "Ptr", nb_tmpHwnd))
+                        PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
                     totalApplied++
                     Sleep, 100
                 }
