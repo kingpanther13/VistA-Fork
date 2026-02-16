@@ -20787,10 +20787,10 @@ NB_EnumDescendantCheckboxes(containerHwnd) {
         item.depth := depth
     }
 
-    ; Resolve parent checkbox labels using MSAA (can't use COM inside Fast callbacks)
+    ; Resolve parent checkbox labels via sibling TDlgFieldPanel + MSAA
     for k, item in NB__descCBResults {
         if (item.label = "" && item.className = "TCPRSDialogParentCheckBox") {
-            item.label := NB_GetAccName(item.hwnd)
+            item.label := NB_ResolveParentCBLabel(item.hwnd)
         }
     }
 
@@ -21292,15 +21292,15 @@ NB_DumpDialogControls:
     enumDump := RegisterCallback("NB__DumpCallback", "Fast")
     DllCall("EnumChildWindows", "Ptr", dlgHwnd, "Ptr", enumDump, "Ptr", 0)
 
-    ; Post-process: resolve parent checkbox labels via MSAA (can't use COM in Fast callbacks)
+    ; Post-process: resolve parent checkbox labels via sibling TDlgFieldPanel + MSAA
     if (NB__dumpParentCBs.Length() > 0) {
-        parentSection := "`n=== Parent Checkbox Labels (via Accessibility) ===`n"
+        parentSection := "`n=== Parent Checkbox Labels (via Sibling Panel) ===`n"
         for i, pcb in NB__dumpParentCBs {
-            accName := NB_GetAccName(pcb.hwnd)
-            if (accName = "")
-                accName := "(could not resolve)"
+            label := NB_ResolveParentCBLabel(pcb.hwnd)
+            if (label = "")
+                label := "(could not resolve)"
             chk := pcb.checked ? "YES" : "NO"
-            parentSection .= "  hwnd=" . pcb.hwnd . " CHECKED=" . chk . " label='" . accName . "'`n"
+            parentSection .= "  hwnd=" . pcb.hwnd . " CHECKED=" . chk . " label='" . label . "'`n"
         }
         FileAppend, %parentSection%, %dumpPath%, UTF-8
     }
@@ -21389,6 +21389,167 @@ NB_EscJson(str) {
     str := StrReplace(str, "`r", "\r")
     str := StrReplace(str, "`t", "\t")
     return """" . str . """"
+}
+
+; Resolve parent checkbox label by finding the sibling TDlgFieldPanel
+; and extracting text from it. CPRS sets parent CB caption to ' ' and
+; puts the visible text in a TLabel (non-windowed) inside a TDlgFieldPanel
+; sibling. We try multiple methods to extract that text.
+NB_ResolveParentCBLabel(cbHwnd) {
+    if !DllCall("IsWindow", "Ptr", cbHwnd, "Int")
+        return ""
+    ; Get the parent container of this checkbox
+    cbParent := DllCall("GetParent", "Ptr", cbHwnd, "Ptr")
+    if (!cbParent)
+        return ""
+    ; Get checkbox screen Y position
+    VarSetCapacity(cbRect, 16, 0)
+    DllCall("GetWindowRect", "Ptr", cbHwnd, "Ptr", &cbRect)
+    cbY := NumGet(cbRect, 4, "Int")
+    ; Walk ALL children of the parent looking for TDlgFieldPanel siblings
+    bestPanel := 0
+    bestDist := 999999
+    child := DllCall("GetWindow", "Ptr", cbParent, "UInt", 5, "Ptr")  ; GW_CHILD
+    while (child) {
+        VarSetCapacity(clsBuf, 256, 0)
+        DllCall("GetClassName", "Ptr", child, "Str", clsBuf, "Int", 256)
+        if (clsBuf = "TDlgFieldPanel") {
+            VarSetCapacity(pRect, 16, 0)
+            DllCall("GetWindowRect", "Ptr", child, "Ptr", &pRect)
+            pY := NumGet(pRect, 4, "Int")
+            dist := Abs(pY - cbY)
+            if (dist < bestDist) {
+                bestPanel := child
+                bestDist := dist
+            }
+        }
+        child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")  ; GW_HWNDNEXT
+    }
+    if (!bestPanel || bestDist > 100)
+        return ""
+    ; Method 1: GetWindowText on the panel
+    text := ""
+    tLen := DllCall("GetWindowTextLengthW", "Ptr", bestPanel, "Int")
+    if (tLen > 0) {
+        VarSetCapacity(tBuf, (tLen + 1) * 2, 0)
+        DllCall("GetWindowTextW", "Ptr", bestPanel, "Ptr", &tBuf, "Int", tLen + 1)
+        text := Trim(StrGet(&tBuf, "UTF-16"))
+    }
+    if (text != "")
+        return text
+    ; Method 2: accName on the panel itself (safe vtable call)
+    text := NB_GetAccName(bestPanel)
+    if (text != "")
+        return text
+    ; Method 3: GetWindowText on windowed children of the panel
+    panelChild := DllCall("GetWindow", "Ptr", bestPanel, "UInt", 5, "Ptr")
+    while (panelChild) {
+        pcLen := DllCall("GetWindowTextLengthW", "Ptr", panelChild, "Int")
+        if (pcLen > 0) {
+            VarSetCapacity(pcBuf, (pcLen + 1) * 2, 0)
+            DllCall("GetWindowTextW", "Ptr", panelChild, "Ptr", &pcBuf, "Int", pcLen + 1)
+            text := Trim(StrGet(&pcBuf, "UTF-16"))
+            if (text != "")
+                return text
+        }
+        panelChild := DllCall("GetWindow", "Ptr", panelChild, "UInt", 2, "Ptr")
+    }
+    ; Method 4: accName on windowed children of the panel
+    panelChild := DllCall("GetWindow", "Ptr", bestPanel, "UInt", 5, "Ptr")
+    while (panelChild) {
+        text := NB_GetAccName(panelChild)
+        if (text != "")
+            return text
+        panelChild := DllCall("GetWindow", "Ptr", panelChild, "UInt", 2, "Ptr")
+    }
+    ; Method 5: Walk IAccessible children of the panel (can find non-windowed TLabel)
+    text := NB_GetAccChildrenText(bestPanel)
+    if (text != "")
+        return text
+    return ""
+}
+
+; Walk IAccessible children of a control and return the first non-empty accName.
+; Uses raw vtable DllCalls to avoid COM dispatch crashes.
+; This can find non-windowed controls like Delphi TLabel (TGraphicControl).
+NB_GetAccChildrenText(hwnd) {
+    if !DllCall("IsWindow", "Ptr", hwnd, "Int")
+        return ""
+    Acc_Init()
+    VarSetCapacity(IID, 16)
+    NumPut(0x11CF3C3D618736E0, IID, 0, "Int64")
+    NumPut(0x719B3800AA000C81, IID, 8, "Int64")
+    pAcc := 0
+    hr := DllCall("oleacc\AccessibleObjectFromWindow", "Ptr", hwnd, "UInt", 0, "Ptr", &IID, "Ptr*", pAcc, "Int")
+    if (hr != 0 || !pAcc)
+        return ""
+    vtbl := NumGet(pAcc + 0, 0, "Ptr")
+    if (!vtbl) {
+        ObjRelease(pAcc)
+        return ""
+    }
+    ; get_accChildCount is vtable slot 8
+    childCount := 0
+    DllCall(NumGet(vtbl + 0, 8 * A_PtrSize, "Ptr"), "Ptr", pAcc, "Int*", childCount, "Int")
+    if (childCount <= 0) {
+        ObjRelease(pAcc)
+        return ""
+    }
+    ; Try get_accName with simple child IDs (1..N)
+    ; Delphi MSAA proxies expose TLabel as simple children with integer IDs
+    VarSetCapacity(varChild, 24, 0)
+    NumPut(3, varChild, 0, "UShort")  ; VT_I4
+    Loop, %childCount% {
+        NumPut(A_Index, varChild, 8, "Int")
+        pName := 0
+        DllCall(NumGet(vtbl + 0, 10 * A_PtrSize, "Ptr"), "Ptr", pAcc, "Ptr", &varChild, "Ptr*", pName, "Int")
+        if (pName) {
+            name := StrGet(pName, "UTF-16")
+            DllCall("OleAut32\SysFreeString", "Ptr", pName)
+            name := Trim(name)
+            if (name != "") {
+                ObjRelease(pAcc)
+                return name
+            }
+        }
+    }
+    ; Try AccessibleChildren for IDispatch child objects
+    varSize := 8 + 2 * A_PtrSize
+    totalSize := childCount * varSize
+    VarSetCapacity(varChildren, totalSize, 0)
+    cReturned := 0
+    DllCall("oleacc\AccessibleChildren", "Ptr", pAcc, "Int", 0, "Int", childCount
+        , "Ptr", &varChildren, "Int*", cReturned, "Int")
+    result := ""
+    Loop, %cReturned% {
+        offset := (A_Index - 1) * varSize
+        vt := NumGet(varChildren, offset, "UShort")
+        if (vt = 9) {  ; VT_DISPATCH - child IAccessible object
+            pChild := NumGet(varChildren, offset + 8, "Ptr")
+            if (pChild && result = "") {
+                cVtbl := NumGet(pChild + 0, 0, "Ptr")
+                if (cVtbl) {
+                    VarSetCapacity(varSelf, 24, 0)
+                    NumPut(3, varSelf, 0, "UShort")
+                    NumPut(0, varSelf, 8, "Int")
+                    pChildName := 0
+                    DllCall(NumGet(cVtbl + 0, 10 * A_PtrSize, "Ptr"), "Ptr", pChild
+                        , "Ptr", &varSelf, "Ptr*", pChildName, "Int")
+                    if (pChildName) {
+                        cName := StrGet(pChildName, "UTF-16")
+                        DllCall("OleAut32\SysFreeString", "Ptr", pChildName)
+                        cName := Trim(cName)
+                        if (cName != "")
+                            result := cName
+                    }
+                }
+            }
+            if (pChild)
+                ObjRelease(pChild)
+        }
+    }
+    ObjRelease(pAcc)
+    return result
 }
 
 ; Get accessible name for a control via MSAA (IAccessible.get_accName).
