@@ -22696,7 +22696,8 @@ CF__CheckForFormControls(hwnd, lParam) {
     }
     ; Check for Delphi-specific class names
     if (InStr(className, "TCheckBox") || InStr(className, "TRadioButton")
-        || InStr(className, "TComboBox") || className = "ComboBox") {
+        || InStr(className, "TComboBox") || className = "ComboBox"
+        || InStr(className, "TCheckListBox")) {
         CF__hasFormControls := true
         return 0
     }
@@ -22732,6 +22733,10 @@ CF_ClassifyControl(hwnd) {
         || (InStr(className, "WindowsForms") && InStr(className, "ComboBox"))) {
         return "combo"
     }
+
+    ; Delphi TCheckListBox — a listbox with per-item checkboxes
+    if (InStr(className, "TCheckListBox"))
+        return "checklist"
 
     ; Delphi-specific class name detection
     if (InStr(className, "TCheckBox"))
@@ -22892,6 +22897,13 @@ CF__SpyCallback(hwnd, lParam) {
         extra := " [COMBOBOX] SELECTED_IDX=" . selIdx
         CF__spyComboCount++
     }
+    else if (controlType = "checklist") {
+        ; Enumerate items in the TCheckListBox
+        SendMessage, 0x018B, 0, 0,, ahk_id %hwnd%   ; LB_GETCOUNT
+        clItemCount := ErrorLevel
+        extra := " [CHECKLISTBOX] ITEMS=" . clItemCount
+        CF__spyCBCount += clItemCount
+    }
     else if (controlType = "groupbox") {
         extra := " [GROUPBOX]"
     }
@@ -22956,8 +22968,14 @@ CF__EnumFormCallback(hwnd, lParam) {
     global CF__enumResults, CF__enumTargetHwnd
 
     controlType := CF_ClassifyControl(hwnd)
-    if (controlType != "checkbox" && controlType != "radio" && controlType != "combo")
+    if (controlType != "checkbox" && controlType != "radio" && controlType != "combo" && controlType != "checklist")
         return 1
+
+    ; Handle TCheckListBox: expand into individual checklist items
+    if (controlType = "checklist") {
+        CF_EnumCheckListBoxItems(hwnd)
+        return 1
+    }
 
     VarSetCapacity(buf, 512, 0)
     DllCall("GetClassName", "Ptr", hwnd, "Str", buf, "Int", 256)
@@ -23112,6 +23130,113 @@ CF__AdjLabelCallback(hwnd, lParam) {
 
 
 ;============================================================================================
+; CF - TCHECKLISTBOX SUPPORT
+;
+; Delphi TCheckListBox is a single listbox control that draws per-item checkboxes.
+; Items are NOT child windows — they live inside the listbox.
+; We use LB_ messages to enumerate items and ReadProcessMemory to read check state
+; from Delphi's internal TCheckListBoxDataWrapper (FState at offset +4 from item data pointer).
+;============================================================================================
+
+CF_EnumCheckListBoxItems(listBoxHwnd) {
+    global CF__enumResults
+
+    ; Get item count
+    SendMessage, 0x018B, 0, 0,, ahk_id %listBoxHwnd%   ; LB_GETCOUNT
+    itemCount := ErrorLevel
+    if (itemCount <= 0 || itemCount > 500)
+        return
+
+    ; Get screen position of the listbox itself
+    VarSetCapacity(lbRect, 16, 0)
+    DllCall("GetWindowRect", "Ptr", listBoxHwnd, "Ptr", &lbRect)
+    lbY := NumGet(lbRect, 4, "Int")
+    lbX := NumGet(lbRect, 0, "Int")
+
+    ; Open the process for memory reading (needed for check state)
+    WinGet, pid, PID, ahk_id %listBoxHwnd%
+    hProc := DllCall("OpenProcess", "UInt", 0x0010, "Int", 0, "UInt", pid, "Ptr")  ; PROCESS_VM_READ
+
+    Loop, %itemCount%
+    {
+        idx := A_Index - 1
+
+        ; Get item text via LB_GETTEXT
+        ; First get text length
+        SendMessage, 0x018A, idx, 0,, ahk_id %listBoxHwnd%   ; LB_GETTEXTLEN
+        tLen := ErrorLevel
+        itemText := ""
+        if (tLen > 0 && tLen < 1024) {
+            VarSetCapacity(tBuf, (tLen + 2) * 2, 0)
+            SendMessage, 0x0189, idx, &tBuf,, ahk_id %listBoxHwnd%   ; LB_GETTEXT
+            itemText := StrGet(&tBuf)
+        }
+
+        ; Get item rect for Y position
+        VarSetCapacity(itemRect, 16, 0)
+        NumPut(idx, itemRect, 0, "Int")  ; LB_GETITEMRECT needs index in RECT
+        SendMessage, 0x0198, idx, &itemRect,, ahk_id %listBoxHwnd%   ; LB_GETITEMRECT
+        ; itemRect is in client coords — convert to screen
+        VarSetCapacity(pt, 8, 0)
+        NumPut(NumGet(itemRect, 0, "Int"), pt, 0, "Int")
+        NumPut(NumGet(itemRect, 4, "Int"), pt, 4, "Int")
+        DllCall("ClientToScreen", "Ptr", listBoxHwnd, "Ptr", &pt)
+        itemY := NumGet(pt, 4, "Int")
+
+        ; Read check state from Delphi internals via LB_GETITEMDATA + ReadProcessMemory
+        itemChecked := false
+        SendMessage, 0x0199, idx, 0,, ahk_id %listBoxHwnd%   ; LB_GETITEMDATA
+        dataPtr := ErrorLevel
+        if (hProc && dataPtr && dataPtr != 0xFFFFFFFF && dataPtr != -1) {
+            ; Read FState at offset +4 (after FData which is a LongInt)
+            VarSetCapacity(stateVal, 4, 0)
+            bytesRead := 0
+            DllCall("ReadProcessMemory", "Ptr", hProc, "Ptr", dataPtr + 4
+                , "Ptr", &stateVal, "UInt", 4, "Ptr*", bytesRead)
+            if (bytesRead > 0) {
+                state := NumGet(stateVal, 0, "Int")
+                itemChecked := (state = 1) ? true : false  ; cbChecked=1
+            }
+        }
+
+        entry := {hwnd: listBoxHwnd, type: "checklist", className: "TCheckListBox"
+            , label: itemText, checked: itemChecked, selected: false, value: ""
+            , valueIdx: -1, y: itemY, x: lbX, parentHwnd: 0, parentLabel: ""
+            , checklistIdx: idx}
+        CF__enumResults.Push(entry)
+    }
+
+    if (hProc)
+        DllCall("CloseHandle", "Ptr", hProc)
+}
+
+CF_ReadCheckListItemState(listBoxHwnd, itemIdx) {
+    ; Read the check state of a single TCheckListBox item
+    ; Returns true if checked, false otherwise
+    WinGet, pid, PID, ahk_id %listBoxHwnd%
+    hProc := DllCall("OpenProcess", "UInt", 0x0010, "Int", 0, "UInt", pid, "Ptr")
+    if (!hProc)
+        return false
+
+    SendMessage, 0x0199, itemIdx, 0,, ahk_id %listBoxHwnd%   ; LB_GETITEMDATA
+    dataPtr := ErrorLevel
+    result := false
+    if (dataPtr && dataPtr != 0xFFFFFFFF && dataPtr != -1) {
+        VarSetCapacity(stateVal, 4, 0)
+        bytesRead := 0
+        DllCall("ReadProcessMemory", "Ptr", hProc, "Ptr", dataPtr + 4
+            , "Ptr", &stateVal, "UInt", 4, "Ptr*", bytesRead)
+        if (bytesRead > 0) {
+            state := NumGet(stateVal, 0, "Int")
+            result := (state = 1) ? true : false
+        }
+    }
+    DllCall("CloseHandle", "Ptr", hProc)
+    return result
+}
+
+
+;============================================================================================
 ; CF - SAVE TEMPLATE
 ;============================================================================================
 
@@ -23164,8 +23289,10 @@ CF_BtnSaveTemplate:
         json .= ", ""idx"": " . (ci - 1)
         json .= ", ""y"": " . ctrl.y
 
-        if (ctrl.type = "checkbox") {
+        if (ctrl.type = "checkbox" || ctrl.type = "checklist") {
             json .= ", ""checked"": " . (ctrl.checked ? "true" : "false")
+            if (ctrl.type = "checklist")
+                json .= ", ""checklistIdx"": " . ctrl.checklistIdx
             cbCount++
         }
         else if (ctrl.type = "radio") {
@@ -23373,6 +23500,23 @@ CF_ApplyTemplate(templatePath) {
                 Sleep, 150
             }
         }
+        else if (cfTplType = "checklist") {
+            ; TCheckListBox item: read current state and toggle if needed
+            cfCLIdx := liveControls[bestLiveIdx].checklistIdx
+            ; Read current check state via ReadProcessMemory
+            currentCLChecked := CF_ReadCheckListItemState(cfMatchHwnd, cfCLIdx)
+            if (currentCLChecked != cfTplChecked) {
+                ; Select the item then send Space to toggle
+                SendMessage, 0x0186, cfCLIdx, 0,, ahk_id %cfMatchHwnd%   ; LB_SETCURSEL
+                Sleep, 50
+                ; Send Space key to toggle the check
+                PostMessage, 0x0100, 0x20, 0,, ahk_id %cfMatchHwnd%   ; WM_KEYDOWN VK_SPACE
+                Sleep, 30
+                PostMessage, 0x0101, 0x20, 0,, ahk_id %cfMatchHwnd%   ; WM_KEYUP VK_SPACE
+                totalApplied++
+                Sleep, 150
+            }
+        }
         else if (cfTplType = "radio") {
             if (cfTplSelected) {
                 ; Only click if not already selected
@@ -23525,8 +23669,13 @@ CF_ParseControls(jsonContent) {
         if (RegExMatch(itemStr, """group_label"":\s*""((?:[^""\\]|\\.)*)""", m))
             group_label := m1
 
+        checklistIdx := -1
+        if (RegExMatch(itemStr, """checklistIdx"":\s*(-?\d+)", m))
+            checklistIdx := m1 + 0
+
         entry := {type: ctrlType, label: label, checked: checked, selected: selected
-            , value: value, valueIdx: valueIdx, y: yPos, group_label: group_label}
+            , value: value, valueIdx: valueIdx, y: yPos, group_label: group_label
+            , checklistIdx: checklistIdx}
         controls.Push(entry)
 
         itemPos := itemEnd
