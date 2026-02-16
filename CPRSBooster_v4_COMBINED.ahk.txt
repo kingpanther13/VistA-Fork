@@ -1118,7 +1118,7 @@ if winexist("Consult Toolbox")
 
 sleep 50
 
-if (winactive("fxnbar") || winactive("hyperdrivebar") || winactive("Booster Quick Orders") || winactive("Ambient Scribe Toolbar") || winactive("Booster Dictation Box"))  ; if any of these are active, don't do anything
+if (winactive("fxnbar") || winactive("hyperdrivebar") || winactive("Booster Quick Orders") || winactive("Ambient Scribe Toolbar") || winactive("Booster Dictation Box") || winactive("NursingBoosterPanel"))  ; if any of these are active, don't do anything
 {
 
 
@@ -20085,7 +20085,7 @@ return
 ;============================================================================================
 
 NB_CheckCPRS:
-    SetTitleMatchMode, 2
+    Critical
     ; --- CPRS Detection ---
     cprsStatus := "CPRS: Not detected"
     IfWinExist, ahk_exe CPRSChart.exe
@@ -20125,7 +20125,6 @@ return
 
 NB_FindActiveDialogWindow() {
     ; Try TfrmRemDlg first (reminder dialog)
-    SetTitleMatchMode, 2
     hwnd := WinExist("ahk_class TfrmRemDlg")
     if (hwnd)
         return hwnd
