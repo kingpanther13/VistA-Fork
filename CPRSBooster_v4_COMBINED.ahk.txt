@@ -103,8 +103,19 @@ global NB_AppTitle := "Nursing Booster"
 global NB_TemplateDir := onedrivelocal . "\NursingTemplates"
 global NB_LogDir := onedrivelocal . "\NursingTemplates\Logs"
 global NB_MacroDir := onedrivelocal . "\NursingTemplates\KeyMacros"
-global NB_BoosterGuiVisible := 1
+global NB_BoosterGuiVisible := 0
 global NB_CPRSDetected := 0
+global NB_HotkeyConfigPath := onedrivelocal . "\NursingTemplates\hotkey_buttons.json"
+global NB_HK1_Label := "Quick 1"
+global NB_HK1_Action := ""
+global NB_HK2_Label := "Quick 2"
+global NB_HK2_Action := ""
+global NB_HK3_Label := "Quick 3"
+global NB_HK3_Action := ""
+global NB_HK4_Label := "Quick 4"
+global NB_HK4_Action := ""
+global NB_HK5_Label := "Quick 5"
+global NB_HK5_Action := ""
 global NB_MacroSteps := []
 global NB_MacroBuilderOpen := 0
 global NB_MacroKeepSteps := 0
@@ -708,6 +719,9 @@ WinGetPos , X0, Y0, Width0, Height0, CPRS ; starting positions of CPRS prior to 
 
 ;  deactivate this for now---SetTimer, MonitorForSpecificWindows, 1000
 
+; --- Load hotkey button config ---
+gosub NB_LoadHotkeyConfig
+
 ; --- NursingBooster: Build floating panel (Gui 67) ---
 Gui, 67:Destroy
 Gui, 67:Color, 1a1a2e
@@ -733,11 +747,20 @@ Gui, 67:Add, Button, x5   y136 w90 h26 gCF_PanelSpy, CPFS Spy
 Gui, 67:Add, Button, x100 y136 w90 h26 gCF_PanelSave, CPFS Save
 Gui, 67:Add, Button, x195 y136 w90 h26 gCF_PanelLoad, CPFS Load
 Gui, 67:Add, Button, x290 y136 w90 h26 gCF_PanelDelete, CPFS Delete
+Gui, 67:Font, s7 cFFD700, Segoe UI
+Gui, 67:Add, Text, x5 y166 w370 h16 Center BackgroundTrans, --- Quick Actions ---
+Gui, 67:Font, s7 cBlack, Segoe UI
+Gui, 67:Add, Button, x5   y183 w68 h24 gNB_HK1_Run vNB_HK1_Btn, %NB_HK1_Label%
+Gui, 67:Add, Button, x76  y183 w68 h24 gNB_HK2_Run vNB_HK2_Btn, %NB_HK2_Label%
+Gui, 67:Add, Button, x147 y183 w68 h24 gNB_HK3_Run vNB_HK3_Btn, %NB_HK3_Label%
+Gui, 67:Add, Button, x218 y183 w68 h24 gNB_HK4_Run vNB_HK4_Btn, %NB_HK4_Label%
+Gui, 67:Add, Button, x289 y183 w68 h24 gNB_HK5_Run vNB_HK5_Btn, %NB_HK5_Label%
+Gui, 67:Add, Button, x360 y183 w20 h24 gNB_HK_Setup, ...
 Gui, 67:Font, s7 cSilver, Segoe UI
-Gui, 67:Add, Text, x5 y166 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected | CPFS: Not detected
+Gui, 67:Add, Text, x5 y210 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected | CPFS: Not detected
 Gui, 67:+AlwaysOnTop -Caption +ToolWindow
-Gui, 67:Show, x0 y0 w385 h186 NoActivate, NursingBoosterPanel
-NB_BoosterGuiVisible := 1
+Gui, 67:Show, x0 y0 w385 h230 Hide, NursingBoosterPanel
+NB_BoosterGuiVisible := 0
 
 ; --- NursingBooster: Start CPRS detection timer ---
 SetTimer, NB_CheckCPRS, 3000
@@ -20077,6 +20100,261 @@ return
 
 CF_PanelDelete:
     gosub CF_BtnDeleteTemplate
+return
+
+
+;============================================================================================
+; QUICK ACTION HOTKEY BUTTON HANDLERS
+;============================================================================================
+
+NB_HK1_Run:
+    NB_RunHotkeyAction(NB_HK1_Action, "Quick 1")
+return
+
+NB_HK2_Run:
+    NB_RunHotkeyAction(NB_HK2_Action, "Quick 2")
+return
+
+NB_HK3_Run:
+    NB_RunHotkeyAction(NB_HK3_Action, "Quick 3")
+return
+
+NB_HK4_Run:
+    NB_RunHotkeyAction(NB_HK4_Action, "Quick 4")
+return
+
+NB_HK5_Run:
+    NB_RunHotkeyAction(NB_HK5_Action, "Quick 5")
+return
+
+NB_RunHotkeyAction(action, slotName) {
+    global NB_TemplateDir, NB_MacroDir, CF_TemplateDir, NB_AppTitle
+    if (action = "") {
+        ToolTip, %slotName% not configured - click [...] to set up
+        SetTimer, NB_ClearToolTip, -2000
+        return
+    }
+    ; Parse action type: "nb_template:Name", "cf_template:Name", "macro:Name"
+    if (RegExMatch(action, "^nb_template:(.+)$", m)) {
+        NB_ApplyNamedTemplate(m1)
+    }
+    else if (RegExMatch(action, "^cf_template:(.+)$", m)) {
+        templatePath := CF_TemplateDir . "\" . m1 . ".json"
+        if (FileExist(templatePath)) {
+            CF_ApplyTemplate(templatePath)
+        } else {
+            MsgBox, 48, %NB_AppTitle%, CPFS template "%m1%" not found.`n`nSave a template with that name using CPFS Save first.
+        }
+    }
+    else if (RegExMatch(action, "^macro:(.+)$", m)) {
+        macroPath := NB_MacroDir . "\" . m1 . ".keymacro"
+        if (FileExist(macroPath)) {
+            playSteps := NB_ParseMacroFile(macroPath)
+            if (playSteps.Length() > 0) {
+                NB_ExecuteMacro(playSteps, 150)
+            }
+        } else {
+            MsgBox, 48, %NB_AppTitle%, Macro "%m1%" not found.`n`nSave a macro with that name using Build Key Macro first.
+        }
+    }
+    else {
+        ToolTip, Unknown action: %action%
+        SetTimer, NB_ClearToolTip, -2000
+    }
+}
+
+;============================================================================================
+; QUICK ACTION SETUP DIALOG (Gui 71)
+;============================================================================================
+
+NB_HK_Setup:
+    global NB_HK1_Action, NB_HK2_Action, NB_HK3_Action, NB_HK4_Action, NB_HK5_Action
+    global NB_HK1_Label, NB_HK2_Label, NB_HK3_Label, NB_HK4_Label, NB_HK5_Label
+    global NB_TemplateDir, NB_MacroDir, CF_TemplateDir
+
+    ; Build list of available actions
+    actionList := "-- None --|"
+
+    ; NB templates
+    Loop, Files, %NB_TemplateDir%\*.json
+    {
+        fname := StrReplace(A_LoopFileName, ".json", "")
+        actionList .= "NB Template: " . fname . "|"
+    }
+
+    ; CF templates
+    Loop, Files, %CF_TemplateDir%\*.json
+    {
+        fname := StrReplace(A_LoopFileName, ".json", "")
+        actionList .= "CPFS Template: " . fname . "|"
+    }
+
+    ; Macros
+    Loop, Files, %NB_MacroDir%\*.keymacro
+    {
+        fname := StrReplace(A_LoopFileName, ".keymacro", "")
+        actionList .= "Macro: " . fname . "|"
+    }
+
+    Gui, 71:Destroy
+    Gui, 71:+AlwaysOnTop +ToolWindow
+    Gui, 71:Color, F8F8F8
+    Gui, 71:Font, s9 Bold, Segoe UI
+    Gui, 71:Add, Text, x10 y10 w380, Quick Action Button Setup
+    Gui, 71:Font, s8 Norm, Segoe UI
+
+    ; Slot 1
+    Gui, 71:Add, Text, x10 y40 w50, Slot 1:
+    Gui, 71:Add, Edit, x65 y38 w100 h22 vNB_HKSetup_L1, %NB_HK1_Label%
+    Gui, 71:Add, DropDownList, x170 y38 w220 vNB_HKSetup_A1, %actionList%
+    NB_HKSetupSelectAction("NB_HKSetup_A1", NB_HK1_Action)
+
+    ; Slot 2
+    Gui, 71:Add, Text, x10 y68 w50, Slot 2:
+    Gui, 71:Add, Edit, x65 y66 w100 h22 vNB_HKSetup_L2, %NB_HK2_Label%
+    Gui, 71:Add, DropDownList, x170 y66 w220 vNB_HKSetup_A2, %actionList%
+    NB_HKSetupSelectAction("NB_HKSetup_A2", NB_HK2_Action)
+
+    ; Slot 3
+    Gui, 71:Add, Text, x10 y96 w50, Slot 3:
+    Gui, 71:Add, Edit, x65 y94 w100 h22 vNB_HKSetup_L3, %NB_HK3_Label%
+    Gui, 71:Add, DropDownList, x170 y94 w220 vNB_HKSetup_A3, %actionList%
+    NB_HKSetupSelectAction("NB_HKSetup_A3", NB_HK3_Action)
+
+    ; Slot 4
+    Gui, 71:Add, Text, x10 y124 w50, Slot 4:
+    Gui, 71:Add, Edit, x65 y122 w100 h22 vNB_HKSetup_L4, %NB_HK4_Label%
+    Gui, 71:Add, DropDownList, x170 y122 w220 vNB_HKSetup_A4, %actionList%
+    NB_HKSetupSelectAction("NB_HKSetup_A4", NB_HK4_Action)
+
+    ; Slot 5
+    Gui, 71:Add, Text, x10 y152 w50, Slot 5:
+    Gui, 71:Add, Edit, x65 y150 w100 h22 vNB_HKSetup_L5, %NB_HK5_Label%
+    Gui, 71:Add, DropDownList, x170 y150 w220 vNB_HKSetup_A5, %actionList%
+    NB_HKSetupSelectAction("NB_HKSetup_A5", NB_HK5_Action)
+
+    Gui, 71:Add, Button, x110 y185 w90 h28 gNB_HKSetup_Save Default, Save
+    Gui, 71:Add, Button, x210 y185 w90 h28 gNB_HKSetup_Cancel, Cancel
+    Gui, 71:Show, w400 h225, Quick Action Setup
+return
+
+NB_HKSetupSelectAction(ctrlName, currentAction) {
+    ; Convert stored action back to display text for dropdown selection
+    displayText := "-- None --"
+    if (RegExMatch(currentAction, "^nb_template:(.+)$", m))
+        displayText := "NB Template: " . m1
+    else if (RegExMatch(currentAction, "^cf_template:(.+)$", m))
+        displayText := "CPFS Template: " . m1
+    else if (RegExMatch(currentAction, "^macro:(.+)$", m))
+        displayText := "Macro: " . m1
+    GuiControl, 71:ChooseString, %ctrlName%, %displayText%
+}
+
+NB_HKSetup_Save:
+    Gui, 71:Submit
+    global NB_HK1_Label, NB_HK1_Action, NB_HK2_Label, NB_HK2_Action
+    global NB_HK3_Label, NB_HK3_Action, NB_HK4_Label, NB_HK4_Action
+    global NB_HK5_Label, NB_HK5_Action
+
+    ; Convert display text back to action strings
+    NB_HK1_Label := NB_HKSetup_L1
+    NB_HK1_Action := NB_HKParseActionChoice(NB_HKSetup_A1)
+    NB_HK2_Label := NB_HKSetup_L2
+    NB_HK2_Action := NB_HKParseActionChoice(NB_HKSetup_A2)
+    NB_HK3_Label := NB_HKSetup_L3
+    NB_HK3_Action := NB_HKParseActionChoice(NB_HKSetup_A3)
+    NB_HK4_Label := NB_HKSetup_L4
+    NB_HK4_Action := NB_HKParseActionChoice(NB_HKSetup_A4)
+    NB_HK5_Label := NB_HKSetup_L5
+    NB_HK5_Action := NB_HKParseActionChoice(NB_HKSetup_A5)
+
+    ; Update button labels on panel
+    GuiControl, 67:, NB_HK1_Btn, %NB_HK1_Label%
+    GuiControl, 67:, NB_HK2_Btn, %NB_HK2_Label%
+    GuiControl, 67:, NB_HK3_Btn, %NB_HK3_Label%
+    GuiControl, 67:, NB_HK4_Btn, %NB_HK4_Label%
+    GuiControl, 67:, NB_HK5_Btn, %NB_HK5_Label%
+
+    ; Save to file
+    gosub NB_SaveHotkeyConfig
+    Gui, 71:Destroy
+    ToolTip, Quick actions saved
+    SetTimer, NB_ClearToolTip, -2000
+return
+
+NB_HKSetup_Cancel:
+    Gui, 71:Destroy
+return
+
+NB_HKParseActionChoice(displayText) {
+    ; Convert dropdown display text to stored action string
+    if (displayText = "-- None --" || displayText = "")
+        return ""
+    if (RegExMatch(displayText, "^NB Template: (.+)$", m))
+        return "nb_template:" . m1
+    if (RegExMatch(displayText, "^CPFS Template: (.+)$", m))
+        return "cf_template:" . m1
+    if (RegExMatch(displayText, "^Macro: (.+)$", m))
+        return "macro:" . m1
+    return ""
+}
+
+;============================================================================================
+; QUICK ACTION CONFIG SAVE/LOAD
+;============================================================================================
+
+NB_LoadHotkeyConfig:
+    global NB_HotkeyConfigPath
+    global NB_HK1_Label, NB_HK1_Action, NB_HK2_Label, NB_HK2_Action
+    global NB_HK3_Label, NB_HK3_Action, NB_HK4_Label, NB_HK4_Action
+    global NB_HK5_Label, NB_HK5_Action
+
+    if (!FileExist(NB_HotkeyConfigPath))
+        return
+
+    FileRead, hkJson, %NB_HotkeyConfigPath%
+    if (hkJson = "")
+        return
+
+    ; Parse each slot with regex
+    if (RegExMatch(hkJson, """label1"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK1_Label := m1
+    if (RegExMatch(hkJson, """action1"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK1_Action := m1
+    if (RegExMatch(hkJson, """label2"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK2_Label := m1
+    if (RegExMatch(hkJson, """action2"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK2_Action := m1
+    if (RegExMatch(hkJson, """label3"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK3_Label := m1
+    if (RegExMatch(hkJson, """action3"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK3_Action := m1
+    if (RegExMatch(hkJson, """label4"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK4_Label := m1
+    if (RegExMatch(hkJson, """action4"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK4_Action := m1
+    if (RegExMatch(hkJson, """label5"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK5_Label := m1
+    if (RegExMatch(hkJson, """action5"":\s*""((?:[^""\\]|\\.)*)""", m))
+        NB_HK5_Action := m1
+return
+
+NB_SaveHotkeyConfig:
+    global NB_HotkeyConfigPath
+    global NB_HK1_Label, NB_HK1_Action, NB_HK2_Label, NB_HK2_Action
+    global NB_HK3_Label, NB_HK3_Action, NB_HK4_Label, NB_HK4_Action
+    global NB_HK5_Label, NB_HK5_Action
+
+    hkJson := "{`n"
+    hkJson .= "  ""label1"": """ . NB_EscJson(NB_HK1_Label) . """, ""action1"": """ . NB_EscJson(NB_HK1_Action) . """,`n"
+    hkJson .= "  ""label2"": """ . NB_EscJson(NB_HK2_Label) . """, ""action2"": """ . NB_EscJson(NB_HK2_Action) . """,`n"
+    hkJson .= "  ""label3"": """ . NB_EscJson(NB_HK3_Label) . """, ""action3"": """ . NB_EscJson(NB_HK3_Action) . """,`n"
+    hkJson .= "  ""label4"": """ . NB_EscJson(NB_HK4_Label) . """, ""action4"": """ . NB_EscJson(NB_HK4_Action) . """,`n"
+    hkJson .= "  ""label5"": """ . NB_EscJson(NB_HK5_Label) . """, ""action5"": """ . NB_EscJson(NB_HK5_Action) . """`n"
+    hkJson .= "}"
+
+    FileDelete, %NB_HotkeyConfigPath%
+    FileAppend, %hkJson%, %NB_HotkeyConfigPath%
 return
 
 
