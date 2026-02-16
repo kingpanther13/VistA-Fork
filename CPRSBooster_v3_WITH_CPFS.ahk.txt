@@ -23405,7 +23405,7 @@ CF_ApplyTemplate(templatePath) {
 
     CF_DismissIntermediatePopups()
 
-    ToolTip, Done: %totalApplied% applied, %totalNotFound% not matched. Review before submitting.
+    ToolTip, Done: %totalApplied% applied`, %totalNotFound% not matched - review before submitting
     SetTimer, CF_ClearToolTip, -5000
 }
 
