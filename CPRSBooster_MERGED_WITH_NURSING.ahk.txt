@@ -20840,52 +20840,71 @@ NB__EnumDescCBCallback(hwnd, lParam) {
             label := Trim(StrGet(&tBuf2))
         }
     }
-    ; CPRS parent checkboxes have Caption=' ' by design (CPRS clears it).
-    ; The actual text lives in a sibling TDlgFieldPanel at the same Y position.
-    ; Walk the next siblings to find it.
+    ; CPRS parent checkboxes have Caption=' ' by design (CPRS source clears it).
+    ; The visible text is in a non-windowed TLabel inside a sibling TDlgFieldPanel.
+    ; Use MSAA (Accessibility) to get the name, then fall back to sibling search.
     if (label = "" && buf = "TCPRSDialogParentCheckBox") {
-        VarSetCapacity(cbRect, 16, 0)
-        DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", &cbRect)
-        cbY := NumGet(cbRect, 4, "Int")
-        sib := DllCall("GetWindow", "Ptr", hwnd, "UInt", 2, "Ptr")  ; GW_HWNDNEXT
-        while (sib) {
-            VarSetCapacity(sibBuf, 256, 0)
-            DllCall("GetClassName", "Ptr", sib, "Str", sibBuf, "Int", 256)
-            if (sibBuf = "TDlgFieldPanel") {
-                VarSetCapacity(sibRect, 16, 0)
-                DllCall("GetWindowRect", "Ptr", sib, "Ptr", &sibRect)
-                sibY := NumGet(sibRect, 4, "Int")
-                ; Same Y position (within 5px tolerance) = this is the label panel
-                yDiff := cbY - sibY
-                if (yDiff < 0)
-                    yDiff := -yDiff
-                if (yDiff <= 5) {
-                    ; The panel itself may contain child label controls - try panel text first
-                    pLen := DllCall("GetWindowTextLengthW", "Ptr", sib, "Int")
-                    if (pLen > 0) {
-                        VarSetCapacity(pBuf, (pLen + 1) * 2, 0)
-                        DllCall("GetWindowTextW", "Ptr", sib, "Ptr", &pBuf, "Int", pLen + 1)
-                        label := Trim(StrGet(&pBuf, "UTF-16"))
-                    }
-                    ; If panel has no direct text, check its first child (often a TLabel or TCPRSDialogStaticLabel)
-                    if (label = "") {
-                        panelChild := DllCall("GetWindow", "Ptr", sib, "UInt", 5, "Ptr")  ; GW_CHILD
-                        while (panelChild) {
-                            pcLen := DllCall("GetWindowTextLengthW", "Ptr", panelChild, "Int")
-                            if (pcLen > 0) {
-                                VarSetCapacity(pcBuf, (pcLen + 1) * 2, 0)
-                                DllCall("GetWindowTextW", "Ptr", panelChild, "Ptr", &pcBuf, "Int", pcLen + 1)
-                                label := Trim(StrGet(&pcBuf, "UTF-16"))
-                                if (label != "")
-                                    break
+        ; Method 1: MSAA IAccessible.accName - CPRS supports screen readers
+        VarSetCapacity(IID_IA, 16)
+        DllCall("ole32\CLSIDFromString", "WStr", "{618736E0-3C3D-11CF-810C-00AA00389B71}", "Ptr", &IID_IA)
+        pAcc := 0
+        hr := DllCall("oleacc\AccessibleObjectFromWindow", "Ptr", hwnd, "UInt", 0, "Ptr", &IID_IA, "Ptr*", pAcc, "Int")
+        if (hr = 0 && pAcc) {
+            try {
+                accObj := ComObject(9, pAcc, 1)
+                label := Trim(accObj.accName(0))
+            }
+        }
+        ; Method 2: Walk ALL children of the parent container looking for any
+        ; windowed control at the same Y with text (checks both directions)
+        if (label = "") {
+            cbParent := DllCall("GetParent", "Ptr", hwnd, "Ptr")
+            if (cbParent) {
+                VarSetCapacity(cbRect, 16, 0)
+                DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", &cbRect)
+                cbY := NumGet(cbRect, 4, "Int")
+                cbX := NumGet(cbRect, 0, "Int")
+                child := DllCall("GetWindow", "Ptr", cbParent, "UInt", 5, "Ptr")  ; GW_CHILD
+                while (child) {
+                    if (child != hwnd) {
+                        VarSetCapacity(childRect, 16, 0)
+                        DllCall("GetWindowRect", "Ptr", child, "Ptr", &childRect)
+                        childY := NumGet(childRect, 4, "Int")
+                        childX := NumGet(childRect, 0, "Int")
+                        yDiff := cbY - childY
+                        if (yDiff < 0)
+                            yDiff := -yDiff
+                        ; Same Y (within 5px) and to the right of checkbox
+                        if (yDiff <= 5 && childX > cbX) {
+                            ; Try this control's text
+                            cLen := DllCall("GetWindowTextLengthW", "Ptr", child, "Int")
+                            if (cLen > 0) {
+                                VarSetCapacity(cBuf, (cLen + 1) * 2, 0)
+                                DllCall("GetWindowTextW", "Ptr", child, "Ptr", &cBuf, "Int", cLen + 1)
+                                label := Trim(StrGet(&cBuf, "UTF-16"))
                             }
-                            panelChild := DllCall("GetWindow", "Ptr", panelChild, "UInt", 2, "Ptr")
+                            ; Try its windowed children too
+                            if (label = "") {
+                                gc := DllCall("GetWindow", "Ptr", child, "UInt", 5, "Ptr")
+                                while (gc) {
+                                    gcLen := DllCall("GetWindowTextLengthW", "Ptr", gc, "Int")
+                                    if (gcLen > 0) {
+                                        VarSetCapacity(gcBuf, (gcLen + 1) * 2, 0)
+                                        DllCall("GetWindowTextW", "Ptr", gc, "Ptr", &gcBuf, "Int", gcLen + 1)
+                                        label := Trim(StrGet(&gcBuf, "UTF-16"))
+                                        if (label != "")
+                                            break
+                                    }
+                                    gc := DllCall("GetWindow", "Ptr", gc, "UInt", 2, "Ptr")
+                                }
+                            }
+                            if (label != "")
+                                break
                         }
                     }
-                    break
+                    child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")
                 }
             }
-            sib := DllCall("GetWindow", "Ptr", sib, "UInt", 2, "Ptr")
         }
     }
 
@@ -21375,49 +21394,68 @@ NB__DumpCallback(hwnd, lParam) {
         }
     }
 
-    ; CPRS parent checkboxes have Caption=' ' (cleared by CPRS code).
-    ; The visible text is in a sibling TDlgFieldPanel at the same Y position.
+    ; CPRS parent checkboxes have Caption=' ' (cleared by CPRS source code).
+    ; The visible text is in a non-windowed TLabel inside a sibling panel.
+    ; Use MSAA (Accessibility) then fall back to searching all siblings.
     text := Trim(text)
     if (text = "" && className = "TCPRSDialogParentCheckBox") {
-        VarSetCapacity(dCbRect, 16, 0)
-        DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", &dCbRect)
-        dCbY := NumGet(dCbRect, 4, "Int")
-        dSib := DllCall("GetWindow", "Ptr", hwnd, "UInt", 2, "Ptr")
-        while (dSib) {
-            VarSetCapacity(dSibBuf, 256, 0)
-            DllCall("GetClassName", "Ptr", dSib, "Str", dSibBuf, "Int", 256)
-            if (dSibBuf = "TDlgFieldPanel") {
-                VarSetCapacity(dSibRect, 16, 0)
-                DllCall("GetWindowRect", "Ptr", dSib, "Ptr", &dSibRect)
-                dSibY := NumGet(dSibRect, 4, "Int")
-                dYDiff := dCbY - dSibY
-                if (dYDiff < 0)
-                    dYDiff := -dYDiff
-                if (dYDiff <= 5) {
-                    dpLen := DllCall("GetWindowTextLengthW", "Ptr", dSib, "Int")
-                    if (dpLen > 0) {
-                        VarSetCapacity(dpBuf, (dpLen + 1) * 2, 0)
-                        DllCall("GetWindowTextW", "Ptr", dSib, "Ptr", &dpBuf, "Int", dpLen + 1)
-                        text := Trim(StrGet(&dpBuf, "UTF-16"))
-                    }
-                    if (text = "") {
-                        dPanelChild := DllCall("GetWindow", "Ptr", dSib, "UInt", 5, "Ptr")
-                        while (dPanelChild) {
-                            dpcLen := DllCall("GetWindowTextLengthW", "Ptr", dPanelChild, "Int")
-                            if (dpcLen > 0) {
-                                VarSetCapacity(dpcBuf, (dpcLen + 1) * 2, 0)
-                                DllCall("GetWindowTextW", "Ptr", dPanelChild, "Ptr", &dpcBuf, "Int", dpcLen + 1)
-                                text := Trim(StrGet(&dpcBuf, "UTF-16"))
-                                if (text != "")
-                                    break
+        ; Method 1: MSAA IAccessible.accName
+        VarSetCapacity(dIID, 16)
+        DllCall("ole32\CLSIDFromString", "WStr", "{618736E0-3C3D-11CF-810C-00AA00389B71}", "Ptr", &dIID)
+        dPAcc := 0
+        dHr := DllCall("oleacc\AccessibleObjectFromWindow", "Ptr", hwnd, "UInt", 0, "Ptr", &dIID, "Ptr*", dPAcc, "Int")
+        if (dHr = 0 && dPAcc) {
+            try {
+                dAccObj := ComObject(9, dPAcc, 1)
+                text := Trim(dAccObj.accName(0))
+            }
+        }
+        ; Method 2: Search all children of parent container at same Y
+        if (text = "") {
+            dCbParent := DllCall("GetParent", "Ptr", hwnd, "Ptr")
+            if (dCbParent) {
+                VarSetCapacity(dCbRect, 16, 0)
+                DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", &dCbRect)
+                dCbY := NumGet(dCbRect, 4, "Int")
+                dCbX := NumGet(dCbRect, 0, "Int")
+                dChild := DllCall("GetWindow", "Ptr", dCbParent, "UInt", 5, "Ptr")
+                while (dChild) {
+                    if (dChild != hwnd) {
+                        VarSetCapacity(dcRect, 16, 0)
+                        DllCall("GetWindowRect", "Ptr", dChild, "Ptr", &dcRect)
+                        dcY := NumGet(dcRect, 4, "Int")
+                        dcX := NumGet(dcRect, 0, "Int")
+                        dYDiff := dCbY - dcY
+                        if (dYDiff < 0)
+                            dYDiff := -dYDiff
+                        if (dYDiff <= 5 && dcX > dCbX) {
+                            dcLen := DllCall("GetWindowTextLengthW", "Ptr", dChild, "Int")
+                            if (dcLen > 0) {
+                                VarSetCapacity(dcBuf, (dcLen + 1) * 2, 0)
+                                DllCall("GetWindowTextW", "Ptr", dChild, "Ptr", &dcBuf, "Int", dcLen + 1)
+                                text := Trim(StrGet(&dcBuf, "UTF-16"))
                             }
-                            dPanelChild := DllCall("GetWindow", "Ptr", dPanelChild, "UInt", 2, "Ptr")
+                            if (text = "") {
+                                dgc := DllCall("GetWindow", "Ptr", dChild, "UInt", 5, "Ptr")
+                                while (dgc) {
+                                    dgcLen := DllCall("GetWindowTextLengthW", "Ptr", dgc, "Int")
+                                    if (dgcLen > 0) {
+                                        VarSetCapacity(dgcBuf, (dgcLen + 1) * 2, 0)
+                                        DllCall("GetWindowTextW", "Ptr", dgc, "Ptr", &dgcBuf, "Int", dgcLen + 1)
+                                        text := Trim(StrGet(&dgcBuf, "UTF-16"))
+                                        if (text != "")
+                                            break
+                                    }
+                                    dgc := DllCall("GetWindow", "Ptr", dgc, "UInt", 2, "Ptr")
+                                }
+                            }
+                            if (text != "")
+                                break
                         }
                     }
-                    break
+                    dChild := DllCall("GetWindow", "Ptr", dChild, "UInt", 2, "Ptr")
                 }
             }
-            dSib := DllCall("GetWindow", "Ptr", dSib, "UInt", 2, "Ptr")
         }
     }
 
