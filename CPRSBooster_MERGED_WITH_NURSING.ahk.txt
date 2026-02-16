@@ -21292,15 +21292,19 @@ NB_DumpDialogControls:
     enumDump := RegisterCallback("NB__DumpCallback", "Fast")
     DllCall("EnumChildWindows", "Ptr", dlgHwnd, "Ptr", enumDump, "Ptr", 0)
 
-    ; Post-process: resolve parent checkbox labels via sibling TDlgFieldPanel + MSAA
+    ; Post-process: resolve parent checkbox labels via sibling TDlgFieldPanel
+    ; NOTE: CPRS renders parent CB labels using non-windowed TLabel (TGraphicControl)
+    ; when no screen reader is active. These have no HWND and are invisible to all
+    ; Windows APIs (Win32, MSAA, UI Automation). Labels may show as "(not accessible)".
     if (NB__dumpParentCBs.Length() > 0) {
-        parentSection := "`n=== Parent Checkbox Labels (via Sibling Panel) ===`n"
+        parentSection := "`n=== Parent Checkboxes ===`n"
+        parentSection .= "(Parent CB labels use non-windowed TLabel - may not be readable)`n"
         for i, pcb in NB__dumpParentCBs {
             label := NB_ResolveParentCBLabel(pcb.hwnd)
             if (label = "")
-                label := "(could not resolve)"
+                label := "(not accessible)"
             chk := pcb.checked ? "YES" : "NO"
-            parentSection .= "  hwnd=" . pcb.hwnd . " CHECKED=" . chk . " label='" . label . "'`n"
+            parentSection .= "  CHECKED=" . chk . " label='" . label . "'`n"
         }
         FileAppend, %parentSection%, %dumpPath%, UTF-8
     }
@@ -21391,19 +21395,16 @@ NB_EscJson(str) {
     return """" . str . """"
 }
 
-; Resolve parent checkbox label by finding the sibling TDlgFieldPanel
-; and extracting text from it. CPRS sets parent CB caption to ' ' and
-; puts the visible text in a TLabel (non-windowed) inside a TDlgFieldPanel
-; sibling. We try multiple methods to extract that text.
+; Attempt to resolve parent checkbox label. CPRS sets parent CB Caption to ' '
+; and renders the text via a non-windowed TLabel (TGraphicControl) inside a
+; sibling TDlgFieldPanel. Without a screen reader (JAWS), TLabel has no HWND
+; and is invisible to Win32, MSAA, and UI Automation APIs.
+; This function tries GetWindowText on the sibling panel and its windowed
+; children as a best-effort attempt. Returns "" if unresolvable.
 NB_ResolveParentCBLabel(cbHwnd) {
+    static junkNames := "|system|application|pane|check box|"
     if !DllCall("IsWindow", "Ptr", cbHwnd, "Int")
         return ""
-    ; Method 0: Try UIA Name directly on the checkbox itself
-    ; UIA sometimes aggregates label text from associated controls
-    text := NB_GetUIAName(cbHwnd)
-    if (text != "" && text != "system" && text != " ")
-        return text
-    ; Get the parent container of this checkbox
     cbParent := DllCall("GetParent", "Ptr", cbHwnd, "Ptr")
     if (!cbParent)
         return ""
@@ -21411,7 +21412,7 @@ NB_ResolveParentCBLabel(cbHwnd) {
     VarSetCapacity(cbRect, 16, 0)
     DllCall("GetWindowRect", "Ptr", cbHwnd, "Ptr", &cbRect)
     cbY := NumGet(cbRect, 4, "Int")
-    ; Walk ALL children of the parent looking for TDlgFieldPanel siblings
+    ; Find the nearest sibling TDlgFieldPanel by Y position
     bestPanel := 0
     bestDist := 999999
     child := DllCall("GetWindow", "Ptr", cbParent, "UInt", 5, "Ptr")  ; GW_CHILD
@@ -21432,7 +21433,7 @@ NB_ResolveParentCBLabel(cbHwnd) {
     }
     if (!bestPanel || bestDist > 100)
         return ""
-    ; Method 1: GetWindowText on the panel
+    ; Try GetWindowText on the panel itself
     text := ""
     tLen := DllCall("GetWindowTextLengthW", "Ptr", bestPanel, "Int")
     if (tLen > 0) {
@@ -21440,13 +21441,9 @@ NB_ResolveParentCBLabel(cbHwnd) {
         DllCall("GetWindowTextW", "Ptr", bestPanel, "Ptr", &tBuf, "Int", tLen + 1)
         text := Trim(StrGet(&tBuf, "UTF-16"))
     }
-    if (text != "")
+    if (text != "" && !InStr(junkNames, "|" . text . "|"))
         return text
-    ; Method 2: accName on the panel itself (safe vtable call)
-    text := NB_GetAccName(bestPanel)
-    if (text != "" && text != "system")
-        return text
-    ; Method 3: GetWindowText on windowed children of the panel
+    ; Try GetWindowText on windowed children of the panel
     panelChild := DllCall("GetWindow", "Ptr", bestPanel, "UInt", 5, "Ptr")
     while (panelChild) {
         pcLen := DllCall("GetWindowTextLengthW", "Ptr", panelChild, "Int")
@@ -21454,280 +21451,12 @@ NB_ResolveParentCBLabel(cbHwnd) {
             VarSetCapacity(pcBuf, (pcLen + 1) * 2, 0)
             DllCall("GetWindowTextW", "Ptr", panelChild, "Ptr", &pcBuf, "Int", pcLen + 1)
             text := Trim(StrGet(&pcBuf, "UTF-16"))
-            if (text != "")
+            if (text != "" && !InStr(junkNames, "|" . text . "|"))
                 return text
         }
         panelChild := DllCall("GetWindow", "Ptr", panelChild, "UInt", 2, "Ptr")
     }
-    ; Method 4: accName on windowed children of the panel
-    panelChild := DllCall("GetWindow", "Ptr", bestPanel, "UInt", 5, "Ptr")
-    while (panelChild) {
-        text := NB_GetAccName(panelChild)
-        if (text != "" && text != "system")
-            return text
-        panelChild := DllCall("GetWindow", "Ptr", panelChild, "UInt", 2, "Ptr")
-    }
-    ; Method 5: Walk IAccessible children of the panel (can find non-windowed TLabel)
-    text := NB_GetAccChildrenText(bestPanel)
-    if (text != "" && text != "system")
-        return text
-    ; Method 6: UI Automation - can see elements MSAA cannot, including
-    ; non-windowed Delphi TLabel controls in apps with 508 compliance
-    text := NB_GetUIADescendantText(bestPanel)
-    if (text != "")
-        return text
     return ""
-}
-
-; Get UI Automation Name property for a single HWND.
-; Returns the UIA CurrentName which may include label text from associated controls.
-NB_GetUIAName(hwnd) {
-    if !DllCall("IsWindow", "Ptr", hwnd, "Int")
-        return ""
-    VarSetCapacity(CLSID_UIA, 16)
-    DllCall("ole32\CLSIDFromString", "WStr", "{ff48dba4-60ef-4201-aa87-54103eef594e}", "Ptr", &CLSID_UIA)
-    VarSetCapacity(IID_UIA, 16)
-    DllCall("ole32\CLSIDFromString", "WStr", "{30cbe57d-d9d0-452a-ab13-7ac5ac4825ee}", "Ptr", &IID_UIA)
-    pUIA := 0
-    hr := DllCall("ole32\CoCreateInstance", "Ptr", &CLSID_UIA, "Ptr", 0, "UInt", 1
-        , "Ptr", &IID_UIA, "Ptr*", pUIA, "Int")
-    if (hr != 0 || !pUIA)
-        return ""
-    uiaVT := NumGet(pUIA + 0, 0, "Ptr")
-    ; ElementFromHandle (slot 6)
-    pElement := 0
-    DllCall(NumGet(uiaVT + 0, 6 * A_PtrSize, "Ptr"), "Ptr", pUIA, "Ptr", hwnd, "Ptr*", pElement, "Int")
-    result := ""
-    if (pElement) {
-        elemVT := NumGet(pElement + 0, 0, "Ptr")
-        ; get_CurrentName (slot 21)
-        pName := 0
-        DllCall(NumGet(elemVT + 0, 21 * A_PtrSize, "Ptr"), "Ptr", pElement, "Ptr*", pName, "Int")
-        if (pName) {
-            result := Trim(StrGet(pName, "UTF-16"))
-            DllCall("OleAut32\SysFreeString", "Ptr", pName)
-        }
-        ObjRelease(pElement)
-    }
-    ObjRelease(pUIA)
-    return result
-}
-
-; Use UI Automation to find text in descendant elements of an HWND.
-; UI Automation can see non-windowed controls (like Delphi TLabel) that MSAA cannot.
-; All calls use raw vtable DllCalls via CoCreateInstance to avoid COM dispatch crashes.
-NB_GetUIADescendantText(hwnd) {
-    if !DllCall("IsWindow", "Ptr", hwnd, "Int")
-        return ""
-    ; CUIAutomation CLSID: {ff48dba4-60ef-4201-aa87-54103eef594e}
-    VarSetCapacity(CLSID_UIA, 16)
-    DllCall("ole32\CLSIDFromString", "WStr", "{ff48dba4-60ef-4201-aa87-54103eef594e}", "Ptr", &CLSID_UIA)
-    ; IUIAutomation IID: {30cbe57d-d9d0-452a-ab13-7ac5ac4825ee}
-    VarSetCapacity(IID_UIA, 16)
-    DllCall("ole32\CLSIDFromString", "WStr", "{30cbe57d-d9d0-452a-ab13-7ac5ac4825ee}", "Ptr", &IID_UIA)
-    pUIA := 0
-    hr := DllCall("ole32\CoCreateInstance", "Ptr", &CLSID_UIA, "Ptr", 0, "UInt", 1
-        , "Ptr", &IID_UIA, "Ptr*", pUIA, "Int")
-    if (hr != 0 || !pUIA)
-        return ""
-    uiaVT := NumGet(pUIA + 0, 0, "Ptr")
-    ; IUIAutomation::ElementFromHandle (vtable slot 6)
-    ; HRESULT ElementFromHandle(UIA_HWND hwnd, IUIAutomationElement** element)
-    pElement := 0
-    DllCall(NumGet(uiaVT + 0, 6 * A_PtrSize, "Ptr"), "Ptr", pUIA, "Ptr", hwnd, "Ptr*", pElement, "Int")
-    if (!pElement) {
-        ObjRelease(pUIA)
-        return ""
-    }
-    ; First try: get_CurrentName on the panel element itself
-    ; IUIAutomationElement vtable: 3=SetFocus, 4=GetRuntimeId, 5=FindFirst,
-    ;   6=FindAll, 7-9=cache, 10-13=property, 14-17=pattern,
-    ;   18=ProcessId, 19=ControlType, 20=LocalizedControlType, 21=CurrentName
-    elemVT := NumGet(pElement + 0, 0, "Ptr")
-    pName := 0
-    DllCall(NumGet(elemVT + 0, 21 * A_PtrSize, "Ptr"), "Ptr", pElement, "Ptr*", pName, "Int")
-    if (pName) {
-        name := StrGet(pName, "UTF-16")
-        DllCall("OleAut32\SysFreeString", "Ptr", pName)
-        name := Trim(name)
-        if (name != "" && name != "system") {
-            ObjRelease(pElement)
-            ObjRelease(pUIA)
-            return name
-        }
-    }
-    ; Create TrueCondition to find all descendants
-    ; IUIAutomation vtable: 3=CompareElements, ..., 6=ElementFromHandle, ...,
-    ;   16=CreateCacheRequest, 17=CreateTrueCondition
-    pCond := 0
-    DllCall(NumGet(uiaVT + 0, 17 * A_PtrSize, "Ptr"), "Ptr", pUIA, "Ptr*", pCond, "Int")
-    if (!pCond) {
-        ObjRelease(pElement)
-        ObjRelease(pUIA)
-        return ""
-    }
-    ; IUIAutomationElement::FindAll (vtable slot 6)
-    ; TreeScope_Descendants = 4
-    pArray := 0
-    DllCall(NumGet(elemVT + 0, 6 * A_PtrSize, "Ptr"), "Ptr", pElement, "Int", 4
-        , "Ptr", pCond, "Ptr*", pArray, "Int")
-    result := ""
-    if (pArray) {
-        arrVT := NumGet(pArray + 0, 0, "Ptr")
-        ; IUIAutomationElementArray::get_Length (vtable slot 3)
-        arrLen := 0
-        DllCall(NumGet(arrVT + 0, 3 * A_PtrSize, "Ptr"), "Ptr", pArray, "Int*", arrLen, "Int")
-        Loop, %arrLen% {
-            if (result != "")
-                break
-            ; IUIAutomationElementArray::GetElement (vtable slot 4)
-            pChild := 0
-            DllCall(NumGet(arrVT + 0, 4 * A_PtrSize, "Ptr"), "Ptr", pArray, "Int", A_Index - 1
-                , "Ptr*", pChild, "Int")
-            if (pChild) {
-                childVT := NumGet(pChild + 0, 0, "Ptr")
-                ; get_CurrentName (vtable slot 21)
-                pChildName := 0
-                DllCall(NumGet(childVT + 0, 21 * A_PtrSize, "Ptr"), "Ptr", pChild, "Ptr*", pChildName, "Int")
-                if (pChildName) {
-                    cName := StrGet(pChildName, "UTF-16")
-                    DllCall("OleAut32\SysFreeString", "Ptr", pChildName)
-                    cName := Trim(cName)
-                    if (cName != "" && cName != "system")
-                        result := cName
-                }
-                ObjRelease(pChild)
-            }
-        }
-        ObjRelease(pArray)
-    }
-    ObjRelease(pCond)
-    ObjRelease(pElement)
-    ObjRelease(pUIA)
-    return result
-}
-
-; Walk IAccessible children of a control and return the first non-empty accName.
-; Uses raw vtable DllCalls to avoid COM dispatch crashes.
-; This can find non-windowed controls like Delphi TLabel (TGraphicControl).
-NB_GetAccChildrenText(hwnd) {
-    if !DllCall("IsWindow", "Ptr", hwnd, "Int")
-        return ""
-    Acc_Init()
-    VarSetCapacity(IID, 16)
-    NumPut(0x11CF3C3D618736E0, IID, 0, "Int64")
-    NumPut(0x719B3800AA000C81, IID, 8, "Int64")
-    pAcc := 0
-    hr := DllCall("oleacc\AccessibleObjectFromWindow", "Ptr", hwnd, "UInt", 0, "Ptr", &IID, "Ptr*", pAcc, "Int")
-    if (hr != 0 || !pAcc)
-        return ""
-    vtbl := NumGet(pAcc + 0, 0, "Ptr")
-    if (!vtbl) {
-        ObjRelease(pAcc)
-        return ""
-    }
-    ; get_accChildCount is vtable slot 8
-    childCount := 0
-    DllCall(NumGet(vtbl + 0, 8 * A_PtrSize, "Ptr"), "Ptr", pAcc, "Int*", childCount, "Int")
-    if (childCount <= 0) {
-        ObjRelease(pAcc)
-        return ""
-    }
-    ; Try get_accName with simple child IDs (1..N)
-    ; Delphi MSAA proxies expose TLabel as simple children with integer IDs
-    VarSetCapacity(varChild, 24, 0)
-    NumPut(3, varChild, 0, "UShort")  ; VT_I4
-    Loop, %childCount% {
-        NumPut(A_Index, varChild, 8, "Int")
-        pName := 0
-        DllCall(NumGet(vtbl + 0, 10 * A_PtrSize, "Ptr"), "Ptr", pAcc, "Ptr", &varChild, "Ptr*", pName, "Int")
-        if (pName) {
-            name := StrGet(pName, "UTF-16")
-            DllCall("OleAut32\SysFreeString", "Ptr", pName)
-            name := Trim(name)
-            if (name != "" && name != "system") {
-                ObjRelease(pAcc)
-                return name
-            }
-        }
-    }
-    ; Try AccessibleChildren for IDispatch child objects
-    varSize := 8 + 2 * A_PtrSize
-    totalSize := childCount * varSize
-    VarSetCapacity(varChildren, totalSize, 0)
-    cReturned := 0
-    DllCall("oleacc\AccessibleChildren", "Ptr", pAcc, "Int", 0, "Int", childCount
-        , "Ptr", &varChildren, "Int*", cReturned, "Int")
-    result := ""
-    Loop, %cReturned% {
-        offset := (A_Index - 1) * varSize
-        vt := NumGet(varChildren, offset, "UShort")
-        if (vt = 9) {  ; VT_DISPATCH - child IAccessible object
-            pChild := NumGet(varChildren, offset + 8, "Ptr")
-            if (pChild && result = "") {
-                cVtbl := NumGet(pChild + 0, 0, "Ptr")
-                if (cVtbl) {
-                    VarSetCapacity(varSelf, 24, 0)
-                    NumPut(3, varSelf, 0, "UShort")
-                    NumPut(0, varSelf, 8, "Int")
-                    pChildName := 0
-                    DllCall(NumGet(cVtbl + 0, 10 * A_PtrSize, "Ptr"), "Ptr", pChild
-                        , "Ptr", &varSelf, "Ptr*", pChildName, "Int")
-                    if (pChildName) {
-                        cName := StrGet(pChildName, "UTF-16")
-                        DllCall("OleAut32\SysFreeString", "Ptr", pChildName)
-                        cName := Trim(cName)
-                        if (cName != "" && cName != "system")
-                            result := cName
-                    }
-                }
-            }
-            if (pChild)
-                ObjRelease(pChild)
-        }
-    }
-    ObjRelease(pAcc)
-    return result
-}
-
-; Get accessible name for a control via MSAA (IAccessible.get_accName).
-; Uses raw vtable DllCall instead of COM method dispatch to avoid
-; access violations on MSAA proxy objects that don't support IDispatch.
-NB_GetAccName(hwnd) {
-    name := ""
-    ; Verify window still exists
-    if !DllCall("IsWindow", "Ptr", hwnd, "Int")
-        return name
-    Acc_Init()
-    ; IAccessible IID {618736E0-3C3D-11CF-810C-00AA00389B71}
-    VarSetCapacity(IID, 16)
-    NumPut(0x11CF3C3D618736E0, IID, 0, "Int64")
-    NumPut(0x719B3800AA000C81, IID, 8, "Int64")
-    pAcc := 0
-    hr := DllCall("oleacc\AccessibleObjectFromWindow", "Ptr", hwnd, "UInt", 0, "Ptr", &IID, "Ptr*", pAcc, "Int")
-    if (hr != 0 || !pAcc)
-        return name
-    ; VARIANT for CHILDID_SELF: VT_I4=3, lVal=0
-    VarSetCapacity(varChild, 24, 0)
-    NumPut(3, varChild, 0, "UShort")
-    NumPut(0, varChild, 8, "Int")
-    ; Call get_accName via IAccessible vtable slot 10 directly
-    ; (avoids IDispatch::Invoke which can crash on some MSAA proxies)
-    ; vtable: 0-2 IUnknown, 3-6 IDispatch, 7 accParent, 8 accChildCount, 9 accChild, 10 accName
-    pName := 0
-    vtbl := NumGet(pAcc + 0, 0, "Ptr")
-    if (vtbl) {
-        fnAddr := NumGet(vtbl + 0, 10 * A_PtrSize, "Ptr")
-        if (fnAddr)
-            DllCall(fnAddr, "Ptr", pAcc, "Ptr", &varChild, "Ptr*", pName, "Int")
-    }
-    if (pName) {
-        name := StrGet(pName, "UTF-16")
-        DllCall("OleAut32\SysFreeString", "Ptr", pName)
-    }
-    ; Release IAccessible
-    ObjRelease(pAcc)
-    return Trim(name)
 }
 
 
