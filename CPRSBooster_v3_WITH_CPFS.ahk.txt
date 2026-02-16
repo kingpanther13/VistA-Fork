@@ -23295,7 +23295,16 @@ CF_ApplyTemplate(templatePath) {
 
     cfTotalTpl := templateControls.Length()
     for ti, tplCtrl in templateControls {
+        ; Extract all template control properties to plain variables (AHK v1 safe)
+        cfTplType := tplCtrl.type
         cfTplLabel := tplCtrl.label
+        cfTplChecked := tplCtrl.checked
+        cfTplSelected := tplCtrl.selected
+        cfTplValue := tplCtrl.value
+        cfTplValueIdx := tplCtrl.valueIdx
+        cfTplY := tplCtrl.y
+        cfTplGroupLabel := tplCtrl.group_label
+
         ToolTip, Applying control %ti%/%cfTotalTpl%: %cfTplLabel%
 
         ; Find best matching live control
@@ -23303,26 +23312,32 @@ CF_ApplyTemplate(templatePath) {
         bestScore := 0
 
         for li, liveCtrl in liveControls {
+            ; Extract live control properties to plain variables
+            cfLiveType := liveCtrl.type
+            cfLiveLabel := liveCtrl.label
+            cfLiveY := liveCtrl.y
+            cfLiveParentLabel := liveCtrl.parentLabel
+
             ; Must be same type
-            if (liveCtrl.type != tplCtrl.type)
+            if (cfLiveType != cfTplType)
                 continue
 
             score := 0
 
             ; Label match (highest priority)
-            if (tplCtrl.label != "" && liveCtrl.label = tplCtrl.label) {
+            if (cfTplLabel != "" && cfLiveLabel = cfTplLabel) {
                 score := 100
             }
-            else if (tplCtrl.label != "" && liveCtrl.label != "" && InStr(liveCtrl.label, tplCtrl.label)) {
+            else if (cfTplLabel != "" && cfLiveLabel != "" && InStr(cfLiveLabel, cfTplLabel)) {
                 score := 70
             }
-            else if (tplCtrl.label != "" && liveCtrl.label != "" && InStr(tplCtrl.label, liveCtrl.label)) {
+            else if (cfTplLabel != "" && cfLiveLabel != "" && InStr(cfTplLabel, cfLiveLabel)) {
                 score := 60
             }
 
             ; Y-position proximity bonus (if labels don't match, use position)
-            if (score = 0 && tplCtrl.label = "" && liveCtrl.label = "") {
-                yDiff := Abs(liveCtrl.y - tplCtrl.y)
+            if (score = 0 && cfTplLabel = "" && cfLiveLabel = "") {
+                yDiff := Abs(cfLiveY - cfTplY)
                 if (yDiff < 20)
                     score := 50
                 else if (yDiff < 50)
@@ -23330,7 +23345,7 @@ CF_ApplyTemplate(templatePath) {
             }
 
             ; For radios, also check group label
-            if (tplCtrl.type = "radio" && tplCtrl.group_label != "" && liveCtrl.parentLabel = tplCtrl.group_label) {
+            if (cfTplType = "radio" && cfTplGroupLabel != "" && cfLiveParentLabel = cfTplGroupLabel) {
                 score += 20
             }
 
@@ -23345,22 +23360,21 @@ CF_ApplyTemplate(templatePath) {
             continue
         }
 
-        liveMatch := liveControls[bestLiveIdx]
-        cfMatchHwnd := liveMatch.hwnd
+        cfMatchHwnd := liveControls[bestLiveIdx].hwnd
 
         ; Apply the state change
-        if (tplCtrl.type = "checkbox") {
+        if (cfTplType = "checkbox") {
             ; Check current state
             SendMessage, 0x00F0, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_GETCHECK
             currentChecked := ErrorLevel ? true : false
-            if (currentChecked != tplCtrl.checked) {
+            if (currentChecked != cfTplChecked) {
                 PostMessage, 0x00F5, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_CLICK
                 totalApplied++
                 Sleep, 150
             }
         }
-        else if (tplCtrl.type = "radio") {
-            if (tplCtrl.selected) {
+        else if (cfTplType = "radio") {
+            if (cfTplSelected) {
                 ; Only click if not already selected
                 SendMessage, 0x00F0, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_GETCHECK
                 currentSelected := ErrorLevel ? true : false
@@ -23371,11 +23385,9 @@ CF_ApplyTemplate(templatePath) {
                 }
             }
         }
-        else if (tplCtrl.type = "combo") {
-            ; Try to set by index
-            cfComboValIdx := tplCtrl.valueIdx
-            if (cfComboValIdx >= 0) {
-                SendMessage, 0x014E, cfComboValIdx, 0,, ahk_id %cfMatchHwnd%   ; CB_SETCURSEL
+        else if (cfTplType = "combo") {
+            if (cfTplValueIdx >= 0) {
+                SendMessage, 0x014E, cfTplValueIdx, 0,, ahk_id %cfMatchHwnd%   ; CB_SETCURSEL
                 ; Notify parent of selection change
                 cfComboParent := DllCall("GetParent", "Ptr", cfMatchHwnd, "Ptr")
                 ctrlId := DllCall("GetDlgCtrlID", "Ptr", cfMatchHwnd, "Int")
