@@ -20822,15 +20822,22 @@ NB__EnumDescCBCallback(hwnd, lParam) {
     y := NumGet(rect, 4, "Int")
     x := NumGet(rect, 0, "Int")
 
-    ; Read label for leaf checkboxes
+    ; Read label for ALL checkbox types (parent + leaf)
     label := ""
-    if (buf = "TCPRSDialogCheckBox" || buf = "TORCheckBox") {
+    tLen := DllCall("GetWindowTextLengthW", "Ptr", hwnd, "Int")
+    if (tLen > 0) {
+        VarSetCapacity(tBuf, (tLen + 1) * 2, 0)
+        DllCall("GetWindowTextW", "Ptr", hwnd, "Ptr", &tBuf, "Int", tLen + 1)
+        label := Trim(StrGet(&tBuf, "UTF-16"))
+    }
+    ; Fallback: try WM_GETTEXT
+    if (label = "") {
         SendMessage, 0x000E, 0, 0,, ahk_id %hwnd%
-        tLen := ErrorLevel
-        if (tLen > 0) {
-            VarSetCapacity(tBuf, (tLen + 1) * 2, 0)
-            SendMessage, 0x000D, tLen + 1, &tBuf,, ahk_id %hwnd%
-            label := Trim(StrGet(&tBuf))
+        tLen2 := ErrorLevel
+        if (tLen2 > 0) {
+            VarSetCapacity(tBuf2, (tLen2 + 1) * 2, 0)
+            SendMessage, 0x000D, tLen2 + 1, &tBuf2,, ahk_id %hwnd%
+            label := Trim(StrGet(&tBuf2))
         }
     }
 
