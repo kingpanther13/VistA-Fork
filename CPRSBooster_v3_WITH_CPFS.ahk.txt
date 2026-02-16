@@ -22967,6 +22967,11 @@ CF_EnumFormControls(windowHwnd) {
 CF__EnumFormCallback(hwnd, lParam) {
     global CF__enumResults, CF__enumTargetHwnd
 
+    ; Skip invisible controls (WS_VISIBLE = 0x10000000)
+    cfStyle := DllCall("GetWindowLong", "Ptr", hwnd, "Int", -16, "UInt")
+    if !(cfStyle & 0x10000000)
+        return 1
+
     controlType := CF_ClassifyControl(hwnd)
     if (controlType != "checkbox" && controlType != "radio" && controlType != "combo" && controlType != "checklist")
         return 1
@@ -23489,6 +23494,9 @@ CF_ApplyTemplate(templatePath) {
 
         cfMatchHwnd := liveControls[bestLiveIdx].hwnd
 
+        ; Scroll the control into view before interacting
+        CF_ScrollIntoView(cfMatchHwnd)
+
         ; Apply the state change
         if (cfTplType = "checkbox") {
             ; Check current state
@@ -23497,54 +23505,54 @@ CF_ApplyTemplate(templatePath) {
             if (currentChecked != cfTplChecked) {
                 PostMessage, 0x00F5, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_CLICK
                 totalApplied++
-                Sleep, 150
+                Sleep, 50
             }
         }
         else if (cfTplType = "checklist") {
-            ; TCheckListBox item: read current state and toggle if needed
+            ; TCheckListBox item: toggle by selecting + Space
             cfCLIdx := liveControls[bestLiveIdx].checklistIdx
-            ; Read current check state via ReadProcessMemory
             currentCLChecked := CF_ReadCheckListItemState(cfMatchHwnd, cfCLIdx)
             if (currentCLChecked != cfTplChecked) {
-                ; Select the item then send Space to toggle
-                SendMessage, 0x0186, cfCLIdx, 0,, ahk_id %cfMatchHwnd%   ; LB_SETCURSEL
-                Sleep, 50
-                ; Send Space key to toggle the check
-                PostMessage, 0x0100, 0x20, 0,, ahk_id %cfMatchHwnd%   ; WM_KEYDOWN VK_SPACE
+                ; Focus the listbox and select the item
+                DllCall("SetFocus", "Ptr", cfMatchHwnd)
                 Sleep, 30
-                PostMessage, 0x0101, 0x20, 0,, ahk_id %cfMatchHwnd%   ; WM_KEYUP VK_SPACE
+                SendMessage, 0x0186, cfCLIdx, 0,, ahk_id %cfMatchHwnd%   ; LB_SETCURSEL
+                Sleep, 30
+                ; Click on the checkbox area of the item
+                VarSetCapacity(itmRect, 16, 0)
+                SendMessage, 0x0198, cfCLIdx, &itmRect,, ahk_id %cfMatchHwnd%  ; LB_GETITEMRECT
+                itmY := NumGet(itmRect, 4, "Int") + 5  ; middle of item vertically
+                ; Click at x=8 (checkbox area) within client coords
+                clickLParam := (itmY << 16) | 8
+                PostMessage, 0x0201, 0x0001, clickLParam,, ahk_id %cfMatchHwnd%  ; WM_LBUTTONDOWN
+                Sleep, 30
+                PostMessage, 0x0202, 0, clickLParam,, ahk_id %cfMatchHwnd%  ; WM_LBUTTONUP
                 totalApplied++
-                Sleep, 150
+                Sleep, 50
             }
         }
         else if (cfTplType = "radio") {
             if (cfTplSelected) {
-                ; Only click if not already selected
                 SendMessage, 0x00F0, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_GETCHECK
                 currentSelected := ErrorLevel ? true : false
                 if (!currentSelected) {
                     PostMessage, 0x00F5, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_CLICK
                     totalApplied++
-                    Sleep, 150
+                    Sleep, 50
                 }
             }
         }
         else if (cfTplType = "combo") {
             if (cfTplValueIdx >= 0) {
                 SendMessage, 0x014E, cfTplValueIdx, 0,, ahk_id %cfMatchHwnd%   ; CB_SETCURSEL
-                ; Notify parent of selection change
                 cfComboParent := DllCall("GetParent", "Ptr", cfMatchHwnd, "Ptr")
                 ctrlId := DllCall("GetDlgCtrlID", "Ptr", cfMatchHwnd, "Int")
-                wParam := (0x0001 << 16) | ctrlId   ; CBN_SELCHANGE=1 in HIWORD, ctrl ID in LOWORD
+                wParam := (0x0001 << 16) | ctrlId
                 PostMessage, 0x0111, wParam, cfMatchHwnd,, ahk_id %cfComboParent%  ; WM_COMMAND
                 totalApplied++
-                Sleep, 150
+                Sleep, 50
             }
         }
-
-        ; Dismiss any intermediate popups after every few controls
-        if (Mod(totalApplied, 5) = 0)
-            CF_DismissIntermediatePopups()
     }
 
     CF_DismissIntermediatePopups()
@@ -23793,6 +23801,76 @@ CF__FindOKCallback(hwnd, lParam) {
         }
     }
     return 1
+}
+
+
+;============================================================================================
+; CF - SCROLL INTO VIEW
+;
+; Scrolls the parent TScrollBox so the target control is visible.
+; Walks up the parent chain to find a TScrollBox, then scrolls it.
+;============================================================================================
+
+CF_ScrollIntoView(controlHwnd) {
+    ; Find the parent TScrollBox
+    scrollBoxHwnd := 0
+    parent := controlHwnd
+    Loop, 10
+    {
+        parent := DllCall("GetParent", "Ptr", parent, "Ptr")
+        if (!parent)
+            break
+        VarSetCapacity(pBuf, 512, 0)
+        DllCall("GetClassName", "Ptr", parent, "Str", pBuf, "Int", 256)
+        pClass := pBuf
+        if (pClass = "TScrollBox") {
+            scrollBoxHwnd := parent
+            break
+        }
+    }
+    if (!scrollBoxHwnd)
+        return
+
+    ; Get scroll box client rect (visible area)
+    VarSetCapacity(sbRect, 16, 0)
+    DllCall("GetWindowRect", "Ptr", scrollBoxHwnd, "Ptr", &sbRect)
+    sbTop := NumGet(sbRect, 4, "Int")
+    sbBottom := NumGet(sbRect, 12, "Int")
+
+    ; Get control screen rect
+    VarSetCapacity(ctrlRect, 16, 0)
+    DllCall("GetWindowRect", "Ptr", controlHwnd, "Ptr", &ctrlRect)
+    ctrlTop := NumGet(ctrlRect, 4, "Int")
+    ctrlBottom := NumGet(ctrlRect, 12, "Int")
+
+    ; If already visible, no scroll needed
+    if (ctrlTop >= sbTop && ctrlBottom <= sbBottom)
+        return
+
+    ; Calculate how much to scroll
+    if (ctrlBottom > sbBottom) {
+        scrollAmount := ctrlBottom - sbBottom + 30
+    } else {
+        scrollAmount := ctrlTop - sbTop - 30
+    }
+
+    ; Get current scroll position
+    VarSetCapacity(si, 28, 0)
+    NumPut(28, si, 0, "UInt")
+    NumPut(0x17, si, 4, "UInt")   ; SIF_ALL
+    DllCall("GetScrollInfo", "Ptr", scrollBoxHwnd, "Int", 1, "Ptr", &si)  ; SB_VERT=1
+    currentPos := NumGet(si, 20, "Int")
+
+    ; Set new position
+    newPos := currentPos + scrollAmount
+    NumPut(newPos, si, 20, "Int")
+    NumPut(0x04, si, 4, "UInt")   ; SIF_POS
+    DllCall("SetScrollInfo", "Ptr", scrollBoxHwnd, "Int", 1, "Ptr", &si, "Int", 1)
+
+    ; Notify the scrollbox to scroll
+    wParam := (newPos << 16) | 4  ; SB_THUMBPOSITION=4
+    PostMessage, 0x0115, wParam, 0,, ahk_id %scrollBoxHwnd%  ; WM_VSCROLL
+    Sleep, 80
 }
 
 
