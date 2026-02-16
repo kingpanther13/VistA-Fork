@@ -21301,13 +21301,23 @@ NB__DumpCallback(hwnd, lParam) {
     DllCall("GetClassName", "Ptr", hwnd, "Str", buf, "Int", 256)
     className := buf
 
+    ; Get text using GetWindowTextW (works with Delphi TORCheckBox controls)
     text := ""
-    SendMessage, 0x000E, 0, 0,, ahk_id %hwnd%
-    tLen := ErrorLevel
+    tLen := DllCall("GetWindowTextLengthW", "Ptr", hwnd, "Int")
     if (tLen > 0) {
         VarSetCapacity(tBuf, (tLen + 1) * 2, 0)
-        SendMessage, 0x000D, tLen + 1, &tBuf,, ahk_id %hwnd%
-        text := StrGet(&tBuf)
+        DllCall("GetWindowTextW", "Ptr", hwnd, "Ptr", &tBuf, "Int", tLen + 1)
+        text := StrGet(&tBuf, "UTF-16")
+    }
+    ; Fallback: try WM_GETTEXT if GetWindowTextW returned empty
+    if (text = "") {
+        SendMessage, 0x000E, 0, 0,, ahk_id %hwnd%
+        tLen2 := ErrorLevel
+        if (tLen2 > 0) {
+            VarSetCapacity(tBuf2, (tLen2 + 1) * 2, 0)
+            SendMessage, 0x000D, tLen2 + 1, &tBuf2,, ahk_id %hwnd%
+            text := StrGet(&tBuf2)
+        }
     }
 
     depth := 0
