@@ -20372,11 +20372,11 @@ NB_SaveHotkeyConfig:
     global NB_HK5_Label, NB_HK5_Action
 
     hkJson := "{`n"
-    hkJson .= "  ""label1"": """ . NB_EscJson(NB_HK1_Label) . """, ""action1"": """ . NB_EscJson(NB_HK1_Action) . """,`n"
-    hkJson .= "  ""label2"": """ . NB_EscJson(NB_HK2_Label) . """, ""action2"": """ . NB_EscJson(NB_HK2_Action) . """,`n"
-    hkJson .= "  ""label3"": """ . NB_EscJson(NB_HK3_Label) . """, ""action3"": """ . NB_EscJson(NB_HK3_Action) . """,`n"
-    hkJson .= "  ""label4"": """ . NB_EscJson(NB_HK4_Label) . """, ""action4"": """ . NB_EscJson(NB_HK4_Action) . """,`n"
-    hkJson .= "  ""label5"": """ . NB_EscJson(NB_HK5_Label) . """, ""action5"": """ . NB_EscJson(NB_HK5_Action) . """`n"
+    hkJson .= "  ""label1"": " . NB_EscJson(NB_HK1_Label) . ", ""action1"": " . NB_EscJson(NB_HK1_Action) . ",`n"
+    hkJson .= "  ""label2"": " . NB_EscJson(NB_HK2_Label) . ", ""action2"": " . NB_EscJson(NB_HK2_Action) . ",`n"
+    hkJson .= "  ""label3"": " . NB_EscJson(NB_HK3_Label) . ", ""action3"": " . NB_EscJson(NB_HK3_Action) . ",`n"
+    hkJson .= "  ""label4"": " . NB_EscJson(NB_HK4_Label) . ", ""action4"": " . NB_EscJson(NB_HK4_Action) . ",`n"
+    hkJson .= "  ""label5"": " . NB_EscJson(NB_HK5_Label) . ", ""action5"": " . NB_EscJson(NB_HK5_Action) . "`n"
     hkJson .= "}"
 
     FileDelete, %NB_HotkeyConfigPath%
