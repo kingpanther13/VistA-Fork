@@ -22938,12 +22938,18 @@ CF__SpyCallback(hwnd, lParam) {
 ;============================================================================================
 
 CF_EnumFormControls(windowHwnd) {
-    global CF__enumResults, CF__enumTargetHwnd
+    global CF__enumResults, CF__enumTargetHwnd, CF__checkListBoxHwnds
     CF__enumResults := []
+    CF__checkListBoxHwnds := []
     CF__enumTargetHwnd := windowHwnd
 
     enumCB := RegisterCallback("CF__EnumFormCallback", "Fast")
     DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumCB, "Ptr", 0)
+
+    ; Now expand TCheckListBox items OUTSIDE the callback (safe for SendMessage etc)
+    for clbi, clbHwnd in CF__checkListBoxHwnds {
+        CF_EnumCheckListBoxItems(clbHwnd)
+    }
 
     ; Sort by Y position (insertion sort for stable ordering)
     results := CF__enumResults
@@ -22976,9 +22982,9 @@ CF__EnumFormCallback(hwnd, lParam) {
     if (controlType != "checkbox" && controlType != "radio" && controlType != "combo" && controlType != "checklist")
         return 1
 
-    ; Handle TCheckListBox: expand into individual checklist items
+    ; Handle TCheckListBox: just record HWND, expand AFTER EnumChildWindows returns
     if (controlType = "checklist") {
-        CF_EnumCheckListBoxItems(hwnd)
+        CF__checkListBoxHwnds.Push(hwnd)
         return 1
     }
 
@@ -23421,9 +23427,11 @@ CF_ApplyTemplate(templatePath) {
         return
     }
 
-    ; Match template controls to live controls by label (primary) + Y-position (fallback)
+    ; Match template controls to live controls by label + Y-position
+    ; Use "claimed" tracking so duplicate labels (Yes/No) match by position order
     totalApplied := 0
     totalNotFound := 0
+    cfClaimed := {}  ; track which live indices are already matched
 
     cfTotalTpl := templateControls.Length()
     for ti, tplCtrl in templateControls {
@@ -23439,18 +23447,23 @@ CF_ApplyTemplate(templatePath) {
 
         ToolTip, Applying control %ti%/%cfTotalTpl%: %cfTplLabel%
 
-        ; Find best matching live control
+        ; Find best matching live control (that hasn't been claimed yet)
         bestLiveIdx := 0
         bestScore := 0
+        bestYDist := 999999
 
         for li, liveCtrl in liveControls {
+            ; Skip already-claimed controls
+            if (cfClaimed[li])
+                continue
+
             ; Extract live control properties to plain variables
             cfLiveType := liveCtrl.type
             cfLiveLabel := liveCtrl.label
             cfLiveY := liveCtrl.y
             cfLiveParentLabel := liveCtrl.parentLabel
 
-            ; Must be same type
+            ; Must be same type (checklist matches checklist)
             if (cfLiveType != cfTplType)
                 continue
 
@@ -23481,9 +23494,12 @@ CF_ApplyTemplate(templatePath) {
                 score += 20
             }
 
-            if (score > bestScore) {
+            ; When scores tie, prefer the one closest in Y position
+            yDist := Abs(cfLiveY - cfTplY)
+            if (score > bestScore || (score = bestScore && score > 0 && yDist < bestYDist)) {
                 bestScore := score
                 bestLiveIdx := li
+                bestYDist := yDist
             }
         }
 
@@ -23491,6 +23507,9 @@ CF_ApplyTemplate(templatePath) {
             totalNotFound++
             continue
         }
+
+        ; Claim this live control so it can't be matched again
+        cfClaimed[bestLiveIdx] := true
 
         cfMatchHwnd := liveControls[bestLiveIdx].hwnd
 
