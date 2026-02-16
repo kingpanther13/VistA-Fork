@@ -22938,17 +22938,26 @@ CF__SpyCallback(hwnd, lParam) {
 ;============================================================================================
 
 CF_EnumFormControls(windowHwnd) {
-    global CF__enumResults, CF__enumTargetHwnd, CF__checkListBoxHwnds
+    global CF__enumResults, CF__enumTargetHwnd, CF__checkListHwndStr
     CF__enumResults := []
-    CF__checkListBoxHwnds := []
     CF__enumTargetHwnd := windowHwnd
 
+    ; Pass 1: Enumerate standard controls (checkboxes, radios, combos)
     enumCB := RegisterCallback("CF__EnumFormCallback", "Fast")
     DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumCB, "Ptr", 0)
 
-    ; Now expand TCheckListBox items OUTSIDE the callback (safe for SendMessage etc)
-    for clbi, clbHwnd in CF__checkListBoxHwnds {
-        CF_EnumCheckListBoxItems(clbHwnd)
+    ; Pass 2: Find TCheckListBox controls (separate pass — no array methods in callbacks)
+    CF__checkListHwndStr := ""
+    enumCL := RegisterCallback("CF__FindCheckListCallback", "Fast")
+    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumCL, "Ptr", 0)
+
+    ; Expand each TCheckListBox into individual items (safe — outside callbacks)
+    if (CF__checkListHwndStr != "") {
+        Loop, Parse, CF__checkListHwndStr, |
+        {
+            if (A_LoopField != "")
+                CF_EnumCheckListBoxItems(A_LoopField + 0)
+        }
     }
 
     ; Sort by Y position (insertion sort for stable ordering)
@@ -22979,14 +22988,8 @@ CF__EnumFormCallback(hwnd, lParam) {
         return 1
 
     controlType := CF_ClassifyControl(hwnd)
-    if (controlType != "checkbox" && controlType != "radio" && controlType != "combo" && controlType != "checklist")
+    if (controlType != "checkbox" && controlType != "radio" && controlType != "combo")
         return 1
-
-    ; Handle TCheckListBox: just record HWND, expand AFTER EnumChildWindows returns
-    if (controlType = "checklist") {
-        CF__checkListBoxHwnds.Push(hwnd)
-        return 1
-    }
 
     VarSetCapacity(buf, 512, 0)
     DllCall("GetClassName", "Ptr", hwnd, "Str", buf, "Int", 256)
@@ -23066,6 +23069,36 @@ CF__EnumFormCallback(hwnd, lParam) {
         , checked: checked, selected: selected, value: value, valueIdx: valueIdx
         , y: y, x: x, parentHwnd: parentHwnd, parentLabel: parentLabel}
     CF__enumResults.Push(entry)
+    return 1
+}
+
+
+;============================================================================================
+; CF - FIND CHECKLIST CALLBACK
+;
+; Second-pass callback that only looks for TCheckListBox controls.
+; Uses string concatenation (not array methods) because Fast callbacks
+; cannot safely call .Push() or other object methods.
+;============================================================================================
+
+CF__FindCheckListCallback(hwnd, lParam) {
+    global CF__checkListHwndStr
+
+    ; Skip invisible controls
+    cfStyle := DllCall("GetWindowLong", "Ptr", hwnd, "Int", -16, "UInt")
+    if !(cfStyle & 0x10000000)
+        return 1
+
+    ; Get class name
+    VarSetCapacity(clBuf, 512, 0)
+    DllCall("GetClassName", "Ptr", hwnd, "Str", clBuf, "Int", 256)
+    clName := clBuf
+
+    ; Only interested in TCheckListBox
+    if (clName = "TCheckListBox") {
+        CF__checkListHwndStr .= hwnd . "|"
+    }
+
     return 1
 }
 
