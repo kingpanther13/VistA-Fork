@@ -23709,9 +23709,16 @@ CF_ApplyTemplate(templatePath) {
     totalApplied := 0
     totalNotFound := 0
     cfClaimed := {}  ; track which live indices are already matched
+    cfAutoSaveCancelled := false
 
     cfTotalTpl := templateControls.Length()
     for ti, tplCtrl in templateControls {
+        ; Check Esc to cancel auto-save throughout the apply process
+        if (CF_AutoSave && GetKeyState("Escape", "P")) {
+            cfAutoSaveCancelled := true
+            ToolTip, AutoSave cancelled - still applying template
+            SetTimer, CF_ClearToolTip, -2000
+        }
         ; Extract all template control properties to plain variables (AHK v1 safe)
         cfTplType := tplCtrl.type
         cfTplLabel := tplCtrl.label
@@ -23854,15 +23861,19 @@ CF_ApplyTemplate(templatePath) {
     CF_DismissIntermediatePopups()
 
     if (CF_AutoSave && totalApplied > 0) {
-        ToolTip, %totalApplied% applied - AutoSaving (Esc to cancel)
-        Sleep, 500
-        if (GetKeyState("Escape", "P")) {
-            ToolTip, AutoSave cancelled - review and save manually
+        ; Check if Esc was pressed at any point during apply, or right now
+        if (cfAutoSaveCancelled || GetKeyState("Escape", "P")) {
+            ToolTip, AutoSave cancelled - %totalApplied% applied`, review and save manually
             SetTimer, CF_ClearToolTip, -3000
             return
         }
         ; Find and click the Save button
         CF_ClickSaveButton(targetHwnd)
+        ToolTip, %totalApplied% applied and saved
+        SetTimer, CF_ClearToolTip, -3000
+    } else if (CF_AutoSave && totalApplied = 0) {
+        ToolTip, No controls applied - nothing to save
+        SetTimer, CF_ClearToolTip, -3000
     } else {
         ToolTip, Done: %totalApplied% applied`, %totalNotFound% not matched - review before submitting
         SetTimer, CF_ClearToolTip, -5000
