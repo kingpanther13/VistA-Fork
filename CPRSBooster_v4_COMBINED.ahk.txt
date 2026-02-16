@@ -131,6 +131,7 @@ global CF_AppTitle := "CP Flowsheets Booster"
 global CF_TemplateDir := onedrivelocal . "\CPFSTemplates"
 global CF_Detected := 0
 global CF_SpyResults := []
+global CF_AutoSave := 0
 
 ;****************AI Folder**************
 AIPath := onedrivelocal . "\AI\"
@@ -743,10 +744,12 @@ Gui, 67:Add, Button, x245 y88 w130 h26 gNB_PanelRecordMacro, Record Macro
 Gui, 67:Font, s7 c00BFFF, Segoe UI
 Gui, 67:Add, Text, x5 y118 w370 h16 Center BackgroundTrans, --- CP Flowsheets ---
 Gui, 67:Font, s8 cBlack, Segoe UI
-Gui, 67:Add, Button, x5   y136 w90 h26 gCF_PanelSpy, CPFS Spy
-Gui, 67:Add, Button, x100 y136 w90 h26 gCF_PanelSave, CPFS Save
-Gui, 67:Add, Button, x195 y136 w90 h26 gCF_PanelLoad, CPFS Load
-Gui, 67:Add, Button, x290 y136 w90 h26 gCF_PanelDelete, CPFS Delete
+Gui, 67:Add, Button, x5   y136 w75 h26 gCF_PanelSpy, CPFS Spy
+Gui, 67:Add, Button, x83  y136 w75 h26 gCF_PanelSave, CPFS Save
+Gui, 67:Add, Button, x161 y136 w75 h26 gCF_PanelLoad, CPFS Load
+Gui, 67:Add, Button, x239 y136 w75 h26 gCF_PanelDelete, CPFS Del
+Gui, 67:Font, s7 cRed, Segoe UI
+Gui, 67:Add, Checkbox, x320 y140 w60 h18 vCF_AutoSaveChk gCF_ToggleAutoSave, AutoSave
 Gui, 67:Font, s7 cFFD700, Segoe UI
 Gui, 67:Add, Text, x5 y166 w370 h16 Center BackgroundTrans, --- Quick Actions ---
 Gui, 67:Font, s7 cBlack, Segoe UI
@@ -20102,6 +20105,29 @@ CF_PanelDelete:
     gosub CF_BtnDeleteTemplate
 return
 
+CF_ToggleAutoSave:
+    Gui, 67:Submit, NoHide
+    global CF_AutoSave
+    if (CF_AutoSaveChk = 1) {
+        MsgBox, 308, CP Flowsheets - AutoSave WARNING, WARNING: AutoSave will automatically click the SAVE button in CP Flowsheets after applying a template.`n`nThis saves the entry PERMANENTLY to the patient record.`n`nAre you sure you want to enable AutoSave?
+        IfMsgBox, Yes
+        {
+            CF_AutoSave := 1
+            ToolTip, CPFS AutoSave ENABLED - Save will be clicked automatically
+            SetTimer, NB_ClearToolTip, -3000
+        }
+        else
+        {
+            CF_AutoSave := 0
+            GuiControl, 67:, CF_AutoSaveChk, 0
+        }
+    } else {
+        CF_AutoSave := 0
+        ToolTip, CPFS AutoSave disabled
+        SetTimer, NB_ClearToolTip, -2000
+    }
+return
+
 
 ;============================================================================================
 ; QUICK ACTION HOTKEY BUTTON HANDLERS
@@ -23827,8 +23853,20 @@ CF_ApplyTemplate(templatePath) {
 
     CF_DismissIntermediatePopups()
 
-    ToolTip, Done: %totalApplied% applied`, %totalNotFound% not matched - review before submitting
-    SetTimer, CF_ClearToolTip, -5000
+    if (CF_AutoSave && totalApplied > 0) {
+        ToolTip, %totalApplied% applied - AutoSaving (Esc to cancel)
+        Sleep, 500
+        if (GetKeyState("Escape", "P")) {
+            ToolTip, AutoSave cancelled - review and save manually
+            SetTimer, CF_ClearToolTip, -3000
+            return
+        }
+        ; Find and click the Save button
+        CF_ClickSaveButton(targetHwnd)
+    } else {
+        ToolTip, Done: %totalApplied% applied`, %totalNotFound% not matched - review before submitting
+        SetTimer, CF_ClearToolTip, -5000
+    }
 }
 
 
@@ -24069,6 +24107,57 @@ CF__FindOKCallback(hwnd, lParam) {
             CF__foundOKHwnd := hwnd
             return 0
         }
+    }
+    return 1
+}
+
+
+;============================================================================================
+; CF - FIND AND CLICK SAVE BUTTON
+;
+; Finds the "Save" TButton in CP Flowsheets and clicks it.
+; Used by AutoSave feature after template apply.
+;============================================================================================
+
+CF_ClickSaveButton(windowHwnd) {
+    global CF_AppTitle, CF__foundSaveHwnd
+    CF__foundSaveHwnd := 0
+    enumSave := RegisterCallback("CF__FindSaveCallback", "Fast")
+    DllCall("EnumChildWindows", "Ptr", windowHwnd, "Ptr", enumSave, "Ptr", 0)
+
+    if (CF__foundSaveHwnd) {
+        PostMessage, 0x00F5, 0, 0,, ahk_id %CF__foundSaveHwnd%   ; BM_CLICK
+        ToolTip, AutoSave: Save clicked
+        SetTimer, CF_ClearToolTip, -2000
+    } else {
+        ToolTip, AutoSave: Save button not found - save manually
+        SetTimer, CF_ClearToolTip, -3000
+    }
+}
+
+CF__FindSaveCallback(hwnd, lParam) {
+    global CF__foundSaveHwnd
+
+    ; Skip invisible
+    cfStyle := DllCall("GetWindowLong", "Ptr", hwnd, "Int", -16, "UInt")
+    if !(cfStyle & 0x10000000)
+        return 1
+
+    VarSetCapacity(buf, 512, 0)
+    DllCall("GetClassName", "Ptr", hwnd, "Str", buf, "Int", 256)
+    className := buf
+
+    if !(InStr(className, "Button") || InStr(className, "TButton"))
+        return 1
+
+    ; Get button text
+    VarSetCapacity(tBuf, 256, 0)
+    DllCall("GetWindowText", "Ptr", hwnd, "Str", tBuf, "Int", 128)
+    btnText := tBuf
+
+    if (btnText = "Save" || btnText = "&Save") {
+        CF__foundSaveHwnd := hwnd
+        return 0
     }
     return 1
 }
