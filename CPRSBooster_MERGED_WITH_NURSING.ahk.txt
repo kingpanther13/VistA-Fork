@@ -20840,6 +20840,54 @@ NB__EnumDescCBCallback(hwnd, lParam) {
             label := Trim(StrGet(&tBuf2))
         }
     }
+    ; CPRS parent checkboxes have Caption=' ' by design (CPRS clears it).
+    ; The actual text lives in a sibling TDlgFieldPanel at the same Y position.
+    ; Walk the next siblings to find it.
+    if (label = "" && buf = "TCPRSDialogParentCheckBox") {
+        VarSetCapacity(cbRect, 16, 0)
+        DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", &cbRect)
+        cbY := NumGet(cbRect, 4, "Int")
+        sib := DllCall("GetWindow", "Ptr", hwnd, "UInt", 2, "Ptr")  ; GW_HWNDNEXT
+        while (sib) {
+            VarSetCapacity(sibBuf, 256, 0)
+            DllCall("GetClassName", "Ptr", sib, "Str", sibBuf, "Int", 256)
+            if (sibBuf = "TDlgFieldPanel") {
+                VarSetCapacity(sibRect, 16, 0)
+                DllCall("GetWindowRect", "Ptr", sib, "Ptr", &sibRect)
+                sibY := NumGet(sibRect, 4, "Int")
+                ; Same Y position (within 5px tolerance) = this is the label panel
+                yDiff := cbY - sibY
+                if (yDiff < 0)
+                    yDiff := -yDiff
+                if (yDiff <= 5) {
+                    ; The panel itself may contain child label controls - try panel text first
+                    pLen := DllCall("GetWindowTextLengthW", "Ptr", sib, "Int")
+                    if (pLen > 0) {
+                        VarSetCapacity(pBuf, (pLen + 1) * 2, 0)
+                        DllCall("GetWindowTextW", "Ptr", sib, "Ptr", &pBuf, "Int", pLen + 1)
+                        label := Trim(StrGet(&pBuf, "UTF-16"))
+                    }
+                    ; If panel has no direct text, check its first child (often a TLabel or TCPRSDialogStaticLabel)
+                    if (label = "") {
+                        panelChild := DllCall("GetWindow", "Ptr", sib, "UInt", 5, "Ptr")  ; GW_CHILD
+                        while (panelChild) {
+                            pcLen := DllCall("GetWindowTextLengthW", "Ptr", panelChild, "Int")
+                            if (pcLen > 0) {
+                                VarSetCapacity(pcBuf, (pcLen + 1) * 2, 0)
+                                DllCall("GetWindowTextW", "Ptr", panelChild, "Ptr", &pcBuf, "Int", pcLen + 1)
+                                label := Trim(StrGet(&pcBuf, "UTF-16"))
+                                if (label != "")
+                                    break
+                            }
+                            panelChild := DllCall("GetWindow", "Ptr", panelChild, "UInt", 2, "Ptr")
+                        }
+                    }
+                    break
+                }
+            }
+            sib := DllCall("GetWindow", "Ptr", sib, "UInt", 2, "Ptr")
+        }
+    }
 
     NB__descCBResults.Push({hwnd: hwnd, className: buf, checked: checked, label: label, y: y, x: x})
     return 1
@@ -21324,6 +21372,52 @@ NB__DumpCallback(hwnd, lParam) {
             VarSetCapacity(tBuf2, (tLen2 + 1) * 2, 0)
             SendMessage, 0x000D, tLen2 + 1, &tBuf2,, ahk_id %hwnd%
             text := StrGet(&tBuf2)
+        }
+    }
+
+    ; CPRS parent checkboxes have Caption=' ' (cleared by CPRS code).
+    ; The visible text is in a sibling TDlgFieldPanel at the same Y position.
+    text := Trim(text)
+    if (text = "" && className = "TCPRSDialogParentCheckBox") {
+        VarSetCapacity(dCbRect, 16, 0)
+        DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", &dCbRect)
+        dCbY := NumGet(dCbRect, 4, "Int")
+        dSib := DllCall("GetWindow", "Ptr", hwnd, "UInt", 2, "Ptr")
+        while (dSib) {
+            VarSetCapacity(dSibBuf, 256, 0)
+            DllCall("GetClassName", "Ptr", dSib, "Str", dSibBuf, "Int", 256)
+            if (dSibBuf = "TDlgFieldPanel") {
+                VarSetCapacity(dSibRect, 16, 0)
+                DllCall("GetWindowRect", "Ptr", dSib, "Ptr", &dSibRect)
+                dSibY := NumGet(dSibRect, 4, "Int")
+                dYDiff := dCbY - dSibY
+                if (dYDiff < 0)
+                    dYDiff := -dYDiff
+                if (dYDiff <= 5) {
+                    dpLen := DllCall("GetWindowTextLengthW", "Ptr", dSib, "Int")
+                    if (dpLen > 0) {
+                        VarSetCapacity(dpBuf, (dpLen + 1) * 2, 0)
+                        DllCall("GetWindowTextW", "Ptr", dSib, "Ptr", &dpBuf, "Int", dpLen + 1)
+                        text := Trim(StrGet(&dpBuf, "UTF-16"))
+                    }
+                    if (text = "") {
+                        dPanelChild := DllCall("GetWindow", "Ptr", dSib, "UInt", 5, "Ptr")
+                        while (dPanelChild) {
+                            dpcLen := DllCall("GetWindowTextLengthW", "Ptr", dPanelChild, "Int")
+                            if (dpcLen > 0) {
+                                VarSetCapacity(dpcBuf, (dpcLen + 1) * 2, 0)
+                                DllCall("GetWindowTextW", "Ptr", dPanelChild, "Ptr", &dpcBuf, "Int", dpcLen + 1)
+                                text := Trim(StrGet(&dpcBuf, "UTF-16"))
+                                if (text != "")
+                                    break
+                            }
+                            dPanelChild := DllCall("GetWindow", "Ptr", dPanelChild, "UInt", 2, "Ptr")
+                        }
+                    }
+                    break
+                }
+            }
+            dSib := DllCall("GetWindow", "Ptr", dSib, "UInt", 2, "Ptr")
         }
     }
 
