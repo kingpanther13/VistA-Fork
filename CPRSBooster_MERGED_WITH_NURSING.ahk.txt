@@ -20787,6 +20787,13 @@ NB_EnumDescendantCheckboxes(containerHwnd) {
         item.depth := depth
     }
 
+    ; Resolve parent checkbox labels using MSAA (can't use COM inside Fast callbacks)
+    for k, item in NB__descCBResults {
+        if (item.label = "" && item.className = "TCPRSDialogParentCheckBox") {
+            item.label := NB_GetAccName(item.hwnd)
+        }
+    }
+
     ; Sort by screen Y position (with X tiebreaker)
     results := NB__descCBResults
     if (results.Length() > 1) {
@@ -20822,90 +20829,13 @@ NB__EnumDescCBCallback(hwnd, lParam) {
     y := NumGet(rect, 4, "Int")
     x := NumGet(rect, 0, "Int")
 
-    ; Read label for ALL checkbox types (parent + leaf)
+    ; Read label via simple DllCalls only (this is a Fast callback - no COM allowed)
     label := ""
     tLen := DllCall("GetWindowTextLengthW", "Ptr", hwnd, "Int")
     if (tLen > 0) {
         VarSetCapacity(tBuf, (tLen + 1) * 2, 0)
         DllCall("GetWindowTextW", "Ptr", hwnd, "Ptr", &tBuf, "Int", tLen + 1)
         label := Trim(StrGet(&tBuf, "UTF-16"))
-    }
-    ; Fallback: try WM_GETTEXT
-    if (label = "") {
-        SendMessage, 0x000E, 0, 0,, ahk_id %hwnd%
-        tLen2 := ErrorLevel
-        if (tLen2 > 0) {
-            VarSetCapacity(tBuf2, (tLen2 + 1) * 2, 0)
-            SendMessage, 0x000D, tLen2 + 1, &tBuf2,, ahk_id %hwnd%
-            label := Trim(StrGet(&tBuf2))
-        }
-    }
-    ; CPRS parent checkboxes have Caption=' ' by design (CPRS source clears it).
-    ; The visible text is in a non-windowed TLabel inside a sibling TDlgFieldPanel.
-    ; Use MSAA (Accessibility) to get the name, then fall back to sibling search.
-    if (label = "" && buf = "TCPRSDialogParentCheckBox") {
-        ; Method 1: MSAA IAccessible.accName - CPRS supports screen readers
-        VarSetCapacity(IID_IA, 16)
-        DllCall("ole32\CLSIDFromString", "WStr", "{618736E0-3C3D-11CF-810C-00AA00389B71}", "Ptr", &IID_IA)
-        pAcc := 0
-        hr := DllCall("oleacc\AccessibleObjectFromWindow", "Ptr", hwnd, "UInt", 0, "Ptr", &IID_IA, "Ptr*", pAcc, "Int")
-        if (hr = 0 && pAcc) {
-            try {
-                accObj := ComObject(9, pAcc, 1)
-                label := Trim(accObj.accName(0))
-            }
-        }
-        ; Method 2: Walk ALL children of the parent container looking for any
-        ; windowed control at the same Y with text (checks both directions)
-        if (label = "") {
-            cbParent := DllCall("GetParent", "Ptr", hwnd, "Ptr")
-            if (cbParent) {
-                VarSetCapacity(cbRect, 16, 0)
-                DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", &cbRect)
-                cbY := NumGet(cbRect, 4, "Int")
-                cbX := NumGet(cbRect, 0, "Int")
-                child := DllCall("GetWindow", "Ptr", cbParent, "UInt", 5, "Ptr")  ; GW_CHILD
-                while (child) {
-                    if (child != hwnd) {
-                        VarSetCapacity(childRect, 16, 0)
-                        DllCall("GetWindowRect", "Ptr", child, "Ptr", &childRect)
-                        childY := NumGet(childRect, 4, "Int")
-                        childX := NumGet(childRect, 0, "Int")
-                        yDiff := cbY - childY
-                        if (yDiff < 0)
-                            yDiff := -yDiff
-                        ; Same Y (within 5px) and to the right of checkbox
-                        if (yDiff <= 5 && childX > cbX) {
-                            ; Try this control's text
-                            cLen := DllCall("GetWindowTextLengthW", "Ptr", child, "Int")
-                            if (cLen > 0) {
-                                VarSetCapacity(cBuf, (cLen + 1) * 2, 0)
-                                DllCall("GetWindowTextW", "Ptr", child, "Ptr", &cBuf, "Int", cLen + 1)
-                                label := Trim(StrGet(&cBuf, "UTF-16"))
-                            }
-                            ; Try its windowed children too
-                            if (label = "") {
-                                gc := DllCall("GetWindow", "Ptr", child, "UInt", 5, "Ptr")
-                                while (gc) {
-                                    gcLen := DllCall("GetWindowTextLengthW", "Ptr", gc, "Int")
-                                    if (gcLen > 0) {
-                                        VarSetCapacity(gcBuf, (gcLen + 1) * 2, 0)
-                                        DllCall("GetWindowTextW", "Ptr", gc, "Ptr", &gcBuf, "Int", gcLen + 1)
-                                        label := Trim(StrGet(&gcBuf, "UTF-16"))
-                                        if (label != "")
-                                            break
-                                    }
-                                    gc := DllCall("GetWindow", "Ptr", gc, "UInt", 2, "Ptr")
-                                }
-                            }
-                            if (label != "")
-                                break
-                        }
-                    }
-                    child := DllCall("GetWindow", "Ptr", child, "UInt", 2, "Ptr")
-                }
-            }
-        }
     }
 
     NB__descCBResults.Push({hwnd: hwnd, className: buf, checked: checked, label: label, y: y, x: x})
@@ -21357,9 +21287,23 @@ NB_DumpDialogControls:
     global NB__dumpDlgHwnd := dlgHwnd
     global NB__dumpCount := 0
     global NB__dumpCBCount := 0
+    global NB__dumpParentCBs := []
 
     enumDump := RegisterCallback("NB__DumpCallback", "Fast")
     DllCall("EnumChildWindows", "Ptr", dlgHwnd, "Ptr", enumDump, "Ptr", 0)
+
+    ; Post-process: resolve parent checkbox labels via MSAA (can't use COM in Fast callbacks)
+    if (NB__dumpParentCBs.Length() > 0) {
+        parentSection := "`n=== Parent Checkbox Labels (via Accessibility) ===`n"
+        for i, pcb in NB__dumpParentCBs {
+            accName := NB_GetAccName(pcb.hwnd)
+            if (accName = "")
+                accName := "(could not resolve)"
+            chk := pcb.checked ? "YES" : "NO"
+            parentSection .= "  hwnd=" . pcb.hwnd . " CHECKED=" . chk . " label='" . accName . "'`n"
+        }
+        FileAppend, %parentSection%, %dumpPath%, UTF-8
+    }
 
     dumpFooter := "`n=== Summary ===`nTotal controls: " . NB__dumpCount . "`nCheckboxes: " . NB__dumpCBCount . "`n"
     FileAppend, %dumpFooter%, %dumpPath%, UTF-8
@@ -21368,95 +21312,20 @@ NB_DumpDialogControls:
 return
 
 NB__DumpCallback(hwnd, lParam) {
-    global NB__dumpPath, NB__dumpDlgHwnd, NB__dumpCount, NB__dumpCBCount
+    global NB__dumpPath, NB__dumpDlgHwnd, NB__dumpCount, NB__dumpCBCount, NB__dumpParentCBs
     NB__dumpCount++
 
     VarSetCapacity(buf, 256, 0)
     DllCall("GetClassName", "Ptr", hwnd, "Str", buf, "Int", 256)
     className := buf
 
-    ; Get text using GetWindowTextW (works with Delphi TORCheckBox controls)
+    ; Simple text retrieval only (this is a Fast callback - no COM allowed)
     text := ""
     tLen := DllCall("GetWindowTextLengthW", "Ptr", hwnd, "Int")
     if (tLen > 0) {
         VarSetCapacity(tBuf, (tLen + 1) * 2, 0)
         DllCall("GetWindowTextW", "Ptr", hwnd, "Ptr", &tBuf, "Int", tLen + 1)
-        text := StrGet(&tBuf, "UTF-16")
-    }
-    ; Fallback: try WM_GETTEXT if GetWindowTextW returned empty
-    if (text = "") {
-        SendMessage, 0x000E, 0, 0,, ahk_id %hwnd%
-        tLen2 := ErrorLevel
-        if (tLen2 > 0) {
-            VarSetCapacity(tBuf2, (tLen2 + 1) * 2, 0)
-            SendMessage, 0x000D, tLen2 + 1, &tBuf2,, ahk_id %hwnd%
-            text := StrGet(&tBuf2)
-        }
-    }
-
-    ; CPRS parent checkboxes have Caption=' ' (cleared by CPRS source code).
-    ; The visible text is in a non-windowed TLabel inside a sibling panel.
-    ; Use MSAA (Accessibility) then fall back to searching all siblings.
-    text := Trim(text)
-    if (text = "" && className = "TCPRSDialogParentCheckBox") {
-        ; Method 1: MSAA IAccessible.accName
-        VarSetCapacity(dIID, 16)
-        DllCall("ole32\CLSIDFromString", "WStr", "{618736E0-3C3D-11CF-810C-00AA00389B71}", "Ptr", &dIID)
-        dPAcc := 0
-        dHr := DllCall("oleacc\AccessibleObjectFromWindow", "Ptr", hwnd, "UInt", 0, "Ptr", &dIID, "Ptr*", dPAcc, "Int")
-        if (dHr = 0 && dPAcc) {
-            try {
-                dAccObj := ComObject(9, dPAcc, 1)
-                text := Trim(dAccObj.accName(0))
-            }
-        }
-        ; Method 2: Search all children of parent container at same Y
-        if (text = "") {
-            dCbParent := DllCall("GetParent", "Ptr", hwnd, "Ptr")
-            if (dCbParent) {
-                VarSetCapacity(dCbRect, 16, 0)
-                DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", &dCbRect)
-                dCbY := NumGet(dCbRect, 4, "Int")
-                dCbX := NumGet(dCbRect, 0, "Int")
-                dChild := DllCall("GetWindow", "Ptr", dCbParent, "UInt", 5, "Ptr")
-                while (dChild) {
-                    if (dChild != hwnd) {
-                        VarSetCapacity(dcRect, 16, 0)
-                        DllCall("GetWindowRect", "Ptr", dChild, "Ptr", &dcRect)
-                        dcY := NumGet(dcRect, 4, "Int")
-                        dcX := NumGet(dcRect, 0, "Int")
-                        dYDiff := dCbY - dcY
-                        if (dYDiff < 0)
-                            dYDiff := -dYDiff
-                        if (dYDiff <= 5 && dcX > dCbX) {
-                            dcLen := DllCall("GetWindowTextLengthW", "Ptr", dChild, "Int")
-                            if (dcLen > 0) {
-                                VarSetCapacity(dcBuf, (dcLen + 1) * 2, 0)
-                                DllCall("GetWindowTextW", "Ptr", dChild, "Ptr", &dcBuf, "Int", dcLen + 1)
-                                text := Trim(StrGet(&dcBuf, "UTF-16"))
-                            }
-                            if (text = "") {
-                                dgc := DllCall("GetWindow", "Ptr", dChild, "UInt", 5, "Ptr")
-                                while (dgc) {
-                                    dgcLen := DllCall("GetWindowTextLengthW", "Ptr", dgc, "Int")
-                                    if (dgcLen > 0) {
-                                        VarSetCapacity(dgcBuf, (dgcLen + 1) * 2, 0)
-                                        DllCall("GetWindowTextW", "Ptr", dgc, "Ptr", &dgcBuf, "Int", dgcLen + 1)
-                                        text := Trim(StrGet(&dgcBuf, "UTF-16"))
-                                        if (text != "")
-                                            break
-                                    }
-                                    dgc := DllCall("GetWindow", "Ptr", dgc, "UInt", 2, "Ptr")
-                                }
-                            }
-                            if (text != "")
-                                break
-                        }
-                    }
-                    dChild := DllCall("GetWindow", "Ptr", dChild, "UInt", 2, "Ptr")
-                }
-            }
-        }
+        text := Trim(StrGet(&tBuf, "UTF-16"))
     }
 
     depth := 0
@@ -21482,6 +21351,9 @@ NB__DumpCallback(hwnd, lParam) {
         checked := ErrorLevel
         extra := " CHECKED=" . (checked ? "YES" : "NO")
         NB__dumpCBCount++
+        ; Track parent checkboxes for post-processing label lookup
+        if (className = "TCPRSDialogParentCheckBox")
+            NB__dumpParentCBs.Push({hwnd: hwnd, checked: checked})
     }
 
     style := DllCall("GetWindowLong", "Ptr", hwnd, "Int", -16, "Int")
@@ -21517,6 +21389,24 @@ NB_EscJson(str) {
     str := StrReplace(str, "`r", "\r")
     str := StrReplace(str, "`t", "\t")
     return """" . str . """"
+}
+
+; Get accessible name for a control via MSAA (IAccessible.accName).
+; Used to retrieve CPRS parent checkbox labels which are stored in
+; non-windowed TLabel controls invisible to the standard Windows API.
+NB_GetAccName(hwnd) {
+    name := ""
+    VarSetCapacity(IID_IA, 16)
+    DllCall("ole32\CLSIDFromString", "WStr", "{618736E0-3C3D-11CF-810C-00AA00389B71}", "Ptr", &IID_IA)
+    pAcc := 0
+    hr := DllCall("oleacc\AccessibleObjectFromWindow", "Ptr", hwnd, "UInt", 0, "Ptr", &IID_IA, "Ptr*", pAcc, "Int")
+    if (hr = 0 && pAcc) {
+        try {
+            accObj := ComObject(9, pAcc, 1)
+            name := Trim(accObj.accName(0))
+        }
+    }
+    return name
 }
 
 
