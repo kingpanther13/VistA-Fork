@@ -23228,14 +23228,17 @@ CF_EnumCheckListBoxItems(listBoxHwnd) {
         itemY := NumGet(pt, 4, "Int")
 
         ; Read check state from Delphi internals via LB_GETITEMDATA + ReadProcessMemory
+        ; TCheckListBoxDataWrapper layout (32-bit Delphi):
+        ;   Offset 0: VMT pointer (4 bytes)
+        ;   Offset 4: FData (LongInt, 4 bytes)
+        ;   Offset 8: FState (TCheckBoxState: 0=unchecked, 1=checked, 2=grayed)
         itemChecked := false
         SendMessage, 0x0199, idx, 0,, ahk_id %listBoxHwnd%   ; LB_GETITEMDATA
         dataPtr := ErrorLevel
         if (hProc && dataPtr && dataPtr != 0xFFFFFFFF && dataPtr != -1) {
-            ; Read FState at offset +4 (after FData which is a LongInt)
             VarSetCapacity(stateVal, 4, 0)
             bytesRead := 0
-            DllCall("ReadProcessMemory", "Ptr", hProc, "Ptr", dataPtr + 4
+            DllCall("ReadProcessMemory", "Ptr", hProc, "Ptr", dataPtr + 8
                 , "Ptr", &stateVal, "UInt", 4, "Ptr*", bytesRead)
             if (bytesRead > 0) {
                 state := NumGet(stateVal, 0, "Int")
@@ -23266,9 +23269,10 @@ CF_ReadCheckListItemState(listBoxHwnd, itemIdx) {
     dataPtr := ErrorLevel
     result := false
     if (dataPtr && dataPtr != 0xFFFFFFFF && dataPtr != -1) {
+        ; FState is at offset +8: past VMT pointer (4) and FData (4)
         VarSetCapacity(stateVal, 4, 0)
         bytesRead := 0
-        DllCall("ReadProcessMemory", "Ptr", hProc, "Ptr", dataPtr + 4
+        DllCall("ReadProcessMemory", "Ptr", hProc, "Ptr", dataPtr + 8
             , "Ptr", &stateVal, "UInt", 4, "Ptr*", bytesRead)
         if (bytesRead > 0) {
             state := NumGet(stateVal, 0, "Int")
