@@ -21398,6 +21398,11 @@ NB_EscJson(str) {
 NB_ResolveParentCBLabel(cbHwnd) {
     if !DllCall("IsWindow", "Ptr", cbHwnd, "Int")
         return ""
+    ; Method 0: Try UIA Name directly on the checkbox itself
+    ; UIA sometimes aggregates label text from associated controls
+    text := NB_GetUIAName(cbHwnd)
+    if (text != "" && text != "system" && text != " ")
+        return text
     ; Get the parent container of this checkbox
     cbParent := DllCall("GetParent", "Ptr", cbHwnd, "Ptr")
     if (!cbParent)
@@ -21439,7 +21444,7 @@ NB_ResolveParentCBLabel(cbHwnd) {
         return text
     ; Method 2: accName on the panel itself (safe vtable call)
     text := NB_GetAccName(bestPanel)
-    if (text != "")
+    if (text != "" && text != "system")
         return text
     ; Method 3: GetWindowText on windowed children of the panel
     panelChild := DllCall("GetWindow", "Ptr", bestPanel, "UInt", 5, "Ptr")
@@ -21458,15 +21463,148 @@ NB_ResolveParentCBLabel(cbHwnd) {
     panelChild := DllCall("GetWindow", "Ptr", bestPanel, "UInt", 5, "Ptr")
     while (panelChild) {
         text := NB_GetAccName(panelChild)
-        if (text != "")
+        if (text != "" && text != "system")
             return text
         panelChild := DllCall("GetWindow", "Ptr", panelChild, "UInt", 2, "Ptr")
     }
     ; Method 5: Walk IAccessible children of the panel (can find non-windowed TLabel)
     text := NB_GetAccChildrenText(bestPanel)
+    if (text != "" && text != "system")
+        return text
+    ; Method 6: UI Automation - can see elements MSAA cannot, including
+    ; non-windowed Delphi TLabel controls in apps with 508 compliance
+    text := NB_GetUIADescendantText(bestPanel)
     if (text != "")
         return text
     return ""
+}
+
+; Get UI Automation Name property for a single HWND.
+; Returns the UIA CurrentName which may include label text from associated controls.
+NB_GetUIAName(hwnd) {
+    if !DllCall("IsWindow", "Ptr", hwnd, "Int")
+        return ""
+    VarSetCapacity(CLSID_UIA, 16)
+    DllCall("ole32\CLSIDFromString", "WStr", "{ff48dba4-60ef-4201-aa87-54103eef594e}", "Ptr", &CLSID_UIA)
+    VarSetCapacity(IID_UIA, 16)
+    DllCall("ole32\CLSIDFromString", "WStr", "{30cbe57d-d9d0-452a-ab13-7ac5ac4825ee}", "Ptr", &IID_UIA)
+    pUIA := 0
+    hr := DllCall("ole32\CoCreateInstance", "Ptr", &CLSID_UIA, "Ptr", 0, "UInt", 1
+        , "Ptr", &IID_UIA, "Ptr*", pUIA, "Int")
+    if (hr != 0 || !pUIA)
+        return ""
+    uiaVT := NumGet(pUIA + 0, 0, "Ptr")
+    ; ElementFromHandle (slot 6)
+    pElement := 0
+    DllCall(NumGet(uiaVT + 0, 6 * A_PtrSize, "Ptr"), "Ptr", pUIA, "Ptr", hwnd, "Ptr*", pElement, "Int")
+    result := ""
+    if (pElement) {
+        elemVT := NumGet(pElement + 0, 0, "Ptr")
+        ; get_CurrentName (slot 21)
+        pName := 0
+        DllCall(NumGet(elemVT + 0, 21 * A_PtrSize, "Ptr"), "Ptr", pElement, "Ptr*", pName, "Int")
+        if (pName) {
+            result := Trim(StrGet(pName, "UTF-16"))
+            DllCall("OleAut32\SysFreeString", "Ptr", pName)
+        }
+        ObjRelease(pElement)
+    }
+    ObjRelease(pUIA)
+    return result
+}
+
+; Use UI Automation to find text in descendant elements of an HWND.
+; UI Automation can see non-windowed controls (like Delphi TLabel) that MSAA cannot.
+; All calls use raw vtable DllCalls via CoCreateInstance to avoid COM dispatch crashes.
+NB_GetUIADescendantText(hwnd) {
+    if !DllCall("IsWindow", "Ptr", hwnd, "Int")
+        return ""
+    ; CUIAutomation CLSID: {ff48dba4-60ef-4201-aa87-54103eef594e}
+    VarSetCapacity(CLSID_UIA, 16)
+    DllCall("ole32\CLSIDFromString", "WStr", "{ff48dba4-60ef-4201-aa87-54103eef594e}", "Ptr", &CLSID_UIA)
+    ; IUIAutomation IID: {30cbe57d-d9d0-452a-ab13-7ac5ac4825ee}
+    VarSetCapacity(IID_UIA, 16)
+    DllCall("ole32\CLSIDFromString", "WStr", "{30cbe57d-d9d0-452a-ab13-7ac5ac4825ee}", "Ptr", &IID_UIA)
+    pUIA := 0
+    hr := DllCall("ole32\CoCreateInstance", "Ptr", &CLSID_UIA, "Ptr", 0, "UInt", 1
+        , "Ptr", &IID_UIA, "Ptr*", pUIA, "Int")
+    if (hr != 0 || !pUIA)
+        return ""
+    uiaVT := NumGet(pUIA + 0, 0, "Ptr")
+    ; IUIAutomation::ElementFromHandle (vtable slot 6)
+    ; HRESULT ElementFromHandle(UIA_HWND hwnd, IUIAutomationElement** element)
+    pElement := 0
+    DllCall(NumGet(uiaVT + 0, 6 * A_PtrSize, "Ptr"), "Ptr", pUIA, "Ptr", hwnd, "Ptr*", pElement, "Int")
+    if (!pElement) {
+        ObjRelease(pUIA)
+        return ""
+    }
+    ; First try: get_CurrentName on the panel element itself
+    ; IUIAutomationElement vtable: 3=SetFocus, 4=GetRuntimeId, 5=FindFirst,
+    ;   6=FindAll, 7-9=cache, 10-13=property, 14-17=pattern,
+    ;   18=ProcessId, 19=ControlType, 20=LocalizedControlType, 21=CurrentName
+    elemVT := NumGet(pElement + 0, 0, "Ptr")
+    pName := 0
+    DllCall(NumGet(elemVT + 0, 21 * A_PtrSize, "Ptr"), "Ptr", pElement, "Ptr*", pName, "Int")
+    if (pName) {
+        name := StrGet(pName, "UTF-16")
+        DllCall("OleAut32\SysFreeString", "Ptr", pName)
+        name := Trim(name)
+        if (name != "" && name != "system") {
+            ObjRelease(pElement)
+            ObjRelease(pUIA)
+            return name
+        }
+    }
+    ; Create TrueCondition to find all descendants
+    ; IUIAutomation vtable: 3=CompareElements, ..., 6=ElementFromHandle, ...,
+    ;   16=CreateCacheRequest, 17=CreateTrueCondition
+    pCond := 0
+    DllCall(NumGet(uiaVT + 0, 17 * A_PtrSize, "Ptr"), "Ptr", pUIA, "Ptr*", pCond, "Int")
+    if (!pCond) {
+        ObjRelease(pElement)
+        ObjRelease(pUIA)
+        return ""
+    }
+    ; IUIAutomationElement::FindAll (vtable slot 6)
+    ; TreeScope_Descendants = 4
+    pArray := 0
+    DllCall(NumGet(elemVT + 0, 6 * A_PtrSize, "Ptr"), "Ptr", pElement, "Int", 4
+        , "Ptr", pCond, "Ptr*", pArray, "Int")
+    result := ""
+    if (pArray) {
+        arrVT := NumGet(pArray + 0, 0, "Ptr")
+        ; IUIAutomationElementArray::get_Length (vtable slot 3)
+        arrLen := 0
+        DllCall(NumGet(arrVT + 0, 3 * A_PtrSize, "Ptr"), "Ptr", pArray, "Int*", arrLen, "Int")
+        Loop, %arrLen% {
+            if (result != "")
+                break
+            ; IUIAutomationElementArray::GetElement (vtable slot 4)
+            pChild := 0
+            DllCall(NumGet(arrVT + 0, 4 * A_PtrSize, "Ptr"), "Ptr", pArray, "Int", A_Index - 1
+                , "Ptr*", pChild, "Int")
+            if (pChild) {
+                childVT := NumGet(pChild + 0, 0, "Ptr")
+                ; get_CurrentName (vtable slot 21)
+                pChildName := 0
+                DllCall(NumGet(childVT + 0, 21 * A_PtrSize, "Ptr"), "Ptr", pChild, "Ptr*", pChildName, "Int")
+                if (pChildName) {
+                    cName := StrGet(pChildName, "UTF-16")
+                    DllCall("OleAut32\SysFreeString", "Ptr", pChildName)
+                    cName := Trim(cName)
+                    if (cName != "" && cName != "system")
+                        result := cName
+                }
+                ObjRelease(pChild)
+            }
+        }
+        ObjRelease(pArray)
+    }
+    ObjRelease(pCond)
+    ObjRelease(pElement)
+    ObjRelease(pUIA)
+    return result
 }
 
 ; Walk IAccessible children of a control and return the first non-empty accName.
@@ -21507,7 +21645,7 @@ NB_GetAccChildrenText(hwnd) {
             name := StrGet(pName, "UTF-16")
             DllCall("OleAut32\SysFreeString", "Ptr", pName)
             name := Trim(name)
-            if (name != "") {
+            if (name != "" && name != "system") {
                 ObjRelease(pAcc)
                 return name
             }
@@ -21539,7 +21677,7 @@ NB_GetAccChildrenText(hwnd) {
                         cName := StrGet(pChildName, "UTF-16")
                         DllCall("OleAut32\SysFreeString", "Ptr", pChildName)
                         cName := Trim(cName)
-                        if (cName != "")
+                        if (cName != "" && cName != "system")
                             result := cName
                     }
                 }
