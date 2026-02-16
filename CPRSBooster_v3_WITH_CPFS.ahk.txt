@@ -23346,14 +23346,15 @@ CF_ApplyTemplate(templatePath) {
         }
 
         liveMatch := liveControls[bestLiveIdx]
+        cfMatchHwnd := liveMatch.hwnd
 
         ; Apply the state change
         if (tplCtrl.type = "checkbox") {
             ; Check current state
-            SendMessage, 0x00F0, 0, 0,, ahk_id % liveMatch.hwnd   ; BM_GETCHECK
+            SendMessage, 0x00F0, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_GETCHECK
             currentChecked := ErrorLevel ? true : false
             if (currentChecked != tplCtrl.checked) {
-                PostMessage, 0x00F5, 0, 0,, ahk_id % liveMatch.hwnd   ; BM_CLICK
+                PostMessage, 0x00F5, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_CLICK
                 totalApplied++
                 Sleep, 150
             }
@@ -23361,31 +23362,27 @@ CF_ApplyTemplate(templatePath) {
         else if (tplCtrl.type = "radio") {
             if (tplCtrl.selected) {
                 ; Only click if not already selected
-                SendMessage, 0x00F0, 0, 0,, ahk_id % liveMatch.hwnd   ; BM_GETCHECK
+                SendMessage, 0x00F0, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_GETCHECK
                 currentSelected := ErrorLevel ? true : false
                 if (!currentSelected) {
-                    PostMessage, 0x00F5, 0, 0,, ahk_id % liveMatch.hwnd   ; BM_CLICK
+                    PostMessage, 0x00F5, 0, 0,, ahk_id %cfMatchHwnd%   ; BM_CLICK
                     totalApplied++
                     Sleep, 150
                 }
             }
         }
         else if (tplCtrl.type = "combo") {
-            ; Try to set by value text first, then by index
-            if (tplCtrl.value != "") {
-                ; Find the item in the combo box by text
-                SendMessage, 0x014D, 0, tplCtrl.value,, ahk_id % liveMatch.hwnd  ; CB_FINDSTRINGEXACT (start=-1=0)
-                ; Actually CB_FINDSTRINGEXACT expects string pointer. Use index instead.
-                if (tplCtrl.valueIdx >= 0) {
-                    SendMessage, 0x014E, tplCtrl.valueIdx, 0,, ahk_id % liveMatch.hwnd   ; CB_SETCURSEL
-                    ; Notify parent of selection change
-                    parentHwnd := DllCall("GetParent", "Ptr", liveMatch.hwnd, "Ptr")
-                    ctrlId := DllCall("GetDlgCtrlID", "Ptr", liveMatch.hwnd, "Int")
-                    wParam := (0x0001 << 16) | ctrlId   ; CBN_SELCHANGE=1 in HIWORD, ctrl ID in LOWORD
-                    PostMessage, 0x0111, wParam, liveMatch.hwnd,, ahk_id %parentHwnd%  ; WM_COMMAND
-                    totalApplied++
-                    Sleep, 150
-                }
+            ; Try to set by index
+            cfComboValIdx := tplCtrl.valueIdx
+            if (cfComboValIdx >= 0) {
+                SendMessage, 0x014E, cfComboValIdx, 0,, ahk_id %cfMatchHwnd%   ; CB_SETCURSEL
+                ; Notify parent of selection change
+                cfComboParent := DllCall("GetParent", "Ptr", cfMatchHwnd, "Ptr")
+                ctrlId := DllCall("GetDlgCtrlID", "Ptr", cfMatchHwnd, "Int")
+                wParam := (0x0001 << 16) | ctrlId   ; CBN_SELCHANGE=1 in HIWORD, ctrl ID in LOWORD
+                PostMessage, 0x0111, wParam, cfMatchHwnd,, ahk_id %cfComboParent%  ; WM_COMMAND
+                totalApplied++
+                Sleep, 150
             }
         }
 
