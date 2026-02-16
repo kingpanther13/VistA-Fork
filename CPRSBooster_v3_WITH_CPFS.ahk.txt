@@ -23293,8 +23293,10 @@ CF_ApplyTemplate(templatePath) {
     totalApplied := 0
     totalNotFound := 0
 
+    cfTotalTpl := templateControls.Length()
     for ti, tplCtrl in templateControls {
-        ToolTip, Applying control %ti%/%templateControls.Length()%: %tplCtrl.label%
+        cfTplLabel := tplCtrl.label
+        ToolTip, Applying control %ti%/%cfTotalTpl%: %cfTplLabel%
 
         ; Find best matching live control
         bestLiveIdx := 0
