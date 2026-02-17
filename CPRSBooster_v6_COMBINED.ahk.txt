@@ -20031,6 +20031,7 @@ NB_TogglePanel:
     else
     {
         Gui, 67:Show, NoActivate
+        WinSet, AlwaysOnTop, On, NursingBoosterPanel
         NB_BoosterGuiVisible := 1
     }
 return
