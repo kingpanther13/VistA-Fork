@@ -20855,7 +20855,11 @@ NB_ApplyTemplate(templatePath) {
         }
     }
 
-    ; --- Step 3: Apply checkbox states (label-first matching) ---
+    ; --- Step 3: Apply checkbox states (depth-ordered, fresh-read) ---
+    ; v5 FIX: Process each depth level separately (parents before children),
+    ; re-enumerate between levels to catch dynamically-revealed children,
+    ; and read each checkbox's current state fresh before toggling to prevent
+    ; stale-read double-toggles (the click-then-unclick bug).
     Loop, %liveGBCount%
     {
         liveIdx := A_Index
@@ -20867,19 +20871,7 @@ NB_ApplyTemplate(templatePath) {
 
         ToolTip, Applying group %liveIdx% (tpl %tplIdx%)...
 
-        liveDescendants := NB_EnumDescendantCheckboxes(gbHwnd)
-
-        ; v5 FIX: Clear resolved labels on parent checkboxes to prevent false
-        ; cross-class label matches. NB_ResolveParentCBLabel can incorrectly
-        ; pick up leaf checkbox labels (like "Other:", "Ostomy") from nearby
-        ; TDlgFieldPanel panels, causing template LEAF items to match the
-        ; wrong live PARENT items. Parent CBs should match positionally only.
-        for k, liveCb in liveDescendants {
-            if (liveCb.className = "TCPRSDialogParentCheckBox")
-                liveCb.label := ""
-        }
-
-        ; Build per-depth arrays for template
+        ; Build template items grouped by depth (this doesn't change)
         tplByDepth := {}
         for k, tplCb in tplGroup {
             d := tplCb.depth
@@ -20888,26 +20880,37 @@ NB_ApplyTemplate(templatePath) {
             tplByDepth[d].Push(tplCb)
         }
 
-        ; Build per-depth arrays for live
-        liveByDepth := {}
-        for k, liveCb in liveDescendants {
-            d := liveCb.depth
-            if (!liveByDepth.HasKey(d))
-                liveByDepth[d] := []
-            liveByDepth[d].Push(liveCb)
-        }
-
-        ; Match items at each depth level using label-first strategy
+        ; Process each depth level in ascending order
+        ; (AHK v1 integer keys enumerate in ascending order)
         for d, tplItems in tplByDepth {
-            if (!liveByDepth.HasKey(d)) {
+
+            ; v5 FIX: Re-enumerate the group fresh for each depth level.
+            ; After toggling depth-0 parents, CPRS may reveal/hide children
+            ; at deeper depths. Re-enumerating catches these changes.
+            liveDescendants := NB_EnumDescendantCheckboxes(gbHwnd)
+
+            ; v5 FIX: Clear resolved labels on parent checkboxes to prevent
+            ; false cross-class label matches (Other:, Ostomy, etc.)
+            for k, liveCb in liveDescendants {
+                if (liveCb.className = "TCPRSDialogParentCheckBox")
+                    liveCb.label := ""
+            }
+
+            ; Filter live items to current depth
+            liveItems := []
+            for k, liveCb in liveDescendants {
+                if (liveCb.depth = d)
+                    liveItems.Push(liveCb)
+            }
+
+            if (liveItems.Length() = 0) {
                 totalNotFound += tplItems.Length()
                 continue
             }
-            liveItems := liveByDepth[d]
+
             claimed := {}
 
-            ; Pass 1: Match all labeled template items by label text
-            ; v5 FIX: Also require class match to prevent cross-class false matches
+            ; Pass 1: Match labeled template items by label text + class
             for k, tplCb in tplItems {
                 if (tplCb.label = "")
                     continue
@@ -20915,20 +20918,16 @@ NB_ApplyTemplate(templatePath) {
                     if (claimed.HasKey(liveJ))
                         continue
                     if (liveCb.label = tplCb.label && liveCb.className = tplCb.cls) {
-                        if (liveCb.checked != tplCb.checked) {
-                            nb_tmpHwnd := liveCb.hwnd
-                            if (DllCall("IsWindow", "Ptr", nb_tmpHwnd)) {
+                        nb_tmpHwnd := liveCb.hwnd
+                        if (DllCall("IsWindow", "Ptr", nb_tmpHwnd)) {
+                            ; v5 FIX: Fresh read of current state right before toggle
+                            SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
+                            currentState := ErrorLevel ? true : false
+                            if (currentState != tplCb.checked) {
                                 PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
-                                ; v5: Verify toggle took effect for leaf checkboxes
-                                Sleep, 200
-                                SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
-                                verifyState := ErrorLevel ? true : false
-                                if (verifyState != tplCb.checked) {
-                                    PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
-                                    Sleep, 200
-                                }
+                                Sleep, 150
+                                totalApplied++
                             }
-                            totalApplied++
                         }
                         claimed[liveJ] := true
                         break
@@ -20936,7 +20935,7 @@ NB_ApplyTemplate(templatePath) {
                 }
             }
 
-            ; Pass 2: Match unlabeled template items to unclaimed live items
+            ; Pass 2: Match unlabeled template items to unclaimed live items positionally
             unclaimedLive := []
             for liveJ, liveCb in liveItems {
                 if (!claimed.HasKey(liveJ))
@@ -20951,28 +20950,20 @@ NB_ApplyTemplate(templatePath) {
             Loop, %innerPosLimit%
             {
                 i := A_Index
-                if (unclaimedLive[i].checked != unlabeledTpl[i].checked) {
-                    nb_tmpHwnd := unclaimedLive[i].hwnd
-                    if (DllCall("IsWindow", "Ptr", nb_tmpHwnd)) {
+                nb_tmpHwnd := unclaimedLive[i].hwnd
+                if (DllCall("IsWindow", "Ptr", nb_tmpHwnd)) {
+                    ; v5 FIX: Fresh read of current state right before toggle
+                    SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
+                    currentState := ErrorLevel ? true : false
+                    if (currentState != unlabeledTpl[i].checked) {
                         PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
-                        ; v5: Longer sleep for parent CBs + verify toggle took effect
-                        if (unclaimedLive[i].className = "TCPRSDialogParentCheckBox") {
-                            Sleep, 300
-                            SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
-                            verifyState := ErrorLevel ? true : false
-                            if (verifyState != unlabeledTpl[i].checked) {
-                                PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
-                                Sleep, 300
-                            }
-                        } else {
-                            Sleep, 200
-                        }
+                        Sleep, 150
+                        totalApplied++
                     }
-                    totalApplied++
                 }
             }
 
-            ; Count unmatched
+            ; Count unmatched items at this depth
             claimedCount := 0
             for k in claimed
                 claimedCount++
@@ -20980,9 +20971,13 @@ NB_ApplyTemplate(templatePath) {
             if (tplItems.Length() > totalMatched)
                 totalNotFound += tplItems.Length() - totalMatched
 
-            ; v5: Dismiss popups more frequently to prevent blocking
+            ; Dismiss popups between depths
             if (Mod(totalApplied, 5) = 0)
                 NB_DismissIntermediatePopups()
+
+            ; v5 FIX: Let CPRS cascade effects settle between depth levels
+            ; so parent toggles fully propagate before processing children
+            Sleep, 300
         }
 
         NB_DismissIntermediatePopups()
