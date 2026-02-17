@@ -20600,13 +20600,14 @@ return
 
 
 ;============================================================================================
-; NURSING BOOSTER - APPLY TEMPLATE (format v3/v4 - positional matching)
+; NURSING BOOSTER - APPLY TEMPLATE (format v3/v4 - iterative positional)
 ;
 ; Phase 1: Expand/collapse top-level sections to match template.
 ; Phase 2: Match TGroupBox groups by label overlap / fingerprint.
-; Phase 3: Pure positional apply — template item N maps to live item N.
-;           Starting state is always all-unchecked, so positions are
-;           deterministic. Fresh BM_GETCHECK before each toggle.
+; Step 2:  Iterate each group top-to-bottom, one item at a time.
+;          After toggling a parent, re-enumerate the group because CPRS
+;          dynamically creates/destroys child controls. This keeps
+;          positional alignment as the dialog structure evolves.
 ;============================================================================================
 
 NB_ApplyTemplate(templatePath) {
@@ -20801,10 +20802,12 @@ NB_ApplyTemplate(templatePath) {
         groupMap[unmatchedLive[A_Index]] := unmatchedTpl[A_Index]
     }
 
-    ; --- Step 2: Apply checkbox states (pure positional) ---
-    ; Starting state is always all-unchecked, so enumeration order is
-    ; deterministic. Template item N maps directly to live item N.
-    ; Fresh BM_GETCHECK before each toggle to prevent stale-read issues.
+    ; --- Step 2: Apply checkbox states (iterative top-to-bottom) ---
+    ; Process each group one template item at a time. After toggling a
+    ; parent checkbox, re-enumerate the group because CPRS dynamically
+    ; creates/destroys child controls when parents change state.
+    ; This ensures dynamic children appear at the correct positions
+    ; before we try to match subsequent template items.
     Loop, %liveGBCount%
     {
         liveIdx := A_Index
@@ -20813,21 +20816,32 @@ NB_ApplyTemplate(templatePath) {
         tplIdx := groupMap[liveIdx]
         gbHwnd := liveGroupBoxes[liveIdx]
         tplGroup := templateGroups[tplIdx]
+        tplCount := tplGroup.Length()
 
         ToolTip, Applying group %liveIdx%/%liveGBCount% (tpl %tplIdx%)...
 
-        ; Enumerate live checkboxes in Y-sorted order (top to bottom)
+        ; Initial enumeration
         liveDescendants := NB_EnumDescendantCheckboxes(gbHwnd)
-        liveCount := liveDescendants.Length()
-        tplCount := tplGroup.Length()
+        needReEnum := false
 
-        ; Positional matching: process min(tplCount, liveCount) items
-        limit := tplCount < liveCount ? tplCount : liveCount
-        Loop, %limit%
+        tplPos := 1
+        while (tplPos <= tplCount)
         {
-            i := A_Index
-            tplCb := tplGroup[i]
-            liveCb := liveDescendants[i]
+            ; Re-enumerate if a parent toggle may have changed structure
+            if (needReEnum) {
+                liveDescendants := NB_EnumDescendantCheckboxes(gbHwnd)
+                needReEnum := false
+            }
+
+            liveCount := liveDescendants.Length()
+            if (tplPos > liveCount) {
+                totalNotFound++
+                tplPos++
+                continue
+            }
+
+            tplCb := tplGroup[tplPos]
+            liveCb := liveDescendants[tplPos]
 
             nb_tmpHwnd := liveCb.hwnd
             if (DllCall("IsWindow", "Ptr", nb_tmpHwnd)) {
@@ -20836,19 +20850,24 @@ NB_ApplyTemplate(templatePath) {
                 currentState := ErrorLevel ? true : false
                 if (currentState != tplCb.checked) {
                     PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
-                    Sleep, 150
                     totalApplied++
+
+                    ; Parent toggles create/destroy children — must re-enumerate
+                    if (liveCb.className = "TCPRSDialogParentCheckBox") {
+                        Sleep, 300
+                        needReEnum := true
+                    } else {
+                        Sleep, 50
+                    }
                 }
             }
 
+            tplPos++
+
             ; Dismiss popups periodically
-            if (Mod(totalApplied, 10) = 0)
+            if (Mod(totalApplied, 15) = 0)
                 NB_DismissIntermediatePopups()
         }
-
-        ; Track template items that had no live match
-        if (tplCount > liveCount)
-            totalNotFound += tplCount - liveCount
 
         NB_DismissIntermediatePopups()
     }
