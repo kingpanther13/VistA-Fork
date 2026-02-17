@@ -20540,7 +20540,8 @@ NB_BtnSaveCurrentState:
     ; Build JSON
     json := "{"
     json .= "`n  ""name"": " . NB_EscJson(templateName) . ","
-    json .= "`n  ""format"": 3,"
+    json .= "`n  ""format"": 4,"
+    json .= "`n  ""matching"": ""positional"","
     FormatTime, nowTime,, yyyy-MM-dd HH:mm
     json .= "`n  ""created"": """ . nowTime . ""","
     WinGetTitle, dlgTitle, ahk_id %dlgHwnd%
@@ -20599,11 +20600,13 @@ return
 
 
 ;============================================================================================
-; NURSING BOOSTER - APPLY TEMPLATE (format v3 - structural matching)
+; NURSING BOOSTER - APPLY TEMPLATE (format v3/v4 - positional matching)
 ;
 ; Phase 1: Expand/collapse top-level sections to match template.
-; Phase 2: For each TGroupBox, match descendant checkboxes by local
-;          enumeration index and set their states.
+; Phase 2: Match TGroupBox groups by label overlap / fingerprint.
+; Phase 3: Pure positional apply — template item N maps to live item N.
+;           Starting state is always all-unchecked, so positions are
+;           deterministic. Fresh BM_GETCHECK before each toggle.
 ;============================================================================================
 
 NB_ApplyTemplate(templatePath) {
@@ -20618,8 +20621,10 @@ NB_ApplyTemplate(templatePath) {
         return
     }
 
-    ; Require format v3
-    if !(InStr(content, """format"": 3") || InStr(content, """format"":3")) {
+    ; Require format v3 or v4
+    hasV3 := (InStr(content, """format"": 3") || InStr(content, """format"":3"))
+    hasV4 := (InStr(content, """format"": 4") || InStr(content, """format"":4"))
+    if !(hasV3 || hasV4) {
         MsgBox, 48, %NB_AppTitle%, This template must be re-saved with the updated Nursing Booster.`n`n1. Open the reminder dialog in CPRS and fill it out`n2. Select 'Save Template' to create a new version`n`nOld templates (format 1/2) are not compatible.
         return
     }
@@ -20672,14 +20677,13 @@ NB_ApplyTemplate(templatePath) {
         }
     }
 
-    ; === PHASE 2: Match groups, expand, apply states ===
+    ; === PHASE 2: Match groups and apply states ===
     liveGroupBoxes := NB_EnumScrollBoxGroupBoxes(scrollBox)
 
     totalApplied := 0
     totalNotFound := 0
-    totalExpanded := 0
 
-    ; --- Step 1: Match groups BEFORE expansion using label overlap ---
+    ; --- Step 1: Match groups using label overlap / fingerprint ---
     groupMap := {}
     usedTpl := {}
     usedLive := {}
@@ -20797,7 +20801,10 @@ NB_ApplyTemplate(templatePath) {
         groupMap[unmatchedLive[A_Index]] := unmatchedTpl[A_Index]
     }
 
-    ; --- Step 2: Expansion pass (using correct group mapping) ---
+    ; --- Step 2: Apply checkbox states (pure positional) ---
+    ; Starting state is always all-unchecked, so enumeration order is
+    ; deterministic. Template item N maps directly to live item N.
+    ; Fresh BM_GETCHECK before each toggle to prevent stale-read issues.
     Loop, %liveGBCount%
     {
         liveIdx := A_Index
@@ -20807,124 +20814,24 @@ NB_ApplyTemplate(templatePath) {
         gbHwnd := liveGroupBoxes[liveIdx]
         tplGroup := templateGroups[tplIdx]
 
-        ToolTip, Expanding group %liveIdx%/%liveGBCount%...
+        ToolTip, Applying group %liveIdx%/%liveGBCount% (tpl %tplIdx%)...
 
-        Loop, 8
-        {
-            liveDesc := NB_EnumDescendantCheckboxes(gbHwnd)
-            if (liveDesc.Length() >= tplGroup.Length())
-                break
-
-            expandedAny := false
-            currentDepth := 0
-
-            while (currentDepth <= 4 && !expandedAny) {
-                tplAtDepth := []
-                for k, tplCb in tplGroup {
-                    if (tplCb.depth = currentDepth && tplCb.cls = "TCPRSDialogParentCheckBox")
-                        tplAtDepth.Push(tplCb)
-                }
-
-                liveAtDepth := []
-                for k, liveCb in liveDesc {
-                    if (liveCb.depth = currentDepth && liveCb.className = "TCPRSDialogParentCheckBox")
-                        liveAtDepth.Push(liveCb)
-                }
-
-                innerLimit := tplAtDepth.Length() < liveAtDepth.Length() ? tplAtDepth.Length() : liveAtDepth.Length()
-                Loop, %innerLimit%
-                {
-                    i := A_Index
-                    if (tplAtDepth[i].checked && !liveAtDepth[i].checked) {
-                        nb_tmpHwnd := liveAtDepth[i].hwnd
-                        if (DllCall("IsWindow", "Ptr", nb_tmpHwnd))
-                            PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
-                        expandedAny := true
-                        totalExpanded++
-                        Sleep, 500
-                        NB_DismissIntermediatePopups()
-                    }
-                }
-                currentDepth++
-            }
-
-            if (!expandedAny)
-                break
-
-            Sleep, 600
-        }
-    }
-
-    ; --- Step 3: Apply checkbox states (sequential top-to-bottom) ---
-    ; v5: Walk template and live items in order, top to bottom.
-    ; Labeled items act as anchors (search forward for label+class match).
-    ; Unlabeled items search forward for matching depth+class.
-    ; Fresh BM_GETCHECK before every toggle to prevent stale-read double-toggles.
-    Loop, %liveGBCount%
-    {
-        liveIdx := A_Index
-        if (!groupMap.HasKey(liveIdx))
-            continue
-        tplIdx := groupMap[liveIdx]
-        gbHwnd := liveGroupBoxes[liveIdx]
-        tplGroup := templateGroups[tplIdx]
-
-        ToolTip, Applying group %liveIdx% (tpl %tplIdx%)...
-
-        ; Enumerate live checkboxes in tree order (top to bottom)
+        ; Enumerate live checkboxes in Y-sorted order (top to bottom)
         liveDescendants := NB_EnumDescendantCheckboxes(gbHwnd)
-
-        ; Clear resolved labels on parent checkboxes to prevent
-        ; false cross-class label matches (Other:, Ostomy, etc.)
-        for k, liveCb in liveDescendants {
-            if (liveCb.className = "TCPRSDialogParentCheckBox")
-                liveCb.label := ""
-        }
-
-        livePos := 1
         liveCount := liveDescendants.Length()
+        tplCount := tplGroup.Length()
 
-        for tplK, tplCb in tplGroup {
-            if (livePos > liveCount) {
-                totalNotFound++
-                continue
-            }
+        ; Positional matching: process min(tplCount, liveCount) items
+        limit := tplCount < liveCount ? tplCount : liveCount
+        Loop, %limit%
+        {
+            i := A_Index
+            tplCb := tplGroup[i]
+            liveCb := liveDescendants[i]
 
-            matchIdx := 0
-
-            if (tplCb.label != "") {
-                ; Labeled item: search forward for label + class match
-                searchPos := livePos
-                while (searchPos <= liveCount) {
-                    liveCb := liveDescendants[searchPos]
-                    if (liveCb.label = tplCb.label && liveCb.className = tplCb.cls) {
-                        matchIdx := searchPos
-                        break
-                    }
-                    searchPos++
-                }
-            } else {
-                ; Unlabeled item: search forward for depth + class match
-                searchPos := livePos
-                while (searchPos <= liveCount) {
-                    liveCb := liveDescendants[searchPos]
-                    if (liveCb.label = "" && liveCb.depth = tplCb.depth && liveCb.className = tplCb.cls) {
-                        matchIdx := searchPos
-                        break
-                    }
-                    searchPos++
-                }
-            }
-
-            if (matchIdx = 0) {
-                totalNotFound++
-                continue
-            }
-
-            ; Match found — read fresh state and toggle if needed
-            liveCb := liveDescendants[matchIdx]
             nb_tmpHwnd := liveCb.hwnd
             if (DllCall("IsWindow", "Ptr", nb_tmpHwnd)) {
+                ; Fresh state read right before toggle decision
                 SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
                 currentState := ErrorLevel ? true : false
                 if (currentState != tplCb.checked) {
@@ -20934,13 +20841,14 @@ NB_ApplyTemplate(templatePath) {
                 }
             }
 
-            ; Advance past this match
-            livePos := matchIdx + 1
-
             ; Dismiss popups periodically
             if (Mod(totalApplied, 10) = 0)
                 NB_DismissIntermediatePopups()
         }
+
+        ; Track template items that had no live match
+        if (tplCount > liveCount)
+            totalNotFound += tplCount - liveCount
 
         NB_DismissIntermediatePopups()
     }
