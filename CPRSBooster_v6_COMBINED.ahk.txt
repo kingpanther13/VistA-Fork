@@ -104,6 +104,7 @@ global NB_TemplateDir := onedrivelocal . "\NursingTemplates"
 global NB_LogDir := onedrivelocal . "\NursingTemplates\Logs"
 global NB_MacroDir := onedrivelocal . "\NursingTemplates\KeyMacros"
 global NB_BoosterGuiVisible := 0
+global NB_ApplySpeed := 300  ; ms delay after parent toggle (slider range 50-1000)
 global NB_CPRSDetected := 0
 global NB_HotkeyConfigPath := onedrivelocal . "\NursingTemplates\hotkey_buttons.json"
 global NB_HK1_Label := "Quick 1"
@@ -759,10 +760,14 @@ Gui, 67:Add, Button, x147 y183 w68 h24 gNB_HK3_Run vNB_HK3_Btn, %NB_HK3_Label%
 Gui, 67:Add, Button, x218 y183 w68 h24 gNB_HK4_Run vNB_HK4_Btn, %NB_HK4_Label%
 Gui, 67:Add, Button, x289 y183 w68 h24 gNB_HK5_Run vNB_HK5_Btn, %NB_HK5_Label%
 Gui, 67:Add, Button, x360 y183 w20 h24 gNB_HK_Setup, ...
+Gui, 67:Font, s7 c00FF88, Segoe UI
+Gui, 67:Add, Text, x5 y210 w80 h16 BackgroundTrans, Apply Speed:
+Gui, 67:Add, Slider, x85 y208 w210 h22 vNB_SpeedSlider gNB_SpeedSliderChanged Range50-1000 TickInterval100 ToolTip, %NB_ApplySpeed%
+Gui, 67:Add, Text, x300 y210 w80 h16 BackgroundTrans vNB_SpeedLabel, %NB_ApplySpeed% ms
 Gui, 67:Font, s7 cSilver, Segoe UI
-Gui, 67:Add, Text, x5 y210 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected | CPFS: Not detected
+Gui, 67:Add, Text, x5 y234 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected | CPFS: Not detected
 Gui, 67:+AlwaysOnTop -Caption +ToolWindow
-Gui, 67:Show, x0 y0 w385 h230 Hide, NursingBoosterPanel
+Gui, 67:Show, x0 y0 w385 h255 Hide, NursingBoosterPanel
 NB_BoosterGuiVisible := 0
 
 ; --- NursingBooster: Start CPRS detection timer ---
@@ -20084,6 +20089,12 @@ NB_DragPanel:
     PostMessage, 0xA1, 2, 0,, NursingBoosterPanel
 return
 
+NB_SpeedSliderChanged:
+    Gui, 67:Submit, NoHide
+    NB_ApplySpeed := NB_SpeedSlider
+    GuiControl, 67:, NB_SpeedLabel, %NB_ApplySpeed% ms
+return
+
 
 ;============================================================================================
 ; CP FLOWSHEETS PANEL BUTTON HANDLERS
@@ -20504,7 +20515,7 @@ NB_ApplyNamedTemplate(templateName) {
 
 
 ;============================================================================================
-; NURSING BOOSTER - SAVE TEMPLATE (format v5 - flat top-to-bottom)
+; NURSING BOOSTER - SAVE TEMPLATE (format v6 - flat top-to-bottom)
 ;
 ; Captures ALL checkboxes in the scroll box as one flat Y-sorted list.
 ; Includes section toggles, group items, children, grandchildren — everything.
@@ -20541,7 +20552,7 @@ NB_BtnSaveCurrentState:
     ; Build JSON — flat list
     json := "{"
     json .= "`n  ""name"": " . NB_EscJson(templateName) . ","
-    json .= "`n  ""format"": 5,"
+    json .= "`n  ""format"": 6,"
     json .= "`n  ""matching"": ""flat-sequential"","
     FormatTime, nowTime,, yyyy-MM-dd HH:mm
     json .= "`n  ""created"": """ . nowTime . ""","
@@ -20581,7 +20592,7 @@ return
 
 
 ;============================================================================================
-; NURSING BOOSTER - APPLY TEMPLATE (format v5 - flat sequential)
+; NURSING BOOSTER - APPLY TEMPLATE (format v6 - flat sequential)
 ;
 ; Treats the ENTIRE dialog as one flat top-to-bottom list.
 ; No separate phases for sections vs groups. Processes item by item:
@@ -20591,7 +20602,7 @@ return
 ;============================================================================================
 
 NB_ApplyTemplate(templatePath) {
-    global NB_AppTitle, NB_TemplateDir
+    global NB_AppTitle, NB_TemplateDir, NB_ApplySpeed
     dlgHwnd := NB_FindActiveDialogWindow()
     if (!dlgHwnd)
         return
@@ -20602,8 +20613,8 @@ NB_ApplyTemplate(templatePath) {
         return
     }
 
-    ; Require format v5 (flat)
-    if !(InStr(content, """format"": 5") || InStr(content, """format"":5")) {
+    ; Require format v6 (flat)
+    if !(InStr(content, """format"": 6") || InStr(content, """format"":6")) {
         MsgBox, 48, %NB_AppTitle%, This template must be re-saved with the updated Nursing Booster (v6).`n`n1. Open the reminder dialog in CPRS and fill it out`n2. Select 'Save Template' to create a new version
         return
     }
@@ -20669,10 +20680,13 @@ NB_ApplyTemplate(templatePath) {
 
                 ; Parent toggles create/destroy children — must re-enumerate
                 if (liveCb.className = "TCPRSDialogParentCheckBox") {
-                    Sleep, 300
+                    Sleep, %NB_ApplySpeed%
                     needReEnum := true
                 } else {
-                    Sleep, 50
+                    leafDelay := NB_ApplySpeed // 6
+                    if (leafDelay < 20)
+                        leafDelay := 20
+                    Sleep, %leafDelay%
                 }
             }
         }
@@ -21228,7 +21242,7 @@ NB_EnumTopLevelParents(scrollBoxHwnd) {
 NB_ParseFlatCheckboxes(jsonContent) {
     items := []
 
-    ; Find the "checkboxes" array (top-level, format v5)
+    ; Find the "checkboxes" array (top-level, format v6)
     cPos := InStr(jsonContent, """checkboxes""")
     if (!cPos)
         return items
