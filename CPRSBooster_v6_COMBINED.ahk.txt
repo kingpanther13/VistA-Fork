@@ -20090,8 +20090,7 @@ NB_DragPanel:
 return
 
 NB_SpeedSliderChanged:
-    Gui, 67:Submit, NoHide
-    NB_ApplySpeed := NB_SpeedSlider
+    GuiControlGet, NB_ApplySpeed, 67:, NB_SpeedSlider
     GuiControl, 67:, NB_SpeedLabel, %NB_ApplySpeed% ms
 return
 
