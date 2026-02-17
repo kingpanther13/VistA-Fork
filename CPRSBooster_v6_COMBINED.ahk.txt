@@ -20504,7 +20504,11 @@ NB_ApplyNamedTemplate(templateName) {
 
 
 ;============================================================================================
-; NURSING BOOSTER - SAVE TEMPLATE (format v3 - structural matching)
+; NURSING BOOSTER - SAVE TEMPLATE (format v5 - flat top-to-bottom)
+;
+; Captures ALL checkboxes in the scroll box as one flat Y-sorted list.
+; Includes section toggles, group items, children, grandchildren — everything.
+; No separate topLevelParents or groups — just one ordered list.
 ;============================================================================================
 
 NB_BtnSaveCurrentState:
@@ -20521,66 +20525,43 @@ NB_BtnSaveCurrentState:
     ToolTip, Scanning dialog...
     NB_WaitForStableCheckboxCount(dlgHwnd)
 
-    ; Get scrollbox and top-level parents
     scrollBox := NB_FindVisibleScrollBox(dlgHwnd)
     if (!scrollBox) {
         MsgBox, 48, %NB_AppTitle%, Could not find dialog scroll area.
         return
     }
 
-    tlParents := NB_EnumTopLevelParents(scrollBox)
-    if (tlParents.Length() = 0) {
-        MsgBox, 48, %NB_AppTitle%, No sections found in dialog.
+    ; Enumerate ALL checkboxes in the entire scroll box (flat, Y-sorted)
+    allItems := NB_EnumDescendantCheckboxes(scrollBox)
+    if (allItems.Length() = 0) {
+        MsgBox, 48, %NB_AppTitle%, No checkboxes found in dialog.
         return
     }
 
-    ; Get all TGroupBoxes that are direct children of the scrollbox
-    allGroupBoxes := NB_EnumScrollBoxGroupBoxes(scrollBox)
-
-    ; Build JSON
+    ; Build JSON — flat list
     json := "{"
     json .= "`n  ""name"": " . NB_EscJson(templateName) . ","
-    json .= "`n  ""format"": 4,"
-    json .= "`n  ""matching"": ""positional"","
+    json .= "`n  ""format"": 5,"
+    json .= "`n  ""matching"": ""flat-sequential"","
     FormatTime, nowTime,, yyyy-MM-dd HH:mm
     json .= "`n  ""created"": """ . nowTime . ""","
     WinGetTitle, dlgTitle, ahk_id %dlgHwnd%
     json .= "`n  ""source_dialogue"": " . NB_EscJson(dlgTitle) . ","
 
-    ; Top-level parent states
-    json .= "`n  ""topLevelParents"": ["
-    for i, tlp in tlParents {
-        if (i > 1)
-            json .= ", "
-        json .= tlp.checked ? "true" : "false"
-    }
-    json .= "],"
-
-    ; Groups: each TGroupBox with its descendant checkboxes
-    json .= "`n  ""groups"": ["
     totalChecked := 0
-    totalControls := 0
-    for gi, gbHwnd in allGroupBoxes {
-        if (gi > 1)
+    totalControls := allItems.Length()
+    json .= "`n  ""checkboxes"": ["
+    for ci, cb in allItems {
+        if (ci > 1)
             json .= ","
-        json .= "`n    {""checkboxes"": ["
-
-        ; Enumerate all descendant checkboxes within this TGroupBox
-        descendants := NB_EnumDescendantCheckboxes(gbHwnd)
-        for ci, cb in descendants {
-            if (ci > 1)
-                json .= ","
-            json .= "`n      {""idx"": " . (ci - 1) . ", ""cls"": " . NB_EscJson(cb.className)
-                . ", ""checked"": " . (cb.checked ? "true" : "false")
-                . ", ""depth"": " . cb.depth
-            if (cb.label != "")
-                json .= ", ""label"": " . NB_EscJson(cb.label)
-            json .= "}"
-            totalControls++
-            if (cb.checked)
-                totalChecked++
-        }
-        json .= "`n    ]}"
+        json .= "`n    {""idx"": " . (ci - 1) . ", ""cls"": " . NB_EscJson(cb.className)
+            . ", ""checked"": " . (cb.checked ? "true" : "false")
+            . ", ""depth"": " . cb.depth
+        if (cb.label != "")
+            json .= ", ""label"": " . NB_EscJson(cb.label)
+        json .= "}"
+        if (cb.checked)
+            totalChecked++
     }
     json .= "`n  ]"
     json .= "`n}"
@@ -20590,24 +20571,23 @@ NB_BtnSaveCurrentState:
     f.Write(json)
     f.Close()
 
-    ; Log every checkbox state
+    ; Log using group-based view for readability
+    allGroupBoxes := NB_EnumScrollBoxGroupBoxes(scrollBox)
     NB__LogCheckboxStates("SAVE", allGroupBoxes, templateName, dlgTitle, totalChecked, totalControls)
 
-    groupCount := allGroupBoxes.Length()
-    ToolTip, Saved "%templateName%": %totalChecked%/%totalControls% checked across %groupCount% groups
+    ToolTip, Saved "%templateName%": %totalChecked%/%totalControls% checkboxes
     SetTimer, NB_ClearToolTip, -3000
 return
 
 
 ;============================================================================================
-; NURSING BOOSTER - APPLY TEMPLATE (format v3/v4 - iterative positional)
+; NURSING BOOSTER - APPLY TEMPLATE (format v5 - flat sequential)
 ;
-; Phase 1: Expand/collapse top-level sections to match template.
-; Phase 2: Match TGroupBox groups by label overlap / fingerprint.
-; Step 2:  Iterate each group top-to-bottom, one item at a time.
-;          After toggling a parent, re-enumerate the group because CPRS
-;          dynamically creates/destroys child controls. This keeps
-;          positional alignment as the dialog structure evolves.
+; Treats the ENTIRE dialog as one flat top-to-bottom list.
+; No separate phases for sections vs groups. Processes item by item:
+; section toggle → its children → their grandchildren → next section.
+; Re-enumerates the whole scroll box after every parent toggle so
+; dynamically created children appear at the correct positions.
 ;============================================================================================
 
 NB_ApplyTemplate(templatePath) {
@@ -20622,22 +20602,20 @@ NB_ApplyTemplate(templatePath) {
         return
     }
 
-    ; Require format v3 or v4
-    hasV3 := (InStr(content, """format"": 3") || InStr(content, """format"":3"))
-    hasV4 := (InStr(content, """format"": 4") || InStr(content, """format"":4"))
-    if !(hasV3 || hasV4) {
-        MsgBox, 48, %NB_AppTitle%, This template must be re-saved with the updated Nursing Booster.`n`n1. Open the reminder dialog in CPRS and fill it out`n2. Select 'Save Template' to create a new version`n`nOld templates (format 1/2) are not compatible.
+    ; Require format v5 (flat)
+    if !(InStr(content, """format"": 5") || InStr(content, """format"":5")) {
+        MsgBox, 48, %NB_AppTitle%, This template must be re-saved with the updated Nursing Booster (v6).`n`n1. Open the reminder dialog in CPRS and fill it out`n2. Select 'Save Template' to create a new version
         return
     }
 
-    ; Parse template
-    tlpStates := NB_ParseTopLevelParents(content)
-    templateGroups := NB_ParseGroups(content)
-
-    if (templateGroups.Length() = 0) {
-        MsgBox, 48, %NB_AppTitle%, Template has no groups.
+    ; Parse flat checkbox list from template
+    tplItems := NB_ParseFlatCheckboxes(content)
+    if (tplItems.Length() = 0) {
+        MsgBox, 48, %NB_AppTitle%, Template has no checkboxes.
         return
     }
+
+    tplCount := tplItems.Length()
 
     ; Wait for dialog to load
     ToolTip, Waiting for dialog to load...
@@ -20649,236 +20627,73 @@ NB_ApplyTemplate(templatePath) {
         return
     }
 
-    ; === PHASE 1: Expand/collapse top-level sections ===
-    expandCount := 0
-    if (tlpStates.Length() > 0) {
-        liveTopParents := NB_EnumTopLevelParents(scrollBox)
-        limit := tlpStates.Length() < liveTopParents.Length() ? tlpStates.Length() : liveTopParents.Length()
-
-        ToolTip, Setting up %limit% sections...
-        Loop, %limit%
-        {
-            liveCb := liveTopParents[A_Index]
-            nb_tmpHwnd := liveCb.hwnd
-            SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
-            currentState := ErrorLevel ? true : false
-            desired := tlpStates[A_Index]
-
-            if (currentState != desired) {
-                PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
-                expandCount++
-                Sleep, 500
-                NB_DismissIntermediatePopups()
-            }
-        }
-
-        if (expandCount > 0) {
-            ToolTip, Expanded %expandCount% sections - waiting for controls...
-            NB_WaitForStableCheckboxCount(dlgHwnd)
-        }
-    }
-
-    ; === PHASE 2: Match groups and apply states ===
-    liveGroupBoxes := NB_EnumScrollBoxGroupBoxes(scrollBox)
-
     totalApplied := 0
     totalNotFound := 0
 
-    ; --- Step 1: Match groups using label overlap / fingerprint ---
-    groupMap := {}
-    usedTpl := {}
-    usedLive := {}
+    ; Enumerate ALL checkboxes in the scroll box (flat, Y-sorted)
+    liveItems := NB_EnumDescendantCheckboxes(scrollBox)
+    needReEnum := false
 
-    ; Build template label sets
-    tplLabelSets := []
-    for tplIdx, tplGroup in templateGroups {
-        labels := {}
-        for k, tplCb in tplGroup {
-            if (tplCb.label != "")
-                labels[tplCb.label] := true
-        }
-        tplLabelSets.Push(labels)
-    }
+    ToolTip, Applying %tplCount% items...
 
-    ; Build live base label sets and fingerprints
-    liveLabelSets := []
-    liveFPs := []
-    liveGBCount := liveGroupBoxes.Length()
-    Loop, %liveGBCount%
+    ; Walk the template top-to-bottom, one item at a time.
+    ; After toggling any parent, re-enumerate the entire scroll box
+    ; so dynamically created children appear at the correct positions.
+    tplPos := 1
+    while (tplPos <= tplCount)
     {
-        desc := NB_EnumDescendantCheckboxes(liveGroupBoxes[A_Index])
-        labels := {}
-        for k, cb in desc {
-            if (cb.label != "")
-                labels[cb.label] := true
+        ; Re-enumerate if a parent toggle changed the dialog structure
+        if (needReEnum) {
+            liveItems := NB_EnumDescendantCheckboxes(scrollBox)
+            needReEnum := false
         }
-        liveLabelSets.Push(labels)
-        liveFPs.Push(NB__GroupFingerprint(desc))
-    }
 
-    ; Build template fingerprints
-    tplFPs := []
-    for tplIdx, tplGroup in templateGroups {
-        tplFPs.Push(NB__GroupFingerprint(tplGroup))
-    }
-
-    ; Pass 1: Match groups that have labels by label overlap
-    Loop, % liveLabelSets.Length()
-    {
-        liveIdx := A_Index
-        liveLabels := liveLabelSets[liveIdx]
-        liveHasLabels := false
-        for lbl in liveLabels {
-            liveHasLabels := true
-            break
-        }
-        if (!liveHasLabels)
+        liveCount := liveItems.Length()
+        if (tplPos > liveCount) {
+            totalNotFound++
+            tplPos++
             continue
-
-        bestTpl := 0
-        bestOverlap := 0
-        matchCount := 0
-        Loop, % tplLabelSets.Length()
-        {
-            tplIdx := A_Index
-            if (usedTpl.HasKey(tplIdx))
-                continue
-            overlap := 0
-            for lbl in liveLabels {
-                if (tplLabelSets[tplIdx].HasKey(lbl))
-                    overlap++
-            }
-            if (overlap > bestOverlap) {
-                bestOverlap := overlap
-                bestTpl := tplIdx
-                matchCount := 1
-            } else if (overlap = bestOverlap && overlap > 0) {
-                matchCount++
-            }
         }
-        if (bestTpl > 0 && matchCount = 1) {
-            groupMap[liveIdx] := bestTpl
-            usedTpl[bestTpl] := true
-            usedLive[liveIdx] := true
-        }
-    }
 
-    ; Pass 2: Match remaining groups by fingerprint
-    Loop, % liveFPs.Length()
-    {
-        liveIdx := A_Index
-        if (usedLive.HasKey(liveIdx))
-            continue
-        matches := []
-        Loop, % tplFPs.Length()
-        {
-            tplIdx := A_Index
-            if (!usedTpl.HasKey(tplIdx) && liveFPs[liveIdx] = tplFPs[tplIdx])
-                matches.Push(tplIdx)
-        }
-        if (matches.Length() = 1) {
-            groupMap[liveIdx] := matches[1]
-            usedTpl[matches[1]] := true
-            usedLive[liveIdx] := true
-        }
-    }
+        tplCb := tplItems[tplPos]
+        liveCb := liveItems[tplPos]
 
-    ; Pass 3: Remaining unmatched groups by relative Y-position
-    unmatchedTpl := []
-    Loop, % tplFPs.Length()
-    {
-        if (!usedTpl.HasKey(A_Index))
-            unmatchedTpl.Push(A_Index)
-    }
-    unmatchedLive := []
-    Loop, % liveFPs.Length()
-    {
-        if (!usedLive.HasKey(A_Index))
-            unmatchedLive.Push(A_Index)
-    }
-    posLimit := unmatchedTpl.Length() < unmatchedLive.Length() ? unmatchedTpl.Length() : unmatchedLive.Length()
-    Loop, %posLimit%
-    {
-        groupMap[unmatchedLive[A_Index]] := unmatchedTpl[A_Index]
-    }
+        nb_tmpHwnd := liveCb.hwnd
+        if (DllCall("IsWindow", "Ptr", nb_tmpHwnd)) {
+            ; Fresh state read right before toggle decision
+            SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
+            currentState := ErrorLevel ? true : false
+            if (currentState != tplCb.checked) {
+                PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
+                totalApplied++
 
-    ; --- Step 2: Apply checkbox states (iterative top-to-bottom) ---
-    ; Process each group one template item at a time. After toggling a
-    ; parent checkbox, re-enumerate the group because CPRS dynamically
-    ; creates/destroys child controls when parents change state.
-    ; This ensures dynamic children appear at the correct positions
-    ; before we try to match subsequent template items.
-    Loop, %liveGBCount%
-    {
-        liveIdx := A_Index
-        if (!groupMap.HasKey(liveIdx))
-            continue
-        tplIdx := groupMap[liveIdx]
-        gbHwnd := liveGroupBoxes[liveIdx]
-        tplGroup := templateGroups[tplIdx]
-        tplCount := tplGroup.Length()
-
-        ToolTip, Applying group %liveIdx%/%liveGBCount% (tpl %tplIdx%)...
-
-        ; Initial enumeration
-        liveDescendants := NB_EnumDescendantCheckboxes(gbHwnd)
-        needReEnum := false
-
-        tplPos := 1
-        while (tplPos <= tplCount)
-        {
-            ; Re-enumerate if a parent toggle may have changed structure
-            if (needReEnum) {
-                liveDescendants := NB_EnumDescendantCheckboxes(gbHwnd)
-                needReEnum := false
-            }
-
-            liveCount := liveDescendants.Length()
-            if (tplPos > liveCount) {
-                totalNotFound++
-                tplPos++
-                continue
-            }
-
-            tplCb := tplGroup[tplPos]
-            liveCb := liveDescendants[tplPos]
-
-            nb_tmpHwnd := liveCb.hwnd
-            if (DllCall("IsWindow", "Ptr", nb_tmpHwnd)) {
-                ; Fresh state read right before toggle decision
-                SendMessage, 0x00F0, 0, 0,, ahk_id %nb_tmpHwnd%
-                currentState := ErrorLevel ? true : false
-                if (currentState != tplCb.checked) {
-                    PostMessage, 0x00F5, 0, 0,, ahk_id %nb_tmpHwnd%
-                    totalApplied++
-
-                    ; Parent toggles create/destroy children — must re-enumerate
-                    if (liveCb.className = "TCPRSDialogParentCheckBox") {
-                        Sleep, 300
-                        needReEnum := true
-                    } else {
-                        Sleep, 50
-                    }
+                ; Parent toggles create/destroy children — must re-enumerate
+                if (liveCb.className = "TCPRSDialogParentCheckBox") {
+                    Sleep, 300
+                    needReEnum := true
+                } else {
+                    Sleep, 50
                 }
             }
-
-            tplPos++
-
-            ; Dismiss popups periodically
-            if (Mod(totalApplied, 15) = 0)
-                NB_DismissIntermediatePopups()
         }
 
-        NB_DismissIntermediatePopups()
+        tplPos++
+
+        ; Progress tooltip every 20 items
+        if (Mod(tplPos, 20) = 0)
+            ToolTip, Applying item %tplPos%/%tplCount%...
+
+        ; Dismiss popups periodically
+        if (Mod(totalApplied, 15) = 0)
+            NB_DismissIntermediatePopups()
     }
 
-    ; Count unmatched groups
-    if (templateGroups.Length() > liveGroupBoxes.Length())
-        totalNotFound += templateGroups.Length() - liveGroupBoxes.Length()
+    NB_DismissIntermediatePopups()
 
     ; Log every checkbox state after apply
     WinGetTitle, applyDlgTitle, ahk_id %dlgHwnd%
-    NB__LogCheckboxStates("APPLY", liveGroupBoxes, templatePath, applyDlgTitle, totalApplied, totalNotFound)
+    allGroupBoxes := NB_EnumScrollBoxGroupBoxes(scrollBox)
+    NB__LogCheckboxStates("APPLY", allGroupBoxes, templatePath, applyDlgTitle, totalApplied, totalNotFound)
 
     ToolTip, Done: %totalApplied% toggled - %totalNotFound% not found. Review before Finish.
     SetTimer, NB_ClearToolTip, -5000
@@ -21409,6 +21224,71 @@ NB_EnumTopLevelParents(scrollBoxHwnd) {
 ;============================================================================================
 ; NURSING BOOSTER - TEMPLATE PARSING
 ;============================================================================================
+
+NB_ParseFlatCheckboxes(jsonContent) {
+    items := []
+
+    ; Find the "checkboxes" array (top-level, format v5)
+    cPos := InStr(jsonContent, """checkboxes""")
+    if (!cPos)
+        return items
+
+    arrStart := InStr(jsonContent, "[",, cPos)
+    if (!arrStart)
+        return items
+
+    ; Find matching ]
+    depth := 1
+    scanPos := arrStart + 1
+    arrEnd := 0
+    while (scanPos <= StrLen(jsonContent) && depth > 0) {
+        ch := SubStr(jsonContent, scanPos, 1)
+        if (ch = "[")
+            depth++
+        else if (ch = "]")
+            depth--
+        if (depth = 0)
+            arrEnd := scanPos
+        scanPos++
+    }
+    if (!arrEnd)
+        return items
+
+    ; Parse each checkbox object
+    itemPos := arrStart
+    while (itemPos := InStr(jsonContent, "{",, itemPos + 1)) {
+        if (itemPos > arrEnd)
+            break
+        itemEnd := InStr(jsonContent, "}",, itemPos)
+        if (!itemEnd)
+            break
+        itemStr := SubStr(jsonContent, itemPos, itemEnd - itemPos + 1)
+
+        idx := 0
+        if (RegExMatch(itemStr, """idx"":\s*(\d+)", idxM))
+            idx := idxM1 + 0
+
+        cls := ""
+        if (RegExMatch(itemStr, """cls"":\s*""([^""]*)""", clsM))
+            cls := clsM1
+
+        checked := (InStr(itemStr, """checked"": true") || InStr(itemStr, """checked"":true"))
+            ? true : false
+
+        depthVal := 0
+        if (RegExMatch(itemStr, """depth"":\s*(\d+)", depM))
+            depthVal := depM1 + 0
+
+        label := ""
+        if (RegExMatch(itemStr, """label"":\s*""((?:[^""\\]|\\.)*)""", lblM))
+            label := lblM1
+
+        items.Push({idx: idx, cls: cls, checked: checked, label: label, depth: depthVal})
+        itemPos := itemEnd
+    }
+
+    return items
+}
 
 NB_ParseTopLevelParents(jsonContent) {
     states := []
