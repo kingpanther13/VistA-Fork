@@ -1503,7 +1503,7 @@ modnotelist := "   New Notes   ||  |EDIT LIST BELOW:|   CLICK HERE|  | "  .  not
 gui, 14: Add, DropdownList, gdropdownbutton y0 w100 -Tabstop altsubmit vnotefornow , %modnotelist%
 
 ; --- NursingBooster Dropdown Menu on toolbar ---
-NB_MenuList := "Nursing Booster||Save Template|Load Template|Delete Template|Toggle Panel|Dump Dialog|Build Key Macro|Play Key Macro|Record Macro|Settings"
+NB_MenuList := "Nursing Booster||" . NB_HK1_Label . "|" . NB_HK2_Label . "|" . NB_HK3_Label . "|" . NB_HK4_Label . "|" . NB_HK5_Label . "|Save Template|Load Template|Delete Template|Toggle Panel|Dump Dialog|Build Key Macro|Play Key Macro|Record Macro|Settings"
 gui, 14: Add, DropdownList, gNB_DropdownAction y0 w130 -Tabstop altsubmit vNB_DropdownChoice , %NB_MenuList%
 
 ; Gui 14: +AlwaysOnTop -Caption HWNDGui_Hwnd  +ToolWindow ;   +LastFound
@@ -19990,31 +19990,51 @@ NB_DropdownAction:
     Gui, 14:Submit, NoHide
     if (NB_DropdownChoice = 1)  ; "Nursing Booster" header - do nothing
     {
-        ; Reset dropdown back to header
         GuiControl, 14:Choose, NB_DropdownChoice, 1
         return
     }
-    else if (NB_DropdownChoice = 2)  ; Save Template
+    else if (NB_DropdownChoice >= 2 && NB_DropdownChoice <= 6)  ; Quick Actions 1-5
+    {
+        hkIdx := NB_DropdownChoice - 1
+        if (hkIdx = 1)
+            NB_RunHotkeyAction(NB_HK1_Action, NB_HK1_Label)
+        else if (hkIdx = 2)
+            NB_RunHotkeyAction(NB_HK2_Action, NB_HK2_Label)
+        else if (hkIdx = 3)
+            NB_RunHotkeyAction(NB_HK3_Action, NB_HK3_Label)
+        else if (hkIdx = 4)
+            NB_RunHotkeyAction(NB_HK4_Action, NB_HK4_Label)
+        else if (hkIdx = 5)
+            NB_RunHotkeyAction(NB_HK5_Action, NB_HK5_Label)
+    }
+    else if (NB_DropdownChoice = 7)   ; Save Template
         gosub NB_BtnSaveCurrentState
-    else if (NB_DropdownChoice = 3)  ; Load Template
+    else if (NB_DropdownChoice = 8)   ; Load Template
         gosub NB_BtnLoadSavedTemplate
-    else if (NB_DropdownChoice = 4)  ; Delete Template
+    else if (NB_DropdownChoice = 9)   ; Delete Template
         gosub NB_BtnDeleteTemplate
-    else if (NB_DropdownChoice = 5)  ; Toggle Panel
+    else if (NB_DropdownChoice = 10)  ; Toggle Panel
         gosub NB_TogglePanel
-    else if (NB_DropdownChoice = 6)  ; Dump Dialog
+    else if (NB_DropdownChoice = 11)  ; Dump Dialog
         gosub NB_DumpDialogControls
-    else if (NB_DropdownChoice = 7)  ; Build Key Macro
+    else if (NB_DropdownChoice = 12)  ; Build Key Macro
         gosub NB_OpenMacroBuilder
-    else if (NB_DropdownChoice = 8)  ; Play Key Macro
+    else if (NB_DropdownChoice = 13)  ; Play Key Macro
         gosub NB_PlayMacroSelect
-    else if (NB_DropdownChoice = 9)  ; Record Macro
+    else if (NB_DropdownChoice = 14)  ; Record Macro
         gosub NB_StartRecording
-    else if (NB_DropdownChoice = 10) ; Settings
+    else if (NB_DropdownChoice = 15)  ; Settings
         gosub NB_ToggleSettings
     ; Reset dropdown back to header
     GuiControl, 14:Choose, NB_DropdownChoice, 1
 return
+
+NB_RebuildDropdown() {
+    global NB_HK1_Label, NB_HK2_Label, NB_HK3_Label, NB_HK4_Label, NB_HK5_Label
+    newList := "Nursing Booster||" . NB_HK1_Label . "|" . NB_HK2_Label . "|" . NB_HK3_Label . "|" . NB_HK4_Label . "|" . NB_HK5_Label . "|Save Template|Load Template|Delete Template|Toggle Panel|Dump Dialog|Build Key Macro|Play Key Macro|Record Macro|Settings"
+    GuiControl, 14:, NB_DropdownChoice, |%newList%
+    GuiControl, 14:Choose, NB_DropdownChoice, 1
+}
 
 
 ;============================================================================================
@@ -20310,6 +20330,9 @@ NB_HKSetup_Save:
     GuiControl, 67:, NB_HK3_Btn, %NB_HK3_Label%
     GuiControl, 67:, NB_HK4_Btn, %NB_HK4_Label%
     GuiControl, 67:, NB_HK5_Btn, %NB_HK5_Label%
+
+    ; Rebuild dropdown on bottom bar to reflect new quick action labels
+    NB_RebuildDropdown()
 
     ; Save to file
     gosub NB_SaveHotkeyConfig
