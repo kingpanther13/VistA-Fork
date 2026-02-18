@@ -766,7 +766,7 @@ Gui, 67:Add, Slider, x85 y208 w210 h22 vNB_SpeedSlider gNB_SpeedSliderChanged Ra
 Gui, 67:Add, Text, x300 y210 w80 h16 BackgroundTrans vNB_SpeedLabel, %NB_ApplySpeed% ms
 Gui, 67:Font, s7 cSilver, Segoe UI
 Gui, 67:Add, Text, x5 y234 w370 h16 Center BackgroundTrans vNB_PanelStatus, Ready | CPRS: Not detected | CPFS: Not detected
-Gui, 67:+AlwaysOnTop -Caption +ToolWindow
+Gui, 67:+AlwaysOnTop -Caption +ToolWindow +HwndNB_PanelHwnd
 Gui, 67:Show, x0 y0 w385 h255 Hide, NursingBoosterPanel
 NB_BoosterGuiVisible := 0
 
@@ -20031,7 +20031,7 @@ NB_TogglePanel:
     else
     {
         Gui, 67:Show, NoActivate
-        WinSet, AlwaysOnTop, On, NursingBoosterPanel
+        WinSet, AlwaysOnTop, On, ahk_id %NB_PanelHwnd%
         NB_BoosterGuiVisible := 1
     }
 return
@@ -20711,6 +20711,10 @@ NB_ApplyTemplate(templatePath) {
 
     ToolTip, Done: %totalApplied% toggled - %totalNotFound% not found. Review before Finish.
     SetTimer, NB_ClearToolTip, -5000
+
+    ; Re-assert AlwaysOnTop on the panel — WinActivate on CPRS dialog strips it
+    if (NB_BoosterGuiVisible = 1)
+        WinSet, AlwaysOnTop, On, ahk_id %NB_PanelHwnd%
 }
 
 
@@ -23703,6 +23707,10 @@ CF_ApplyTemplate(templatePath) {
         ToolTip, Done: %totalApplied% applied`, %totalNotFound% not matched - review before submitting
         SetTimer, CF_ClearToolTip, -5000
     }
+
+    ; Re-assert AlwaysOnTop on the panel — WinActivate on CPFS dialog strips it
+    if (NB_BoosterGuiVisible = 1)
+        WinSet, AlwaysOnTop, On, ahk_id %NB_PanelHwnd%
 }
 
 
