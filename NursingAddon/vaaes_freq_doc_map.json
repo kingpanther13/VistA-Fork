@@ -1,0 +1,3258 @@
+{
+  "template": "VAAES Freq Doc",
+  "source": "Copy of VAAES_HF_Template_View.xlsx (Freq Doc sheet)",
+  "total_categories": 35,
+  "total_health_factors": 608,
+  "body_systems": [
+    {
+      "category_hf_name": "VA-ACUTE STOKE NIHSS LOC [C]",
+      "short_name": "VA-ACUTE STOKE NIHSS LOC",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC 3",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS ATAXIA [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS ATAXIA",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS ATAXIA 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS ATAXIA 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS ATAXIA 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS ATAXIA N/A",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS DYSARTHRIA [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS DYSARTHRIA",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS DYSARTHRIA 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS DYSARTHRIA 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS DYSARTHRIA 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS DYSARTHRIA N/A",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS GAZE [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS GAZE",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS GAZE 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS GAZE 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS GAZE 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS INATTENTION [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS INATTENTION",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS INATTENTION 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS INATTENTION 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS INATTENTION 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS LANGUAGE [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS LANGUAGE",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS LANGUAGE 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LANGUAGE 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LANGUAGE 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LANGUAGE 3",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS LOC COMMAND [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS LOC COMMAND",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC CMD 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC CMD 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC CMD 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS LOC QUESTIONS [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS LOC QUESTIONS",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC QUEST 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC QUEST 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LOC QUEST 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS MOTOR ARM [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS MOTOR ARM",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT ARM 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT ARM 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT ARM 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT ARM 3",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT ARM 4",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT ARM N/A",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT ARM 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT ARM 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT ARM 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT ARM 3",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT ARM 4",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT ARM N/A",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS MOTOR LEG [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS MOTOR LEG",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT LEG 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT LEG 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT LEG 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT LEG 3",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT LEG 4",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS LEFT LEG N/A",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT LEG 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT LEG 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT LEG 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT LEG 3",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT LEG 4",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS RIGHT LEG N/A",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS PALSY [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS PALSY",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS PALSY 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS PALSY 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS PALSY 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS PALSY 3",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS SENSORY [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS SENSORY",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS SENSORY 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS SENSORY 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS SENSORY 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE NIHSS VISUAL [C]",
+      "short_name": "VA-ACUTE STROKE NIHSS VISUAL",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS VISUAL 0",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS VISUAL 1",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS VISUAL 2",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        },
+        {
+          "name": "VA-ACUTE STROKE NIHSS VISUAL 3",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ACUTE STROKE RAPID ASSESSMENT [C]",
+      "short_name": "VA-ACUTE STROKE RAPID ASSESSMENT",
+      "health_factors": [
+        {
+          "name": "VA-ACUTE STROKE NIHSS INITIAL SCORE",
+          "print_name": "(blank)",
+          "description": "(blank)"
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-ORAL CARE [C]",
+      "short_name": "VA-ORAL CARE",
+      "health_factors": [
+        {
+          "name": "VA-VAAES ORAL CARE NON-VENT PATIENT",
+          "print_name": "Oral Care For A Non-Ventilator Patient",
+          "description": "Oral care for a non-ventilator patient (HEADER)."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES ADL [C]",
+      "short_name": "ADL",
+      "health_factors": [
+        {
+          "name": "VA-VAAES ADL ASSESS",
+          "print_name": "Activities Of Daily Living",
+          "description": "Activities of daily living (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING",
+          "print_name": "Dressing",
+          "description": "Dressing (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING COMMENT",
+          "print_name": "Dressing Comment",
+          "description": "Dressing comment is a write in response."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING LOWER DEPENDENT",
+          "print_name": "Dressing Lower Body: Dependent",
+          "description": "Patient's ability to dress lower body documented as dependent."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING LOWER INDEPENDENT",
+          "print_name": "Dressing Lower Body: Independent",
+          "description": "Patient's ability to dress lower body documented as independent."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING LOWER MAX ASSIST",
+          "print_name": "Dressing Lower Body: Maximal Assist",
+          "description": "Patient's ability to dress lower body documented as requiring maximal assist."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING LOWER MIN ASSIST",
+          "print_name": "Dressing Lower Body: Minimal Assist",
+          "description": "Patient's ability to dress lower body documented as requiring minimal assist."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING LOWER MOD ASSIST",
+          "print_name": "Dressing Lower Body: Moderate Assist",
+          "description": "Patient's ability to dress lower body documented as requiring moderate assist."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING UPPER DEPENDENT",
+          "print_name": "Dressing Upper Body: Dependent",
+          "description": "Patient's ability to dress upper body documented as dependent."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING UPPER INDEPENDENT",
+          "print_name": "Dressing Upper Body: Independent",
+          "description": "Patient's ability to dress upper body documented as independent."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING UPPER MAX ASSIST",
+          "print_name": "Dressing Upper Body: Maximal Assist",
+          "description": "Patient's ability to dress upper body documented as requiring maximal assist."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING UPPER MIN ASSIST",
+          "print_name": "Dressing Upper Body: Minimal Assist",
+          "description": "Patient's ability to dress upper body documented as requiring minimal assist."
+        },
+        {
+          "name": "VA-VAAES ADL DRESSING UPPER MOD ASSIST",
+          "print_name": "Dressing Upper Body: Moderate Assist",
+          "description": "Patient's ability to dress upper body documented as requiring moderate assist."
+        },
+        {
+          "name": "VA-VAAES ADL FOOT CARE",
+          "print_name": "Foot Care",
+          "description": "Foot Care (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ADL FOOT CARE COMMENT",
+          "print_name": "Foot Care Comment",
+          "description": "Write in comment related to foot care."
+        },
+        {
+          "name": "VA-VAAES ADL FOOT CARE INSPECTION",
+          "print_name": "Foot Care: Inspection",
+          "description": "Foot inspection completed as part of foot care ."
+        },
+        {
+          "name": "VA-VAAES ADL FOOT CARE LOTION APPLIED",
+          "print_name": "Foot Care: Lotion Applied",
+          "description": "Lotion applied as part of foot care."
+        },
+        {
+          "name": "VA-VAAES ADL FOOT CARE PT DECLINED",
+          "print_name": "Foot Care: Patient Declined",
+          "description": "Patient declined foot care."
+        },
+        {
+          "name": "VA-VAAES ADL GEN COMMENT",
+          "print_name": "Hygiene ADL Comment",
+          "description": "Hygiene ADL write in comment."
+        },
+        {
+          "name": "VA-VAAES ADL HAND HYGIENE",
+          "print_name": "Hand Hygiene",
+          "description": "Hand Hygiene (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ADL HAND HYGIENE POST TOILET",
+          "print_name": "Hand Hygiene: Post Toileting",
+          "description": "Hand hygiene performed post toileting."
+        },
+        {
+          "name": "VA-VAAES ADL HAND HYGIENE PRE MEAL/SNACK",
+          "print_name": "Hand Hygiene: Pre Meals/Snacks",
+          "description": "Hand hygiene performed pre meals/snacks."
+        },
+        {
+          "name": "VA-VAAES ADL HAND HYGIENE PT DECLINED",
+          "print_name": "Hand Hygiene: Patient Declined",
+          "description": "Patient declined hand hygiene."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EAT ASSISTIVE DEVICE",
+          "print_name": "Eating: Uses Assistive/Adaptive Devices",
+          "description": "Patient documented as eating uses assistive/adaptive devices."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EAT COMMENT",
+          "print_name": "Eating Comment",
+          "description": "Eating comment is a write in response."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EAT DEPENDENT",
+          "print_name": "Eating: Dependent",
+          "description": "Patient documented as eating dependent."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EAT INDEPENDENT",
+          "print_name": "Eating: Independent",
+          "description": "Patient documented as eating independently."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EAT MAX ASSIST",
+          "print_name": "Eating: Maximal Assist",
+          "description": "Patient documented as eating requires maximal assist."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EAT MIN ASSIST",
+          "print_name": "Eating: Minimal Assist",
+          "description": "Patient documented as eating requires minimal assist."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EAT MOD ASSIST",
+          "print_name": "Eating: Moderate Assist",
+          "description": "Patient documented as eating requires moderate assist."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EAT PT DECLINED",
+          "print_name": "Eating: Patient Declined",
+          "description": "Patient documented as declined to eat."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC EATING",
+          "print_name": "Activities Of Daily Living Eating",
+          "description": "Activities of daily living eating."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI",
+          "print_name": "Pericare",
+          "description": "Pericare (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI CLSN PRDT",
+          "print_name": "Pericare: Cleansing Product Used",
+          "description": "Cleansing product documented as used with pericare."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI COMM",
+          "print_name": "Pericare Comment",
+          "description": "Pericare write in comment."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI DEPENDENT",
+          "print_name": "Pericare: Dependent",
+          "description": "Patient is dependent with pericare."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI INDEPEND",
+          "print_name": "Pericare: Independent",
+          "description": "Veteran performs pericare independently."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI INDWELLING",
+          "print_name": "Pericare: Indwelling Catheter Is Present",
+          "description": "Indwelling catheter is present."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI MAX ASSIST",
+          "print_name": "Pericare: Maximal Assist",
+          "description": "Patient needs maximal assist with pericare."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI MIN ASSIST",
+          "print_name": "Pericare: Minimal Assist",
+          "description": "Patient needs minimal assistance with pericare."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI MOD ASSIST",
+          "print_name": "Pericare: Moderate Assist",
+          "description": "Patient needs moderate assistance with pericare."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI PT DEC",
+          "print_name": "Pericare: Patient Declined",
+          "description": "Patient declined pericare."
+        },
+        {
+          "name": "VA-VAAES ADL HYG PC PERI SOAP",
+          "print_name": "Pericare: Soap And Water Used",
+          "description": "Soap and water documented as used for pericare."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE",
+          "print_name": "Personal Care",
+          "description": "Personal care (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE BATH",
+          "print_name": "Personal Care: Bath",
+          "description": "Bath documented as personal care completed."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE COMMENT",
+          "print_name": "Personal Care Comment",
+          "description": "Personal care write in comment."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE DEPENDENT",
+          "print_name": "Personal Care: Dependent",
+          "description": "Patient dependent with  personal care."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE INDEPENDENT",
+          "print_name": "Personal Care: Independent",
+          "description": "Patient independent with personal care."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE MAX ASSIST",
+          "print_name": "Personal Care: Maximal Assist",
+          "description": "Patient requires maximal assistance with personal care."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE MIN ASSIST",
+          "print_name": "Personal Care: Minimal Assist",
+          "description": "Patient requires minimal assistance with personal care."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE MOD ASSIST",
+          "print_name": "Personal Care: Moderate Assist",
+          "description": "Patient requires moderate assistance with personal care."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE PT DECLINED",
+          "print_name": "Personal Care: Patient Declined",
+          "description": "Patient declined personal care."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE SHOWER",
+          "print_name": "Personal Care: Shower",
+          "description": "Shower documented as personal care completed."
+        },
+        {
+          "name": "VA-VAAES ADL PERSONAL CARE W/ CHG",
+          "print_name": "Personal Care: With Chlorhexidine",
+          "description": "Chlorhexidine used as part of personal care ."
+        },
+        {
+          "name": "VA-VAAES ADL TOILETING",
+          "print_name": "Toileting",
+          "description": "Toileting (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ADL TOILETING COMMENT",
+          "print_name": "Toileting Comment",
+          "description": "Toileting write in comment."
+        },
+        {
+          "name": "VA-VAAES ADL TOILETING DEPENDENT",
+          "print_name": "Toileting: Dependent",
+          "description": "Patient dependent with toileting."
+        },
+        {
+          "name": "VA-VAAES ADL TOILETING INDEPENDENT",
+          "print_name": "Toileting: Independent",
+          "description": "Patient independent with toileting."
+        },
+        {
+          "name": "VA-VAAES ADL TOILETING MAX ASSIST",
+          "print_name": "Toileting: Maximal Assist",
+          "description": "Patient requires maximal assistance with toileting."
+        },
+        {
+          "name": "VA-VAAES ADL TOILETING MIN ASSIST",
+          "print_name": "Toileting: Minimal Assist",
+          "description": "Patient requires minimal assistance with toileting."
+        },
+        {
+          "name": "VA-VAAES ADL TOILETING MOD ASSIST",
+          "print_name": "Toileting: Moderate Assist",
+          "description": "Patient requires moderate assistance with toileting."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES CARDIO [C]",
+      "short_name": "CARDIO",
+      "health_factors": [
+        {
+          "name": "VA-VAAES CARDIO CAP REFILL ALL 4 EXT <3",
+          "print_name": "Capillary Refill < Or = 3 Seconds All 4 Extremities",
+          "description": "Capillary refill all 4 extremities, less than or equal to 3 seconds."
+        },
+        {
+          "name": "VA-VAAES CARDIO CAP REFILL COMMENT",
+          "print_name": "Capillary Refill Comment",
+          "description": "Write in comments documented for capillary refill."
+        },
+        {
+          "name": "VA-VAAES CARDIO CAP REFILL INDIVIDUAL",
+          "print_name": "Individual Capillary Refill",
+          "description": "Individual capillary refill documented."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB ASSESS",
+          "print_name": "Embolism Prevention",
+          "description": "Embolism prevention is selected."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB COMMENT",
+          "print_name": "Embolism Prevention: Comment",
+          "description": "Embolism prevention comment (write in response)."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB COMP STOCKINGS",
+          "print_name": "Graduated Compression Stockings",
+          "description": "Graduated compression stockings is selected."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB NOT APPLIED",
+          "print_name": "Embolism Prevention: Not Applied",
+          "description": "Embolism prevention is not applied."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB PREV KNEE HIGH",
+          "print_name": "Embolism Prevention: Knee High Graduated Compression Stockings",
+          "description": "Knee high graduated compression stockings is documented as embolism prevention measure."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB PREV THIGH HIGH",
+          "print_name": "Embolism Prevention: Thigh High Graduated Compression Stockings",
+          "description": "Thigh high graduated compression stockings is documented as embolism prevention measure."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB PT DECLINE",
+          "print_name": "Patient Declined Embolism Prevention",
+          "description": "Patient declined embolism prevention."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB SCD",
+          "print_name": "Embolism Prevention: Sequential Compression Device",
+          "description": "Sequential compression device is documented as embolism prevention measure."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB SCD FOOT",
+          "print_name": "Embolism Prevention: Foot Sequential Comp Device",
+          "description": "Foot sequential compression device is documented as embolism prevention measure."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB SCD KNEE HIGH",
+          "print_name": "Embolism Prevention: Knee High Sequential Compression Device",
+          "description": "Knee high sequential compression device is documented as embolism prevention measure."
+        },
+        {
+          "name": "VA-VAAES CARDIO EMB SCD THIGH HIGH",
+          "print_name": "Embolism Prevention: Thigh High Sequential Compression Device",
+          "description": "Thigh high sequential compression device is documented as embolism prevention measure."
+        },
+        {
+          "name": "VA-VAAES CARDIO PERIPH ALL 4 EXT 3+",
+          "print_name": "Peripheral Pulses 3+ Normal All 4 Extremities",
+          "description": "Peripheral pulses all 4 extremities, 3+ normal."
+        },
+        {
+          "name": "VA-VAAES CARDIO PERIPH INDIVIDUAL",
+          "print_name": "Individual Peripheral Pulses",
+          "description": "Individual peripheral pulses documented."
+        },
+        {
+          "name": "VA-VAAES CARDIO PERIPH PULSE OTHER",
+          "print_name": "Other Peripheral Pulses",
+          "description": "Other peripheral pulses documented."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY A FIB",
+          "print_name": "Cardiac Rhythm Analysis: Atrial Fibrillation",
+          "description": "Cardiac rhythm analysis is atrial fibrillation."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY A FLUTTER",
+          "print_name": "Cardiac Rhythm Analysis: Atrial Flutter",
+          "description": "Cardiac rhythm analysis is atrial flutter."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY ADD DESCRIPTORS",
+          "print_name": "Cardiac Rhythm Analysis: Additional Descriptors",
+          "description": "Additional descriptors for cardiac rhythm analysis documented."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY HEART BLOCK",
+          "print_name": "Cardiac Rhythm Analysis: Heart Block",
+          "description": "Cardiac rhythm analysis is heart block."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY JUNCTIONAL",
+          "print_name": "Cardiac Rhythm Analysis: Junctional Rhythm",
+          "description": "Cardiac rhythm analysis is junctional rhythm."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY NSR",
+          "print_name": "Cardiac Rhythm Analysis: Normal Sinus Rhythm",
+          "description": "Cardiac rhythm analysis is normal sinus rhythm."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY OTHER",
+          "print_name": "Cardiac Rhythm Analysis: Other",
+          "description": "Cardiac rhythm analysis is other (write -in)."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED",
+          "print_name": "Cardiac Rhythm Analysis: Paced",
+          "description": "Nursing shift assessment, cardiac rhythm analysis is paced."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED ATRIAL",
+          "print_name": "Cardiac Rhythm Analysis: Atrial Paced",
+          "description": "Cardiac rhythm analysis is atrial paced."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED ATRIOVENTRIC",
+          "print_name": "Cardiac Rhythm Analysis: Atrioventricular Paced",
+          "description": "Cardiac rhythm analysis is atrioventricular paced."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED CAPT APPRO",
+          "print_name": "Cardiac Rhythm Analysis: Paced, Capturing Appropriately",
+          "description": "Cardiac rhythm analysis is paced capturing appropriately."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED DEMAND",
+          "print_name": "Cardiac Rhythm Analysis: Demand Paced",
+          "description": "Cardiac rhythm analysis is demand paced."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED FIXED",
+          "print_name": "Cardiac Rhythm Analysis: Fixed Paced",
+          "description": "Cardiac rhythm analysis is fixed paced."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED ICD OVERRIDE",
+          "print_name": "Cardiac Rhythm Analysis: ICD Override",
+          "description": "Cardiac rhythm analysis is ICD Override."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED ICD OVERRIDE A",
+          "print_name": "Cardiac Rhythm Analysis: ICD Atrial Override",
+          "description": "Cardiac rhythm analysis is ICD Atrial override."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED ICD OVERRIDE V",
+          "print_name": "Cardiac Rhythm Analysis: ICD Ventricular Override",
+          "description": "Cardiac rhythm analysis is ICD Ventricular override."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED NOT CAPT APPRO",
+          "print_name": "Cardiac Rhythm Analysis: Paced, Not Capturing Appropriately",
+          "description": "Cardiac rhythm analysis is paced not capturing appropriately."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED NOT SENS APPRO",
+          "print_name": "Cardiac Rhythm Analysis: Paced, Not Sensing Appropriately",
+          "description": "Cardiac rhythm analysis is paced not sensing appropriately."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED SENS APPRO",
+          "print_name": "Cardiac Rhythm Analysis: Paced, Sensing Appropriately",
+          "description": "Cardiac rhythm analysis is paced sensing appropriately."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY PACED VENTRICULAR",
+          "print_name": "Cardiac Rhythm Analysis: Ventricular Paced",
+          "description": "Cardiac rhythm analysis is ventricular paced."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY SINUS BRADY",
+          "print_name": "Cardiac Rhythm Analysis: Sinus Bradycardia",
+          "description": "Cardiac rhythm analysis is sinus bradycardia."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY SINUS TACH",
+          "print_name": "Cardiac Rhythm Analysis: Sinus Tachycardia",
+          "description": "Cardiac rhythm analysis is sinus tachycardia."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY SVT",
+          "print_name": "Cardiac Rhythm Analysis: Supraventricular Tachycardia",
+          "description": "Cardiac rhythm analysis is supraventricular tachycardia."
+        },
+        {
+          "name": "VA-VAAES CARDIO RHY VENTRICULAR",
+          "print_name": "Cardiac Rhythm Analysis: Ventricular Rhythm",
+          "description": "Cardiac rhythm analysis is ventricular rhythm."
+        },
+        {
+          "name": "VA-VAAES CARDIO-UNEQUAL TEMP LE",
+          "print_name": "Unequal Lower Extremity Temperature",
+          "description": "Unequal lower extremity temperature."
+        },
+        {
+          "name": "VA-VAAES CARDIO-UNEQUAL TEMP UE",
+          "print_name": "Unequal Upper Extremity Temperature",
+          "description": "Unequal upper extremity temperature."
+        },
+        {
+          "name": "VA-VAAES CARDIO-VASCULAR CHECK ASSESS",
+          "print_name": "Cardiovascular Assess",
+          "description": "Cardiovascular (HEADER)."
+        },
+        {
+          "name": "VA-VAAES VASCULAR CHECK COMMENT",
+          "print_name": "Vascular Check Comment",
+          "description": "Vascular check comment write in field."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES EDU [C]",
+      "short_name": "EDU",
+      "health_factors": [
+        {
+          "name": "VA-VAAES ADULT ED METHOD DEMO",
+          "print_name": "Education Method: Demonstration",
+          "description": "Education  method is demonstration."
+        },
+        {
+          "name": "VA-VAAES ADULT ED METHOD GROUP",
+          "print_name": "Education Method: Group Training",
+          "description": "Education  method is group training."
+        },
+        {
+          "name": "VA-VAAES ADULT ED METHOD GWN",
+          "print_name": "Education Method: Get Well Network",
+          "description": "Education  method is Get Well Network."
+        },
+        {
+          "name": "VA-VAAES ADULT ED METHOD PRINTED",
+          "print_name": "Education Method: Printed Handout",
+          "description": "Education  method is printed handout."
+        },
+        {
+          "name": "VA-VAAES ADULT ED METHOD TEACHBACK",
+          "print_name": "Education Method: Teachback",
+          "description": "Education  method is teachback."
+        },
+        {
+          "name": "VA-VAAES ADULT ED METHOD VERBAL",
+          "print_name": "Education Method: Verbal",
+          "description": "Education  method is verbal."
+        },
+        {
+          "name": "VA-VAAES ADULT ED METHOD VHL",
+          "print_name": "Education Method: Vet Health Library",
+          "description": "Education method is Veterans Health Library materials."
+        },
+        {
+          "name": "VA-VAAES ADULT ED METHOD VIDEO",
+          "print_name": "Education Method: Video",
+          "description": "Education  method is video."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PROV TO CAREGIVER",
+          "print_name": "Education Provided To: Caregiver",
+          "description": "Education provided to the caregiver."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PROV TO FAMILY",
+          "print_name": "Education Provided To: Family/Significant Other",
+          "description": "Education provided to the family/significant other."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PROV TO OTHER",
+          "print_name": "Education Provided To: Other",
+          "description": "Education provided to other (write in response)."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PROV TO PATIENT",
+          "print_name": "Education Provided To: Patient",
+          "description": "Education provided to the patient."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PT DEMONSTRATES",
+          "print_name": "Understanding Of Education: Demonstrates",
+          "description": "Patient understanding of educational content documented as demonstrates."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PT NEEDS MORE TEACHING",
+          "print_name": "Understanding Of Education: Needs Further Teaching",
+          "description": "Patient understanding of educational content documented as needs further teaching."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PT NEEDS PRACTICE",
+          "print_name": "Understanding Of Education: Needs Practice/Supervision",
+          "description": "Patient understanding of educational content documented as needs practice/supervision."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PT UNDERSTANDING OTHER",
+          "print_name": "Understanding Of Education: Other",
+          "description": "Patient understanding of educational content documented as other write in response."
+        },
+        {
+          "name": "VA-VAAES ADULT ED PT VERBALIZE",
+          "print_name": "Understanding Of Education: Verbalized Understanding",
+          "description": "Patient understanding of educational content documented as verbalized understanding."
+        },
+        {
+          "name": "VA-VAAES ADULT ED TOPIC 1",
+          "print_name": "Education Topic 1",
+          "description": "Adult education topic #1 write in response."
+        },
+        {
+          "name": "VA-VAAES ADULT ED TOPIC 2",
+          "print_name": "Education Topic 2",
+          "description": "Adult education topic #2 write in response."
+        },
+        {
+          "name": "VA-VAAES ADULT ED TOPIC 3",
+          "print_name": "Education Topic 3",
+          "description": "Adult education topic #3 write in response."
+        },
+        {
+          "name": "VA-VAAES ADULT ED TOPIC 4",
+          "print_name": "Education Topic 4",
+          "description": "Adult education topic #4 write in response."
+        },
+        {
+          "name": "VA-VAAES ADULT ED TOPIC 5",
+          "print_name": "Education Topic 5",
+          "description": "Adult education topic #5 write in response."
+        },
+        {
+          "name": "VA-VAAES EDU ASSESS",
+          "print_name": "Adult Education",
+          "description": "Adult education (HEADER)."
+        },
+        {
+          "name": "VA-VAAES EDU ASSESS DECLINE",
+          "print_name": "Patient Declined Education Due To Health Status",
+          "description": "Patient declined education due to health status."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES EDUCATION NEEDS [C]",
+      "short_name": "EDUCATION NEEDS",
+      "health_factors": [
+        {
+          "name": "VA-VAAES EDU BARRIER COG",
+          "print_name": "Barrier To Learning: Cognitive",
+          "description": "Patient has cognitive barriers to learning."
+        },
+        {
+          "name": "VA-VAAES EDU BARRIER COMM",
+          "print_name": "Barrier To Learning: Communication",
+          "description": "Patient has communication barriers to learning."
+        },
+        {
+          "name": "VA-VAAES EDU BARRIER CUL/REL",
+          "print_name": "Barrier To Learning: Cultural/Religious",
+          "description": "Patient has cultural/religious barriers to learning."
+        },
+        {
+          "name": "VA-VAAES EDU BARRIER DESIRE",
+          "print_name": "Barrier To Learning: Desire/Motivation",
+          "description": "Patient has desire/motivational barriers to learning."
+        },
+        {
+          "name": "VA-VAAES EDU BARRIER EMOTIONAL",
+          "print_name": "Barrier To Learning: Emotional",
+          "description": "Patient has emotional barriers to learning."
+        },
+        {
+          "name": "VA-VAAES EDU BARRIER PHYSICAL",
+          "print_name": "Barrier To Learning: Physical",
+          "description": "Patient has physical barriers to learning."
+        },
+        {
+          "name": "VA-VAAES EDU BARRIER SENSORY",
+          "print_name": "Barrier To Learning: Sensory",
+          "description": "Patient has sensory barriers to learning."
+        },
+        {
+          "name": "VA-VAAES EDU BARRIER SOCIO",
+          "print_name": "Barrier To Learning: Socioeconomic",
+          "description": "Patient has socioeconomic barriers to learning."
+        },
+        {
+          "name": "VA-VAAES EDU BARRIER UNABLE TO ASSESS",
+          "print_name": "Barriers To Learning Is Unable To Be Assessed",
+          "description": "Patients barriers to learning are unable to be assessed."
+        },
+        {
+          "name": "VA-VAAES EDU LRN STYLE-CAREGIVER",
+          "print_name": "Learning Style Preference Is Caregiver/Family Present",
+          "description": "Patient prefers family/caregiver present for learning/education."
+        },
+        {
+          "name": "VA-VAAES EDU LRN STYLE-DEMO",
+          "print_name": "Learning Style Preference Is Demonstration",
+          "description": "Patients preferred learning style is demonstration."
+        },
+        {
+          "name": "VA-VAAES EDU LRN STYLE-NONE",
+          "print_name": "Learning Style Preference Is None",
+          "description": "Patient has no specific learning style preference."
+        },
+        {
+          "name": "VA-VAAES EDU LRN STYLE-OTHER",
+          "print_name": "Learning Style Preference Is Other",
+          "description": "Patients preferred learning type is anything other than demonstration, printed materials, verbal explanation, video/education TV, or having family/caregiver present."
+        },
+        {
+          "name": "VA-VAAES EDU LRN STYLE-PRINTED MAT",
+          "print_name": "Learning Style Preference Is Printed Materials",
+          "description": "Patients preferred learning style is printed materials."
+        },
+        {
+          "name": "VA-VAAES EDU LRN STYLE-VERBAL",
+          "print_name": "Learning Style Preference Is Verbal Explanation",
+          "description": "Patients preferred learning style is verbal explanation."
+        },
+        {
+          "name": "VA-VAAES EDU LRN STYLE-VIDEO",
+          "print_name": "Learning Style Preference Is Video",
+          "description": "Patients preferred learning style is video/education TV."
+        },
+        {
+          "name": "VA-VAAES EDU NONE EVIDENT",
+          "print_name": "Barrier To Learning: None Evident",
+          "description": "Patient has no apparent barriers to learning."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES ENVIRON SAFETY MGMT [C]",
+      "short_name": "ENVIRON SAFETY MGMT",
+      "health_factors": [
+        {
+          "name": "VA-VAAES ENVIRON CAREGIVER",
+          "print_name": "Safety Measure: Caregiver/Family Present",
+          "description": "The safety measure of caregiver/family present was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON CLOSE TO NUR STATION",
+          "print_name": "Safety Measure: Close To Nurses Station",
+          "description": "The safety measure of patient being close to the nurse's station was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON MAT ON FLOOR",
+          "print_name": "Safety Measure: Mat On Floor Implemented",
+          "description": "The safety measure of mat on floor was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON MOBILITY SUPPORT",
+          "print_name": "Safety Measure: Mobility Support Implemented",
+          "description": "The safety measure of mobility support was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON PSA",
+          "print_name": "Safety Measure: Patient Attendant Implemented",
+          "description": "The safety measure of patient attendant was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON PSA DC",
+          "print_name": "Patient Safety Attendant Discontinued",
+          "description": "Patient safety attendant discontinued."
+        },
+        {
+          "name": "VA-VAAES ENVIRON PSA LPN",
+          "print_name": "Safety Measure: Patient Attendant (LPN/LVN) At Bedside",
+          "description": "The safety measure of patient attendant that is an LPN/LVN at bedside was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON PSA NUR",
+          "print_name": "Safety Measure: Patient Attendant (Nurse) At Bedside",
+          "description": "The safety measure of patient attendant that is a nurse at bedside was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON PSA OTHER",
+          "print_name": "Safety Measure: Patient Attendant (Other) At Bedside",
+          "description": "The safety measure of patient attendant that is not an UAP, LPN/LVN or nurse was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON PSA UAP",
+          "print_name": "Safety Measure: Patient Attendant (UAP) At Bedside",
+          "description": "The safety measure of patient attendant that is an UAP at bedside was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON RESTRAINT",
+          "print_name": "Safety Measure: Restraint Alternatives",
+          "description": "The safety measure of restraint alternatives was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON ROUNDING",
+          "print_name": "Safety Measure: Increased Frequency Of Rounding",
+          "description": "The safety measure of increase frequency of rounding on patient was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY ASSESS",
+          "print_name": "Environmental Safety Management",
+          "description": "Environmental Safety Management (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY BED ALARM",
+          "print_name": "Safety Measure: Bed Alarm Implemented",
+          "description": "The safety measure of bed alarm was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY CHAIR ALARM",
+          "print_name": "Safety Measure: Chair Alarm Implemented",
+          "description": "The safety measure of chair alarm was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY OTHER ALARM",
+          "print_name": "Safety Measure: Other Alarm Implemented",
+          "description": "The safety measure of an alarm other than bed, chair, toilet and wander alarm was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY PT SPECIFIC",
+          "print_name": "Safety Measures: Patient Specific",
+          "description": "Patient specific safety measure text box, write in description."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY SOC",
+          "print_name": "Implement Safety Standards Of Care",
+          "description": "Safety standards of care implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY SOC OTHER",
+          "print_name": "Safety Measure: Other",
+          "description": "Safety intervention is other (write in response)."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY TOILET ALARM",
+          "print_name": "Safety Measure: Toilet Alarm Implemented",
+          "description": "The safety measure of toilet alarm was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SAFETY WANDER ALARM",
+          "print_name": "Safety Measure: Wander Alarm Implemented",
+          "description": "The safety measure of wander alarm was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON SEIZURE",
+          "print_name": "Safety Measure: Seizure Precaution In Place",
+          "description": "The safety measure of seizure precaution was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP",
+          "print_name": "Safety Measure: Therapeutic Companion In Place",
+          "description": "The safety measure of therapeutic companion was implemented."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP DC",
+          "print_name": "Therapeutic Companion Discontinued",
+          "description": "Therapeutic companion discontinued."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP ELOPEMENT",
+          "print_name": "Therapeutic Companion Criteria: Elopement Risk",
+          "description": "The therapeutic companion criteria is patient is an elopement risk."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP FALL",
+          "print_name": "Therapeutic Companion Criteria: Fall Risk",
+          "description": "The therapeutic companion criteria is patient is a fall risk."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP GEN SAFETY",
+          "print_name": "Therapeutic Companion Criteria: General Safety Concerns",
+          "description": "The therapeutic companion criteria is general patient safety concerns."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP MED THER",
+          "print_name": "Therapeutic Companion Criteria: Med Therapy Interruption Risk",
+          "description": "The therapeutic companion criteria is risk for medical therapy interruption."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP MEN STATUS",
+          "print_name": "Therapeutic Companion Criteria: Change In Mental Status",
+          "description": "The therapeutic companion criteria for safety is change in mental status."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP OTHER",
+          "print_name": "Therapeutic Companion Criteria: Is Other Safety Concerns",
+          "description": "The therapeutic companion criteria is other than change in mental status, elopement risk, fall risk, general safety concerns, medical therapy interruption or patient is severely agitated."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP SEVERE AGI",
+          "print_name": "Therapeutic Companion Criteria: Severe Agitation",
+          "description": "The therapeutic companion criteria is patient is severely agitated."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP TYPE LPN",
+          "print_name": "Therapeutic Companion Type: LPN/LVN At Bedside",
+          "description": "Patient's therapeutic companion for safety is LPN/LVN at bedside."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP TYPE NUR",
+          "print_name": "Therapeutic Companion Type: Nurse At Bedside",
+          "description": "Patient's therapeutic companion for safety is a nurse at bedside."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP TYPE OTHER",
+          "print_name": "Therapeutic Companion Type: Other",
+          "description": "Patient's therapeutic companion for safety is other than UAP, LPH/LVN, Nurse, or telecare companion."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP TYPE TELECA",
+          "print_name": "Therapeutic Companion Type: Telecare Companion",
+          "description": "Patient's therapeutic companion for safety is telecare companion."
+        },
+        {
+          "name": "VA-VAAES ENVIRON THERA COMP TYPE UAP",
+          "print_name": "Therapeutic Companion Type: UAP At Bedside",
+          "description": "Patient's therapeutic companion for safety is UAP at bedside."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES FREQ [C]",
+      "short_name": "FREQ",
+      "health_factors": [
+        {
+          "name": "VA-VAAES FA DETAILED REPOSITION",
+          "print_name": "Detailed Repositioning",
+          "description": "Detailed repositioning  (HEADER)."
+        },
+        {
+          "name": "VA-VAAES FREQ ASSESS NEWS",
+          "print_name": "National Early Warning Score",
+          "description": "National Early Warning Score (HEADER)."
+        },
+        {
+          "name": "VA-VAAES FREQ ASSESS NEWS SCORE",
+          "print_name": "News Total Score",
+          "description": "NEWS Total Score."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION ACUTE STROKE ACT",
+          "print_name": "News Action Acute Stroke Activated",
+          "description": "NEWS action is to activate the Acute stroke team."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION CHARGE NURSE NOTIFY",
+          "print_name": "News Action Charge Nurse Notified",
+          "description": "NEWS action is to contact the charge nurse ."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION CODE ACTIVATED",
+          "print_name": "News Action Code Activated",
+          "description": "NEWS action is to activate a Code ."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION CONSULT RT",
+          "print_name": "News Action Consult Respiratory Therapy",
+          "description": "NEWS action is to consult with respiratory therapy."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION CONSULT TEAM",
+          "print_name": "News Action Consult Team",
+          "description": "NEWS action is to contact the consult team."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION EWS STAFF NOTIFY",
+          "print_name": "News Action Early Warning System Staff Notified",
+          "description": "NEWS action is to contact the Early Warning System staff."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION INCREASE VS",
+          "print_name": "News Action Increase Vital Signs",
+          "description": "NEWS action is to increase frequency of vital signs and NEWS scoring."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION OTHER",
+          "print_name": "News Action Other",
+          "description": "NEWS action is other (write in response)."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION REPEAT NEWS",
+          "print_name": "News Action Repeat News Scoring With Next Vital Signs",
+          "description": "NEWS action is to repeat NEWS scoring with next vital signs."
+        },
+        {
+          "name": "VA-VAAES NEWS ACTION RRT ACTIVATED",
+          "print_name": "News Action Rapid Response Team Activated",
+          "description": "NEWS action is to activate a Rapid Response Team ."
+        },
+        {
+          "name": "VA-VAAES NEWS AVPU SCORE 0",
+          "print_name": "News AVPU Score 0",
+          "description": "NEWS APVU score is 0."
+        },
+        {
+          "name": "VA-VAAES NEWS AVPU SCORE 3",
+          "print_name": "News AVPU Score 3",
+          "description": "NEWS APVU score is 3."
+        },
+        {
+          "name": "VA-VAAES NEWS BP SCORE 0",
+          "print_name": "News BP Score 0",
+          "description": "NEWS blood pressure score is 0."
+        },
+        {
+          "name": "VA-VAAES NEWS BP SCORE 1",
+          "print_name": "News BP Score 1",
+          "description": "NEWS blood pressure score is 1."
+        },
+        {
+          "name": "VA-VAAES NEWS BP SCORE 2",
+          "print_name": "News BP Score 2",
+          "description": "NEWS blood pressure score is 2."
+        },
+        {
+          "name": "VA-VAAES NEWS BP SCORE 3",
+          "print_name": "News BP Score 3",
+          "description": "NEWS blood pressure score is 3."
+        },
+        {
+          "name": "VA-VAAES NEWS EVENT SYNOPSIS",
+          "print_name": "News Event Synopsis",
+          "description": "NEWS event synopsis comment field."
+        },
+        {
+          "name": "VA-VAAES NEWS OXY SCORE 0",
+          "print_name": "News Oxygen Saturation Score 0",
+          "description": "NEWS oxygenation saturation score is 0."
+        },
+        {
+          "name": "VA-VAAES NEWS OXY SCORE 1",
+          "print_name": "News Oxygen Saturation Score 1",
+          "description": "NEWS oxygenation saturation score is 1."
+        },
+        {
+          "name": "VA-VAAES NEWS OXY SCORE 2",
+          "print_name": "News Oxygen Saturation Score 2",
+          "description": "NEWS oxygenation saturation score is 2."
+        },
+        {
+          "name": "VA-VAAES NEWS OXY SCORE 3",
+          "print_name": "News Oxygen Saturation Score 3",
+          "description": "NEWS oxygenation saturation score is 3."
+        },
+        {
+          "name": "VA-VAAES NEWS PULSE SCORE 0",
+          "print_name": "News Pulse Score 0",
+          "description": "NEWS pulse score is 0."
+        },
+        {
+          "name": "VA-VAAES NEWS PULSE SCORE 1",
+          "print_name": "News Pulse Score 1",
+          "description": "NEWS pulse score is 1."
+        },
+        {
+          "name": "VA-VAAES NEWS PULSE SCORE 2",
+          "print_name": "News Pulse Score 2",
+          "description": "NEWS pulse score is 2."
+        },
+        {
+          "name": "VA-VAAES NEWS PULSE SCORE 3",
+          "print_name": "News Pulse Score 3",
+          "description": "NEWS pulse score is 3."
+        },
+        {
+          "name": "VA-VAAES NEWS RESP SCORE 0",
+          "print_name": "News Respirations Score 0",
+          "description": "NEWS respiratory rate score is 0."
+        },
+        {
+          "name": "VA-VAAES NEWS RESP SCORE 1",
+          "print_name": "News Respirations Score 1",
+          "description": "NEWS respiratory rate score is 1."
+        },
+        {
+          "name": "VA-VAAES NEWS RESP SCORE 2",
+          "print_name": "News Respirations Score 2",
+          "description": "NEWS respiratory rate score is 2."
+        },
+        {
+          "name": "VA-VAAES NEWS RESP SCORE 3",
+          "print_name": "News Respirations Score 3",
+          "description": "NEWS respiratory rate score is 3."
+        },
+        {
+          "name": "VA-VAAES NEWS STATUS PT EXPIRED",
+          "print_name": "News Patient Status Patient Expired",
+          "description": "NEWS patient status is the patient expired."
+        },
+        {
+          "name": "VA-VAAES NEWS STATUS PT ON UNIT",
+          "print_name": "News Patient Status Remains On Unit",
+          "description": "NEWS patient status is the patient remains on unit."
+        },
+        {
+          "name": "VA-VAAES NEWS STATUS PT TRAN CRIT CARE",
+          "print_name": "News Patient Status Transferred To Critical Care",
+          "description": "NEWS patient status is the patient was transferred to critical care."
+        },
+        {
+          "name": "VA-VAAES NEWS STATUS PT TRAN IND CARE",
+          "print_name": "News Patient Status Transferred To Intermediate Care",
+          "description": "NEWS patient status is the patient was transferred to intermediate care."
+        },
+        {
+          "name": "VA-VAAES NEWS STATUS PT TRAN MED/SURG",
+          "print_name": "News Patient Status Transferred To Med/Surg",
+          "description": "NEWS patient status is the patient was transferred to med/surg."
+        },
+        {
+          "name": "VA-VAAES NEWS STATUS PT TRAN OTHER",
+          "print_name": "News Patient Status Transferred To Other",
+          "description": "NEWS patient status is the patient was transferred to other location."
+        },
+        {
+          "name": "VA-VAAES NEWS STATUS PT TRANSFERRED",
+          "print_name": "News Patient Status Transferred To Higher Level Of Care",
+          "description": "NEWS patient status is the patient was transferred to a higher level of care."
+        },
+        {
+          "name": "VA-VAAES NEWS SUP OXY SAT SCORE 0",
+          "print_name": "News Supplemental Oxygen Score 0",
+          "description": "NEWS supplemental oxygen score is 0."
+        },
+        {
+          "name": "VA-VAAES NEWS SUP OXY SAT SCORE 2",
+          "print_name": "News Supplemental Oxygen Score 2",
+          "description": "NEWS supplemental oxygen score is 2."
+        },
+        {
+          "name": "VA-VAAES NEWS TEMP SCORE 0",
+          "print_name": "News Temperature Score 0",
+          "description": "NEWS temperature score is 0."
+        },
+        {
+          "name": "VA-VAAES NEWS TEMP SCORE 1",
+          "print_name": "News Temperature Score 1",
+          "description": "NEWS temperature score is 1."
+        },
+        {
+          "name": "VA-VAAES NEWS TEMP SCORE 2",
+          "print_name": "News Temperature Score 2",
+          "description": "NEWS temperature score is 2."
+        },
+        {
+          "name": "VA-VAAES NEWS TEMP SCORE 3",
+          "print_name": "News Temperature Score 3",
+          "description": "NEWS temperature score is 3."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES GASTRO [C]",
+      "short_name": "GASTRO",
+      "health_factors": [
+        {
+          "name": "VA-VAAES GASTRO ASSESS",
+          "print_name": "Gastrointestinal",
+          "description": "Gastrointestinal (HEADER)."
+        },
+        {
+          "name": "VA-VAAES GASTRO LAST BM",
+          "print_name": "Date Of Last Bowel Movement",
+          "description": "The date of patient's last bowel movement documented."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL COLOR BLACK",
+          "print_name": "Stool Color: Black",
+          "description": "Stool color documented as black."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL COLOR BLOOD FRANK",
+          "print_name": "Stool Color: Frank Blood",
+          "description": "Stool color documented as frank blood."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL COLOR BLOOD TINGED",
+          "print_name": "Stool Color: Blood-Tinged",
+          "description": "Stool color documented as blood tinged."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL COLOR BROWN",
+          "print_name": "Stool Color: Brown",
+          "description": "Stool color documented as brown."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL COLOR GREEN",
+          "print_name": "Stool Color: Green",
+          "description": "Stool color documented as green."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL COLOR OTHER",
+          "print_name": "Stool Color: Other",
+          "description": "Stool color documented as other (write in response)."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL DESC HARD",
+          "print_name": "Stool Description: Hard",
+          "description": "Stool description documented as hard."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL DESC LIQUID",
+          "print_name": "Stool Description: Liquid",
+          "description": "Stool description documented as liquid."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL DESC OTHER",
+          "print_name": "Stool Description: Other",
+          "description": "Stool description documented as other (write in response)."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL DESC SEMI-FORMED",
+          "print_name": "Stool Description: Semi-Formed",
+          "description": "Stool description documented as semi-formed."
+        },
+        {
+          "name": "VA-VAAES GASTRO STOOL DESC SOFT",
+          "print_name": "Stool Description: Soft",
+          "description": "Stool description documented as soft."
+        },
+        {
+          "name": "VA-VAAES GASTRO SYMPTOM COMMENT",
+          "print_name": "Gastrointestinal Symptoms: Comment",
+          "description": "Gastrointestinal symptoms documented as write in comment."
+        },
+        {
+          "name": "VA-VAAES GASTRO SYMPTOM CONSTIPATION",
+          "print_name": "Gastrointestinal Symptoms: Constipation",
+          "description": "Gastrointestinal symptoms documented as constipation."
+        },
+        {
+          "name": "VA-VAAES GASTRO SYMPTOM CRAMPS",
+          "print_name": "Gastrointestinal Symptoms: Cramping",
+          "description": "Gastrointestinal symptoms documented as cramping."
+        },
+        {
+          "name": "VA-VAAES GASTRO SYMPTOM DIARRHEA",
+          "print_name": "Gastrointestinal Symptoms: Diarrhea",
+          "description": "Gastrointestinal symptoms documented as diarrhea."
+        },
+        {
+          "name": "VA-VAAES GASTRO SYMPTOM HEARTBURN",
+          "print_name": "Gastrointestinal Symptoms: Heartburn",
+          "description": "Gastrointestinal symptoms documented as heartburn."
+        },
+        {
+          "name": "VA-VAAES GASTRO SYMPTOM NAUSEA",
+          "print_name": "Gastrointestinal Symptoms: Nausea",
+          "description": "Gastrointestinal symptoms documented as nausea."
+        },
+        {
+          "name": "VA-VAAES GASTRO SYMPTOM VOMITING",
+          "print_name": "Gastrointestinal Symptoms: Vomiting",
+          "description": "Gastrointestinal symptoms documented as vomiting."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES GEN INFO [C]",
+      "short_name": "GEN INFO",
+      "health_factors": [
+        {
+          "name": "VA-VAAES NSG FREQUENT DOCUMENTATION V2.4",
+          "print_name": "Nursing Frequent Documentation V2.4",
+          "description": "Nursing Frequent Documentation v2.4."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES MOB [C]",
+      "short_name": "MOB",
+      "health_factors": [
+        {
+          "name": "VA-VAAES MOB AMB DIST 10 STEPS TO 25 FT",
+          "print_name": "Ambulation Distance: 10 Steps To 25 Feet",
+          "description": "Mobility ambulation distance documented as 10 steps to 25 feet."
+        },
+        {
+          "name": "VA-VAAES MOB AMB DIST 1001-1500 FT",
+          "print_name": "Ambulation Distance: 1001-1500 Feet",
+          "description": "Mobility ambulation distance documented as 1001-1500 feet."
+        },
+        {
+          "name": "VA-VAAES MOB AMB DIST 1501-2000 FT",
+          "print_name": "Ambulation Distance: 1501-2000 Feet",
+          "description": "Mobility ambulation distance documented as 1501-2000 feet."
+        },
+        {
+          "name": "VA-VAAES MOB AMB DIST 251-500 FT",
+          "print_name": "Ambulation Distance: 251-500 Feet",
+          "description": "Mobility ambulation distance documented as 251-500 feet."
+        },
+        {
+          "name": "VA-VAAES MOB AMB DIST 26-250 FT",
+          "print_name": "Ambulation Distance: 26-250 Feet",
+          "description": "Mobility ambulation distance documented as 26-250 feet."
+        },
+        {
+          "name": "VA-VAAES MOB AMB DIST 501-750 FT",
+          "print_name": "Ambulation Distance: 501-750 Feet",
+          "description": "Mobility ambulation distance documented as 501-750 feet."
+        },
+        {
+          "name": "VA-VAAES MOB AMB DIST 751-1000 FT",
+          "print_name": "Ambulation Distance: 751-1000 Feet",
+          "description": "Mobility ambulation distance documented as 751-1000 feet."
+        },
+        {
+          "name": "VA-VAAES MOB AMB DIST GREATER 2000 FT",
+          "print_name": "Ambulation Distance: Greater Than 2000 Feet",
+          "description": "Mobility ambulation distance documented as greater than 2000 feet."
+        },
+        {
+          "name": "VA-VAAES MOB AMB MINUTES 11-15",
+          "print_name": "Ambulation Length Of Time: 11-15 Minutes",
+          "description": "Length of time ambulated documented as 11-15 minutes."
+        },
+        {
+          "name": "VA-VAAES MOB AMB MINUTES 1-5",
+          "print_name": "Ambulation Length Of Time: 1-5 Minutes",
+          "description": "Length of time ambulated documented as 1-5 minutes."
+        },
+        {
+          "name": "VA-VAAES MOB AMB MINUTES 16-20",
+          "print_name": "Ambulation Length Of Time: 16-20 Minutes",
+          "description": "Length of time ambulated documented as 16-20 minutes."
+        },
+        {
+          "name": "VA-VAAES MOB AMB MINUTES 6-10",
+          "print_name": "Ambulation Length Of Time: 6-10 Minutes",
+          "description": "Length of time ambulated documented as 6-10 minutes."
+        },
+        {
+          "name": "VA-VAAES MOB AMB MINUTES GREATER THAN 20",
+          "print_name": "Ambulation Length Of Time: Greater Than 20 Minutes",
+          "description": "Length of time ambulated documented as greater than 20 minutes."
+        },
+        {
+          "name": "VA-VAAES MOB GAIT OTHER",
+          "print_name": "Gait: Other",
+          "description": "Patient gait is other (write in response)."
+        },
+        {
+          "name": "VA-VAAES MOB GAIT SHUFFLING",
+          "print_name": "Gait: Shuffling",
+          "description": "Patient gait is shuffling."
+        },
+        {
+          "name": "VA-VAAES MOB GAIT STEADY",
+          "print_name": "Gait: Steady",
+          "description": "Patient gait is steady."
+        },
+        {
+          "name": "VA-VAAES MOB GAIT UNABLE TO AMBULATE",
+          "print_name": "Gait: Unable To Ambulate",
+          "description": "Patient gait is unable to ambulate."
+        },
+        {
+          "name": "VA-VAAES MOB GAIT UNSTEADY",
+          "print_name": "Gait: Unsteady",
+          "description": "Patient gait is unsteady."
+        },
+        {
+          "name": "VA-VAAES MOB GAIT WIDE BASED",
+          "print_name": "Gait Wide Based",
+          "description": "Patient gait wide based"
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP",
+          "print_name": "Mobility Independent",
+          "description": "Mobility status is documented as independent ."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ",
+          "print_name": "Mobility Independent: Equipment Utilized",
+          "description": "Mobility status is documented as independent, equipment utilized."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ CANE",
+          "print_name": "Independent Equip: Cane",
+          "description": "Mobility status is documented as independent, utilizes cane."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ CRUTCHES",
+          "print_name": "Independent Equip: Crutches",
+          "description": "Mobility status is documented as independent, utilizes crutches."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ ORTHO DEV ALL",
+          "print_name": "Independent Equip: Orthopedic Devices On At All Times",
+          "description": "Mobility status is documented as independent, utilizes special orthopedic devices that are on at all times."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ ORTHO DEV OTHER",
+          "print_name": "Independent Equip: Other Orthopedic Devices",
+          "description": "Mobility status is documented as independent, utilizes special orthopedic device, other device (write in response)."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ ORTHO DEV TYPE",
+          "print_name": "Independent Equip: Orthopedic Device Type",
+          "description": "Mobility status is documented as independent, utilizes special orthopedic device, type is write in response."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ ORTHO DEV W ACT",
+          "print_name": "Independent Equip: Orthopedic Devices With Activity",
+          "description": "Mobility status is documented as independent, utilizes special orthopedic devices with activity."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ OTHER",
+          "print_name": "Independent Equip: Other Equipment",
+          "description": "Mobility status is documented as independent with equipment other than prosthetic limb, walker, cane, crutches, orthopedic device, and/or manual/power wheelchair."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ PROSTH LIMB",
+          "print_name": "Independent Equip: Prosthetic Limb",
+          "description": "Mobility status is documented as independent, utilizes prosthetic limb."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ WALKER",
+          "print_name": "Independent Equip: Walker",
+          "description": "Mobility status is documented as independent, utilizes walker."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ WC",
+          "print_name": "Independent Equip: Wheelchair",
+          "description": "Mobility status is documented as independent, utilizes wheelchair."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ WC MAN",
+          "print_name": "Independent Equip: Manual Wheelchair",
+          "description": "Mobility status is documented as independent, utilizes manual wheelchair."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP EQ WC PWR",
+          "print_name": "Independent Equip: Power Wheelchair",
+          "description": "Mobility status is documented as independent, utilizes power wheelchair."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP STAND STEP",
+          "print_name": "Mobility Independent: Stand And Step W/O Assistance",
+          "description": "Mobility status is documented as independent, can stand and step without assistance."
+        },
+        {
+          "name": "VA-VAAES MOB MS INDEP STEADY BAL",
+          "print_name": "Mobility Independent: Steady Standing Balance",
+          "description": "Mobility status is documented as independent, steady standing balance."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST",
+          "print_name": "Mobility: Minimum Assist",
+          "description": "Mobility status is documented as minimum assist."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST EQ",
+          "print_name": "Mobility Minimum Assist: Equipment Utilized",
+          "description": "Mobility status is documented as minimum assist with equipment utilized."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST EQ AMB SLING",
+          "print_name": "Minimum Assist Equip: Ambulation Sling",
+          "description": "Mobility status is documented as minimum assist with ambulation sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST EQ CANE",
+          "print_name": "Minimum Assist Equip: Cane",
+          "description": "Mobility status is documented as minimum assist with cane."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST EQ CRUTCHES",
+          "print_name": "Minimum Assist Equip: Crutches",
+          "description": "Mobility status is documented as minimum assist with crutches."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST EQ NO PWR STAND",
+          "print_name": "Minimum Assist Equip: Non-Powered Stand Aid",
+          "description": "Mobility status is documented as minimum assist with non-powered stand aid."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST EQ OTHER",
+          "print_name": "Mobility Minimum Assist Equip: Other",
+          "description": "Mobility status is documented as minimum assist with other equipment."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST EQ SUP",
+          "print_name": "Mobility Minimum Assist Equip: Supervision",
+          "description": "Mobility status is documented as minimum assist with or without supervision."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST EQ WALKER",
+          "print_name": "Minimum Assist Equip: Walker",
+          "description": "Mobility status is documented as minimum assist with walker."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST STANDS",
+          "print_name": "Minimum Assist Stands With Support Only",
+          "description": "Mobility status is documented as minimum assist, stands with support only."
+        },
+        {
+          "name": "VA-VAAES MOB MS MIN ASST UNABLE STEP IND",
+          "print_name": "Minimum Assist: Unable To March & Step Independently",
+          "description": "Mobility status is documented as minimum assist,  unable to march and step independently."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST",
+          "print_name": "Mobility: Moderate Assist",
+          "description": "Mobility status is documented as moderate assist."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST ABLE SIT IND",
+          "print_name": "Moderate Assist: Able To Sit Independently",
+          "description": "Mobility status is documented as moderate assist, able to sit independently."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ",
+          "print_name": "Moderate Assist: Equipment Utilized",
+          "description": "Mobility status is documented as moderate assist, equipment utilized."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ FRICTION",
+          "print_name": "Moderate Assist Equip: Use Friction Reducing Devices",
+          "description": "Mobility status documented as moderate assist with friction reducing devices (air/slide sheet)."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ LIFT",
+          "print_name": "Moderate Assist Equip: Use Ceiling Lift Or Floor Based Lift",
+          "description": "Mobility status documented as  moderate assist with ceiling lift or full body floor based lift."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ PROG TILT",
+          "print_name": "Moderate Assist Equip: Use Progressive Tilt Technology",
+          "description": "Mobility status documented as moderate assist with progressive tilt technology (including sit to stand bed)."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ SLING",
+          "print_name": "Moderate Assist Equip: Sling",
+          "description": "Mobility status is documented as moderate assist with sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ SLING AMB",
+          "print_name": "Moderate Assist Equip: Ambulatory Sling",
+          "description": "Mobility status is documented as moderate assist  with ambulation sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ SLING LIMB",
+          "print_name": "Moderate Assist Equip: Limb Sling",
+          "description": "Mobility status is documented as moderate assist with limb sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ SLING OTHER",
+          "print_name": "Moderate Assist Equip: Other Sling",
+          "description": "Mobility status is documented as moderate assist with other sling; write in response."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ SLING REPO",
+          "print_name": "Moderate Assist Equip: Repositioning Sling",
+          "description": "Mobility status is documented as moderate assist with repositioning sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ SLING SEAT",
+          "print_name": "Moderate Assist Equip: Seated Sling",
+          "description": "Mobility status is documented as moderate assist with seated sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ SLING TURN",
+          "print_name": "Moderate Assist Equip: Turner Sling",
+          "description": "Mobility status is documented as moderate assist with Turner sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST EQ STAND ASST",
+          "print_name": "Moderate Assist Equip: Power Stand Assist",
+          "description": "Mobility status is documented as moderate assist with power stand assist."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST PART OR NON",
+          "print_name": "Moderate Assist: Partial Or Non-Weight Bearing",
+          "description": "Mobility status is documented as moderate assist, partial or non-weight bearing."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST UNABLE EXTEND",
+          "print_name": "Moderate Assist: Unable To Fully Extend Leg(s)",
+          "description": "Mobility status is documented as moderate assist, unable to fully extend at least one leg."
+        },
+        {
+          "name": "VA-VAAES MOB MS MOD ASST UNABLE SIT SURF",
+          "print_name": "Moderate Assist: Unable Clear Buttocks From Sitting Surface",
+          "description": "Mobility status is documented as moderate assist, unable to clear buttocks from sitting surface."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST",
+          "print_name": "Mobility: Total Assist",
+          "description": "Mobility status documented as total assist."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST BEDREST",
+          "print_name": "Total Assist: Bedrest Order",
+          "description": "Mobility status documented as total assist, patient has bedrest order."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ",
+          "print_name": "Mobility Total Assist: Equipment Utilized",
+          "description": "Mobility status documented as total assist, equipment utilized."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ FRICTION",
+          "print_name": "Total Assist Equip: Use Friction Reducing Devices",
+          "description": "Mobility status documented as total assist with friction reducing devices (air/slide sheet)."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ LIFT",
+          "print_name": "Total Assist Equip: Use Ceiling Lift Or Floor Based Lift",
+          "description": "Mobility status documented as  total assist with ceiling lift or full body floor based lift."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ PROG TILT",
+          "print_name": "Total Assist Equip: Use Progressive Tilt Technology",
+          "description": "Mobility status documented as total assist with progressive tilt technology (including sit to stand bed)."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ SLING",
+          "print_name": "Total Assist Equip: Sling",
+          "description": "Mobility status is documented as total assist with sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ SLING AMBU",
+          "print_name": "Total Assist Equip: Ambulation Sling",
+          "description": "Mobility status is documented as total assist with ambulation sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ SLING LIMB",
+          "print_name": "Total Assist Equip: Limb Sling",
+          "description": "Mobility status is documented as total assist with limb sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ SLING OTHER",
+          "print_name": "Total Assist: Other Sling",
+          "description": "Mobility status is documented as total assist with other sling (write in response)."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ SLING REPO",
+          "print_name": "Total Assist Equip: Repositioning Sling",
+          "description": "Mobility status is documented as total assist with repositioning sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ SLING SEAT",
+          "print_name": "Total Assist Equip: Seated Sling",
+          "description": "Mobility status is documented as total assist with seated sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST EQ SLING TURN",
+          "print_name": "Total Assist Equip: Turner Sling",
+          "description": "Mobility status is documented as total assist with Turner sling."
+        },
+        {
+          "name": "VA-VAAES MOB MS TOT ASST UNABLE SIT IND",
+          "print_name": "Total Assist: Unable To Sit At Side Of Bed",
+          "description": "Mobility status documented as total  assist unable to sit independently at side of bed."
+        },
+        {
+          "name": "VA-VAAES MOB PT OT REHAB",
+          "print_name": "Mobility PT/OT/Rehab Involved In Care",
+          "description": "Mobility PT/OT/Rehab involved in care an contributing to mobility goals."
+        },
+        {
+          "name": "VA-VAAES MOB TOL",
+          "print_name": "Mobilization Tolerance",
+          "description": "Mobilization tolerance (HEADER)."
+        },
+        {
+          "name": "VA-VAAES MOB TOL COMMENTS",
+          "print_name": "Mobilization Tolerance Comment",
+          "description": "Mobilization tolerance write in comment."
+        },
+        {
+          "name": "VA-VAAES MOB TOL FATIGUE",
+          "print_name": "Mobilization Tolerance: Fatigue During Task",
+          "description": "Mobilization tolerance is documented as fatigue during task."
+        },
+        {
+          "name": "VA-VAAES MOB TOL FATIGUE PREVENTS",
+          "print_name": "Mobilization Tolerance: Fatigue Prevents Completion Of Task",
+          "description": "Mobilization tolerance is documented as fatigue prevents completion of task."
+        },
+        {
+          "name": "VA-VAAES MOB TOL TIRED",
+          "print_name": "Mobilization Tolerance: Tired At End Of Task",
+          "description": "Mobilization tolerance is documented as tired at end of task."
+        },
+        {
+          "name": "VA-VAAES MOB TOL WELL",
+          "print_name": "Mobilization Tolerance: Tolerates Well",
+          "description": "Mobilization tolerance is documented as tolerates well."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES NEURO [C]",
+      "short_name": "NEURO",
+      "health_factors": [
+        {
+          "name": "VA-VAAES CIWA UNABLE TO PERFORM",
+          "print_name": "Unable To Complete CIWA-Ar Screening",
+          "description": "Staff unable to perform CIWA-Ar screening."
+        },
+        {
+          "name": "VA-VAAES NEURO AB",
+          "print_name": "Affect/Behavior",
+          "description": "Affect/behavior (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO AB CALM",
+          "print_name": "Affect/Behavior: Calm",
+          "description": "Patient affect/behavior is calm."
+        },
+        {
+          "name": "VA-VAAES NEURO AB COMBATIVE",
+          "print_name": "Affect/Behavior: Combative",
+          "description": "Patient affect/behavior is combative."
+        },
+        {
+          "name": "VA-VAAES NEURO AB COMMENTS",
+          "print_name": "Affect/Behavior Comments",
+          "description": "Affect/behavior  write-in comments."
+        },
+        {
+          "name": "VA-VAAES NEURO AB COOPERATIVE",
+          "print_name": "Affect/Behavior: Cooperative",
+          "description": "Patient affect/behavior is cooperative."
+        },
+        {
+          "name": "VA-VAAES NEURO AB IMPULSIVE",
+          "print_name": "Affect/Behavior: Impulsive",
+          "description": "Patient affect/behavior is impulsive."
+        },
+        {
+          "name": "VA-VAAES NEURO AB UNCOOPERATIVE",
+          "print_name": "Affect/Behavior: Uncooperative",
+          "description": "Patient affect/behavior is uncooperative."
+        },
+        {
+          "name": "VA-VAAES NEURO ABS",
+          "print_name": "Agitated Behavior Scale",
+          "description": "Agitated Behavior Scale (ABS for TBI patients only) (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO ABS TOTAL SCORE",
+          "print_name": "Abs Total Score",
+          "description": "ABS Total Score."
+        },
+        {
+          "name": "VA-VAAES NEURO BCAM",
+          "print_name": "Brief Confusion Assessment Method (bCAM) Assessed",
+          "description": "Brief Confusion Assessment Method assessed (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO BCAM NEGATIVE",
+          "print_name": "Brief Confusion Assessment Method (bCAM) Negative",
+          "description": "Brief Confusion Assessment Method (bCAM) negative."
+        },
+        {
+          "name": "VA-VAAES NEURO BCAM POSITIVE",
+          "print_name": "Brief Confusion Assessment Method (bCAM) Positive",
+          "description": "Brief Confusion Assessment Method (bCAM) positive."
+        },
+        {
+          "name": "VA-VAAES NEURO BEFAST",
+          "print_name": "Be-Fast Early Stroke Detection Assessed",
+          "description": "BE-FAST Early Stroke Detection assessed (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO CHECK",
+          "print_name": "Neuro Check Assessed",
+          "description": "Neuro Check assessed (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW",
+          "print_name": "Glasgow Coma Scale",
+          "description": "Glasgow Coma Scale (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW EYE 1",
+          "print_name": "Eye Opening Response: No Eye Opening",
+          "description": "Glasgow Coma Scale, eye opening response is no eye opening."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW EYE 2",
+          "print_name": "Eye Opening Response: Eyes Open To Pain",
+          "description": "Glasgow Coma Scale, eye opening response is eyes open to pain."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW EYE 3",
+          "print_name": "Eye Opening Response: Eyes Open To Verbal",
+          "description": "Glasgow Coma Scale, eye opening response is eyes open to verbal."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW EYE 4",
+          "print_name": "Eye Opening Response: Eyes Open Spontaneously",
+          "description": "Glasgow Coma Scale, eye opening response is eyes open spontaneously."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW MOTOR 1",
+          "print_name": "Best Motor Response: None",
+          "description": "Glasgow Coma Scale, best motor response is none."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW MOTOR 2",
+          "print_name": "Best Motor Response: Abnormal Extension",
+          "description": "Glasgow Coma Scale, best motor response is abnormal extension."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW MOTOR 3",
+          "print_name": "Best Motor Response: Abnormal Flexion",
+          "description": "Glasgow Coma Scale, best motor response is abnormal flexion."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW MOTOR 4",
+          "print_name": "Best Motor Response: Withdraws",
+          "description": "Glasgow Coma Scale, best motor response is withdraws."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW MOTOR 5",
+          "print_name": "Best Motor Response: Localizes To Noxious Stimuli",
+          "description": "Glasgow Coma Scale, best motor response is localizes to noxious stimuli."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW MOTOR 6",
+          "print_name": "Best Motor Response: Obey Commands",
+          "description": "Glasgow Coma Scale, best motor response is obey commands."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW TOTAL",
+          "print_name": "Glasgow Coma Scale Total Score",
+          "description": "Glasgow Coma Scale Total Score."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW VERBAL 1",
+          "print_name": "Best Verbal Response: No Verbal Response",
+          "description": "Glasgow Coma Scale, best verbal response is no verbal response."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW VERBAL 2",
+          "print_name": "Best Verbal Response: Incomprehensible Sounds",
+          "description": "Glasgow Coma Scale, best verbal response is incomprehensible words."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW VERBAL 3",
+          "print_name": "Best Verbal Response: Inappropriate Words",
+          "description": "Glasgow Coma Scale, best verbal response is inappropriate words."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW VERBAL 4",
+          "print_name": "Best Verbal Response: Confused",
+          "description": "Glasgow Coma Scale, best verbal response is confused."
+        },
+        {
+          "name": "VA-VAAES NEURO GLASGOW VERBAL 5",
+          "print_name": "Best Verbal Response: Oriented",
+          "description": "Glasgow Coma Scale, best verbal response is oriented."
+        },
+        {
+          "name": "VA-VAAES NEURO NIH COMPLETE",
+          "print_name": "NIH Stroke Scale Assessed",
+          "description": "NIH Stroke Scale assessed (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO ORIENTED PERSON",
+          "print_name": "Oriented To Person",
+          "description": "Patient oriented to Person."
+        },
+        {
+          "name": "VA-VAAES NEURO ORIENTED PLACE",
+          "print_name": "Oriented To Place",
+          "description": "Patient oriented to Place."
+        },
+        {
+          "name": "VA-VAAES NEURO ORIENTED SITUATION",
+          "print_name": "Oriented To Situation",
+          "description": "Patient oriented to Situation."
+        },
+        {
+          "name": "VA-VAAES NEURO ORIENTED TIME",
+          "print_name": "Oriented To Time",
+          "description": "Patient oriented to Time"
+        },
+        {
+          "name": "VA-VAAES NEURO ORIENTED X4",
+          "print_name": "Oriented X 4",
+          "description": "Patient oriented X4 (person, place, time and situation)"
+        },
+        {
+          "name": "VA-VAAES NEURO PUPILS",
+          "print_name": "Pupils",
+          "description": "Pupils (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS",
+          "print_name": "Sedation And Agitation Tool - RASS",
+          "description": "Sedation and Agitation Tool - RASS (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS AGITATED",
+          "print_name": "RASS Score: Agitated",
+          "description": "RASS score is agitated."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS ALERT/CALM",
+          "print_name": "RASS Score: Alert/Calm",
+          "description": "RASS score is alert/calm."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS COMBATIVE",
+          "print_name": "RASS Score: Combative",
+          "description": "RASS score is combative."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS DEEP SEDATION",
+          "print_name": "RASS Score: Deep Sedation",
+          "description": "RASS score is deep sedation."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS DROWSY",
+          "print_name": "RASS Score: Drowsy",
+          "description": "RASS score is drowsy."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS LIGHT SEDATION",
+          "print_name": "RASS Score: Light Sedation",
+          "description": "RASS score is light sedation."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS MOD SEDATION",
+          "print_name": "RASS Score: Moderate Sedation",
+          "description": "RASS score is moderate sedation."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS RESTLESS",
+          "print_name": "RASS Score: Restless",
+          "description": "RASS score is restless."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS UNAROUSABLE",
+          "print_name": "RASS Score: Unarousable",
+          "description": "RASS score is unarousable."
+        },
+        {
+          "name": "VA-VAAES NEURO RASS VERY AGITATED",
+          "print_name": "RASS Score: Very Agitated",
+          "description": "RASS score is very agitated."
+        },
+        {
+          "name": "VA-VAAES SUP NEURO CIWA",
+          "print_name": "CIWA",
+          "description": "CIWA (HEADER)."
+        },
+        {
+          "name": "VA-VAAES SUP NEURO COWS",
+          "print_name": "COWS",
+          "description": "COWS (HEADER)."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES NEURO AVPU [C]",
+      "short_name": "NEURO AVPU",
+      "health_factors": [
+        {
+          "name": "VA-VAAES NEURO AVPU ALERT",
+          "print_name": "Level Of Consciousness: Alert",
+          "description": "Patient is alert - fully awake not necessarily oriented, may be confused."
+        },
+        {
+          "name": "VA-VAAES NEURO AVPU PAIN",
+          "print_name": "Level Of Consciousness: Responds To Pain Stimulus",
+          "description": "Patient responds to pain stimulus (3 component measures of pain stimulus)."
+        },
+        {
+          "name": "VA-VAAES NEURO AVPU UNRESPONSIVE",
+          "print_name": "Level Of Consciousness: Unresponsive/Unconscious",
+          "description": "Patient is unresponsive or unconscious (no eye, voice, or motor response)."
+        },
+        {
+          "name": "VA-VAAES NEURO AVPU VOICE",
+          "print_name": "Level Of Consciousness: Responds To Voice",
+          "description": "Patient responds to voice - including grunt/moan/sigh/light movement."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES NEURO/EXT [C]",
+      "short_name": "NEURO/EXT",
+      "health_factors": [
+        {
+          "name": "VA-VAAES NEURO/EXT SENSATION",
+          "print_name": "Sensation",
+          "description": "Sensation (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO/EXT SENSATION COMMENTS",
+          "print_name": "Sensation Comment",
+          "description": "Write in comment related to sensation ."
+        },
+        {
+          "name": "VA-VAAES NEURO/EXT SENSATION UNEQUAL LE",
+          "print_name": "Unequal Lower Extremity Sensation",
+          "description": "Unequal lower extremity sensation."
+        },
+        {
+          "name": "VA-VAAES NEURO/EXT SENSATION UNEQUAL UE",
+          "print_name": "Unequal Upper Extremity Sensation",
+          "description": "Unequal upper extremity sensation."
+        },
+        {
+          "name": "VA-VAAES NEURO/EXT STRENGTH",
+          "print_name": "Strength",
+          "description": "Strength (HEADER)."
+        },
+        {
+          "name": "VA-VAAES NEURO/EXT STRENGTH COMMENTS",
+          "print_name": "Strength Comment",
+          "description": "Write in comment related to strength."
+        },
+        {
+          "name": "VA-VAAES NEURO/EXT STRENGTH UNEQUAL GRIP",
+          "print_name": "Unequal Grip Strength",
+          "description": "Unequal grip strength."
+        },
+        {
+          "name": "VA-VAAES NEURO/EXT STRENGTH UNEQUAL LE",
+          "print_name": "Unequal Lower Extremity Strength",
+          "description": "Unequal lower extremity strength."
+        },
+        {
+          "name": "VA-VAAES NEURO/EXT STRENGTH UNEQUAL UE",
+          "print_name": "Unequal Upper Extremity Strength",
+          "description": "Unequal upper extremity strength."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES NUTRITION [C]",
+      "short_name": "NUTRITION",
+      "health_factors": [
+        {
+          "name": "VA-VAAES NUTRITION EATING-UNSURE",
+          "print_name": "Malnutrition Screening Eating Poorly Is Unsure",
+          "description": "Patient reports being unsure if he/she eating poorly due to decreased appetite."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES ORAL CARE [C]",
+      "short_name": "ORAL CARE",
+      "health_factors": [
+        {
+          "name": "VA-VAAES OC BRUSH TEETH DECLINED",
+          "print_name": "Teeth Brushing Declined",
+          "description": "Patient declined teeth brushing."
+        },
+        {
+          "name": "VA-VAAES OC BRUSH TEETH INDEP",
+          "print_name": "Teeth Brushed Independent",
+          "description": "Patient's teeth brushed independently."
+        },
+        {
+          "name": "VA-VAAES OC BRUSH TEETH SWABBING PERFORM",
+          "print_name": "Swabbing Performed - Edentulous With Swab",
+          "description": "Patient is edentulous and had oral swabbing completed."
+        },
+        {
+          "name": "VA-VAAES OC BRUSH TEETH WITH ASSIST",
+          "print_name": "Teeth Brushed With Assistance",
+          "description": "Patient's teeth brushed with assistance."
+        },
+        {
+          "name": "VA-VAAES OC DENT/PART CLEAN DECLINED",
+          "print_name": "Denture/Partial Plates Cleaning Declined",
+          "description": "Patient declined to have denture and/or partial plates cleaned."
+        },
+        {
+          "name": "VA-VAAES OC DENT/PART CLEAN INDEP",
+          "print_name": "Denture/Partial Plates Cleaned Independently",
+          "description": "Patient's dentures and/or partial plates cleaned independently."
+        },
+        {
+          "name": "VA-VAAES OC DENT/PART CLEAN WITH ASST",
+          "print_name": "Denture/Partial Plates Cleaned With Assistance",
+          "description": "Patient's dentures and/or partial plates cleaned with assistance."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE COMMENT",
+          "print_name": "Non-Ventilator Oral Care Comments",
+          "description": "Non-ventilator oral care comments (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE EDUCATION PROVIDED",
+          "print_name": "Patient Educated On Risks Of Poor Oral Hygiene",
+          "description": "Staff educated patient of risks and possible outcomes of poor oral hygiene."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS CLIN GRAD 1",
+          "print_name": "Oral Mucositis Clinical Exam: Grade 1",
+          "description": "Oral mucositis scale during clinical exam is grade 1."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS CLIN GRAD 2",
+          "print_name": "Oral Mucositis Clinical Exam: Grade 2",
+          "description": "Oral mucositis scale during clinical exam is grade 2."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS CLIN GRAD 3",
+          "print_name": "Oral Mucositis Clinical Exam: Grade 3",
+          "description": "Oral mucositis scale during clinical exam is grade 3."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS CLIN GRAD 4",
+          "print_name": "Oral Mucositis Clinical Exam: Grade 4",
+          "description": "Oral mucositis scale during clinical exam is grade 4."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS CLIN GRAD 5",
+          "print_name": "Oral Mucositis Clinical Exam: Grade 5",
+          "description": "Oral mucositis scale during clinical exam is grade 5."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS FUN/SYMP 1",
+          "print_name": "Oral Mucositis Functional/Symptomatic: Grade 1",
+          "description": "Oral mucositis functional/symptomatic assessed as grade 1."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS FUN/SYMP 2",
+          "print_name": "Oral Mucositis Functional/Symptomatic: Grade 2",
+          "description": "Oral mucositis functional/symptomatic assessed as grade 2."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS FUN/SYMP 3",
+          "print_name": "Oral Mucositis Functional/Symptomatic: Grade 3",
+          "description": "Oral mucositis functional/symptomatic assessed as grade 3."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS FUN/SYMP 4",
+          "print_name": "Oral Mucositis Functional/Symptomatic: Grade 4",
+          "description": "Oral mucositis functional/symptomatic assessed as grade 4."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS FUN/SYMP 5",
+          "print_name": "Oral Mucositis Functional/Symptomatic: Grade 5",
+          "description": "Oral mucositis functional/symptomatic assessed as grade 5."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE MUCOSITIS SCALE",
+          "print_name": "Oral Mucositis Scale",
+          "description": "Oral Mucositis Scale (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ORAL CARE VENT PATIENT",
+          "print_name": "Oral Care For Ventilator Patient",
+          "description": "Oral Care for ventilator patient (HEADER)."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES ORAL INTAKE [C]",
+      "short_name": "ORAL INTAKE",
+      "health_factors": [
+        {
+          "name": "VA-VAAES ORAL INTAKE ASSESS",
+          "print_name": "Oral Intake Assess",
+          "description": "Oral Intake Assess (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE BREAKFAST PERCENT",
+          "print_name": "Oral Intake Breakfast Percent",
+          "description": "Percentage of total oral intake of breakfast."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE DINNER PERCENT",
+          "print_name": "Oral Intake Dinner Percent",
+          "description": "Percentage of total oral intake of dinner."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE",
+          "print_name": "Oral Intake Inadequate Assess",
+          "description": "Oral Intake Inadequate Assess (HEADER)."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE APPETITE",
+          "print_name": "Oral Intake Inadequate Reason: Appetite",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is appetite."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE CHEWING",
+          "print_name": "Oral Intake Inadequate Reason: Chewing",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is chewing."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE INT",
+          "print_name": "Oral Intake Inadequate Reason: Interruptions",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is interruptions."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE LETHARGY",
+          "print_name": "Oral Intake Inadequate Reason: Lethargy",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is lethargy."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE N/V",
+          "print_name": "Oral Intake Inadequate Reason: Nausea/Vomiting",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is nausea & vomiting."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE NPO",
+          "print_name": "Oral Intake Inadequate Reason: NPO",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is nothing per oral."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE OTHER",
+          "print_name": "Oral Intake Inadequate Reason: Other",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is other."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE PAIN",
+          "print_name": "Oral Intake Inadequate Reason: Pain",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is pain."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE INADEQUATE PREF",
+          "print_name": "Oral Intake Inadequate Reason: Preferences/Dislikes",
+          "description": "Reason for inadequate oral intake (less than 50% of selected meal) is patient preferences/dislikes."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE LIQUID SUP",
+          "print_name": "Oral Intake Liquid Supplement Percent",
+          "description": "Percentage of total oral intake of liquid supplement(s)."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE LUNCH PERCENT",
+          "print_name": "Oral Intake Lunch Percent",
+          "description": "Percentage of total oral intake of lunch."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE SNACK PERCENT",
+          "print_name": "Oral Intake Snack(s) Percent",
+          "description": "Percentage of total oral intake of snack(s)."
+        },
+        {
+          "name": "VA-VAAES ORAL INTAKE TUBE FEEDING",
+          "print_name": "Oral Intake Tube Feeding Percent",
+          "description": "Percentage of total oral intake of tube feeding(s)."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES PAIN [C]",
+      "short_name": "PAIN",
+      "health_factors": [
+        {
+          "name": "VA-VAAES PAIN ASSESS CPOT",
+          "print_name": "CPOT Pain Assessment",
+          "description": "CPOT Pain Assessment (HEADER)."
+        },
+        {
+          "name": "VA-VAAES PAIN ASSESS PAINAD",
+          "print_name": "Painad Pain Assessment",
+          "description": "PAINAD Pain Assessment (HEADER)."
+        },
+        {
+          "name": "VA-VAAES PAIN INT PRIMARY COLD",
+          "print_name": "Primary Pain Alleviating Intervention: Cold",
+          "description": "Patients primary pain alleviating intervention is cold."
+        },
+        {
+          "name": "VA-VAAES PAIN INT PRIMARY HEAT",
+          "print_name": "Primary Pain Alleviating Intervention: Heat",
+          "description": "Patients primary pain alleviating intervention is heat."
+        },
+        {
+          "name": "VA-VAAES PAIN INT PRIMARY MED",
+          "print_name": "Primary Pain Alleviating Intervention: Medication",
+          "description": "Patients primary pain alleviating intervention is medication."
+        },
+        {
+          "name": "VA-VAAES PAIN INT PRIMARY OTHER",
+          "print_name": "Primary Pain Alleviating Intervention: Other",
+          "description": "Patients primary pain alleviating intervention is anything other than medication, cold, heat, positioning or therapeutic modalities (i.e. aroma, music, relaxation)."
+        },
+        {
+          "name": "VA-VAAES PAIN INT PRIMARY POSITION",
+          "print_name": "Primary Pain Alleviating Intervention: Positioning",
+          "description": "Patients primary pain alleviating intervention is positioning."
+        },
+        {
+          "name": "VA-VAAES PAIN INT PRIMARY THERAPEUTIC",
+          "print_name": "Primary Pain Alleviating Intervention: Therapeutic Modalities",
+          "description": "Patients primary pain alleviating intervention is therapeutic modalities (i.e. aroma, music, relaxation)."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES PROVIDER NOTIFICATION [C]",
+      "short_name": "PROVIDER NOTIFICATION",
+      "health_factors": [
+        {
+          "name": "VA-VAAES PROVIDER NOTIFY",
+          "print_name": "Provider Notification",
+          "description": "Provider Notification (HEADER)."
+        },
+        {
+          "name": "VA-VAAES PROVIDER NOTIFY PROV NAME",
+          "print_name": "Provider Notify: Provider Name",
+          "description": "Name of provide notified."
+        },
+        {
+          "name": "VA-VAAES PROVIDER NOTIFY REASON COND",
+          "print_name": "Provider Notified: Condition Change",
+          "description": "Provider notified of change in Patient condition."
+        },
+        {
+          "name": "VA-VAAES PROVIDER NOTIFY REASON FALL",
+          "print_name": "Reason Provider Notified: Fall",
+          "description": "Provider notified of a patient fall."
+        },
+        {
+          "name": "VA-VAAES PROVIDER NOTIFY REASON NEWS",
+          "print_name": "Reason Provider Notified: News Alert",
+          "description": "Provider notified of a National Early Warning System alert."
+        },
+        {
+          "name": "VA-VAAES PROVIDER NOTIFY REASON ORDER",
+          "print_name": "Reason Provider Notified: Pain",
+          "description": "Provider notified of patient's pain."
+        },
+        {
+          "name": "VA-VAAES PROVIDER NOTIFY REASON OTHER",
+          "print_name": "Reason Provider Notified: Order Clarification",
+          "description": "Provider notified to clarify an order."
+        },
+        {
+          "name": "VA-VAAES PROVIDER NOTIFY REASON PAIN",
+          "print_name": "Reason Provider Notified: Other",
+          "description": "Provider notified of other reason, write in response."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES REPOSITION [C]",
+      "short_name": "REPOSITION",
+      "health_factors": [
+        {
+          "name": "VA-VAAES POSITION-LYING LEFT SIDE TIME",
+          "print_name": "Position Intervention: Total Time Lying Left Side",
+          "description": "The time the patient was lying on their left side."
+        },
+        {
+          "name": "VA-VAAES POSITION-LYING RIGHT SIDE TIME",
+          "print_name": "Position Intervention: Total Time Lying Right Side",
+          "description": "The time the patient was lying on their right side."
+        },
+        {
+          "name": "VA-VAAES POSITION-PRONE TIME",
+          "print_name": "Position Intervention: Total Time Prone",
+          "description": "The time the patient was lying prone."
+        },
+        {
+          "name": "VA-VAAES POSITION-SUPINE TIME",
+          "print_name": "Position Intervention: Total Time Supine",
+          "description": "The time the patient was lying supine."
+        },
+        {
+          "name": "VA-VAAES POSITION-TURNING TOLERANCE",
+          "print_name": "Turning Tolerance",
+          "description": "The patient's tolerance to turning."
+        },
+        {
+          "name": "VA-VAAES POSITION-WHEELCHAIR TIME",
+          "print_name": "Position Tolerance: Total Time In Wheelchair",
+          "description": "Longest time patient spent in wheelchair."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES RESP [C]",
+      "short_name": "RESP",
+      "health_factors": [
+        {
+          "name": "VA-VAAES RESP SUP  VB OCM TEETH CHLOR",
+          "print_name": "Oral Care Method Teeth Brushed Chlorhexidine",
+          "description": "Oral care method is teeth brushed with chlorhexidine."
+        },
+        {
+          "name": "VA-VAAES RESP SUP INC SPIRO",
+          "print_name": "Incentive Spirometry",
+          "description": "Incentive spirometry."
+        },
+        {
+          "name": "VA-VAAES RESP SUP VB SEQ COM DEV YES",
+          "print_name": "Vent Bundle: Sequential Compression Device In Use",
+          "description": "Sequential compression device is worn by patient as a component of the ventilator bundle."
+        }
+      ]
+    },
+    {
+      "category_hf_name": "VA-VAAES URO [C]",
+      "short_name": "URO",
+      "health_factors": [
+        {
+          "name": "VA-VAAES URO ASSESS",
+          "print_name": "Genitourinary",
+          "description": "Genitourinary (HEADER)."
+        },
+        {
+          "name": "VA-VAAES URO BLADDER SCAN",
+          "print_name": "Bladder Scan",
+          "description": "Bladder scan (HEADER)."
+        },
+        {
+          "name": "VA-VAAES URO BLADDER SCAN CATH YES",
+          "print_name": "Bladder Scan: Patient Was Catheterized",
+          "description": "Bladder scan completed and patient catheterized."
+        },
+        {
+          "name": "VA-VAAES URO BLADDER SCAN DISTENTION",
+          "print_name": "Bladder Scan: Distention Is Present",
+          "description": "Bladder distention is present on scan."
+        },
+        {
+          "name": "VA-VAAES URO CATH EXT FEMALE DEVICE",
+          "print_name": "Urinary Catheter Type: External Female Device",
+          "description": "Type of urinary catheter is an external female device."
+        },
+        {
+          "name": "VA-VAAES URO CATH EXT MALE DEVICE",
+          "print_name": "Urinary Catheter Type: External Male Device",
+          "description": "Type of urinary catheter is an external male device."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND ASSESSED",
+          "print_name": "Urinary Catheter Assessment",
+          "description": "Assessment of urinary catheter."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND DC SUPRAPUBIC",
+          "print_name": "Suprapubic Catheter Discontinued",
+          "description": "Suprapubic catheter discontinued."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND DC URETHRAL",
+          "print_name": "Urethral Catheter Discontinued",
+          "description": "Urethral catheter discontinued."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND DISCONTINUE",
+          "print_name": "Urinary Catheter Discontinued",
+          "description": "Urinary catheter discontinued."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND FOLEY CARE",
+          "print_name": "Urinary Catheter CAUTI Foley Care",
+          "description": "Documented urinary catheter  CAUTI Foley care."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND INDICATE CONT",
+          "print_name": "Indications For Indwelling Catheter Continuation Discussed",
+          "description": "Documented indications for indwelling catheter continuation discussed."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND SECURED ABD LLQ",
+          "print_name": "Urinary Catheter Secured: Abdomen, Left Lower Quadrant",
+          "description": "Urinary catheter secured to left lower quadrant of abdomen."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND SECURED ABD RLQ",
+          "print_name": "Urinary Catheter Secured: Abdomen, Right Lower Quadrant",
+          "description": "Urinary catheter secured to right lower quadrant of abdomen."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND SECURED LEFT LEG",
+          "print_name": "Urinary Catheter Secured: Left Leg",
+          "description": "Urinary catheter secured to left leg."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND SECURED RIGHT LEG",
+          "print_name": "Urinary Catheter Secured: Right Leg",
+          "description": "Urinary catheter secured to right leg."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND STER FLD  GLOVES",
+          "print_name": "Sterile Gloves Worn By Inserter Of Urinary Catheter",
+          "description": "Sterile gloves worn by inserter of the urinary catheter."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND STER FLD CLEANING",
+          "print_name": "Urinary Catheter Inserted With Sterile Periurethral Cleaning",
+          "description": "Sterile periurethral cleaning was performed prior to urinary catheter insertion."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND STER FLD DRAPE",
+          "print_name": "Urinary Catheter Inserted Using Sterile Drapes And Sponges",
+          "description": "Urinary catheter was inserted using sterile drapes and sponges."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND STER FLD HW",
+          "print_name": "Hands Washed Prior To Donning Sterile Gloves",
+          "description": "Hand washing performed prior to donning sterile gloves."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND STER FLD LUBE",
+          "print_name": "Urinary Catheter Inserted With Single Use Lubricant",
+          "description": "Single use lubricant was used for urinary catheter insertion."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND STER FLD MAINT",
+          "print_name": "Sterile Field Maintained During Urinary Catheter Insertion",
+          "description": "Sterile field is maintained during urinary catheter insertion."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND SUPRAPUBIC",
+          "print_name": "Urinary Catheter Type: Suprapubic",
+          "description": "Urinary catheter type documented as suprapubic."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND SUPRAPUBIC INSERT",
+          "print_name": "Urinary Catheter Type: Suprapubic Inserted",
+          "description": "Type of Urinary Catheter inserted documented as suprapubic."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL",
+          "print_name": "Urinary Catheter Type: Urethral",
+          "description": "Urinary Catheter type documented as urethral."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL 2 WAY IRR",
+          "print_name": "Urinary Catheter Type: 2 Way Irrigation",
+          "description": "Urinary Catheter type documented as two way irrigation."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL 3 WAY IRR",
+          "print_name": "Urinary Catheter Type: 3 Way Irrigation",
+          "description": "Urinary Catheter type documented as three way irrigation."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL COUDE",
+          "print_name": "Urinary Catheter Type: Coude",
+          "description": "Urinary Catheter type documented as Coude."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL DUAL",
+          "print_name": "Urinary Catheter Type: Dual Balloon",
+          "description": "Urinary Catheter type documented as dual balloon."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL INSERT",
+          "print_name": "Urinary Catheter Type: Urethral Inserted",
+          "description": "Type of Urinary Catheter inserted documented as urethral."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL OTHER",
+          "print_name": "Urinary Catheter Type: Other",
+          "description": "Urinary Catheter type documented as other (write in response)."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL REG",
+          "print_name": "Urinary Catheter Type: Regular",
+          "description": "Urinary Catheter type documented as regular."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URETHRAL TIEMAN",
+          "print_name": "Urinary Catheter Type: Tieman",
+          "description": "Urinary Catheter type documented as Tieman."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO COMFORT",
+          "print_name": "Urinary Catheter Indication: Comfort Measures, End Of Life",
+          "description": "Indwelling urinary catheter is indicated for comfort measures, end of life."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO CRIT ILL",
+          "print_name": "Urinary Catheter Indication: Critical Illness",
+          "description": "Indwelling urinary catheter is indicated for critical illness."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO EPI/SPI/PM",
+          "print_name": "Urinary Catheter Indication: Epidural/Spinal Anesth/Pain Mgmt",
+          "description": "Indwelling urinary catheter is indicated for epidural, spinal anesthesia or pain management."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO IMMOBILE",
+          "print_name": "Urinary Catheter Indication: Prolonged Immobilization",
+          "description": "Indwelling urinary catheter is indicated for prolonged immobilization."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO INCONT",
+          "print_name": "Urinary Catheter Indication: Incont With Open Sacral Wound",
+          "description": "Indwelling urinary catheter is indicated for incontinence with open sacral wound."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO IRRIGATION",
+          "print_name": "Urinary Catheter Indication: Urinary Irrigation",
+          "description": "Indwelling urinary catheter is indicated for urinary irrigation."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO NEURO BLADDER",
+          "print_name": "Urinary Catheter Indication: Neurogenic Bladder Dysfunction",
+          "description": "Indwelling urinary catheter is indicated for neurogenic bladder dysfunction."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO OBSTRUCTION",
+          "print_name": "Urinary Catheter Indication: Urinary Obstruction",
+          "description": "Indwelling urinary catheter is indicated for urinary obstruction."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO PERIOP",
+          "print_name": "Urinary Catheter Indication: Perioperative",
+          "description": "Indwelling urinary catheter is indicated for perioperative procedure."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO RET",
+          "print_name": "Urinary Catheter Indication: Acute Urinary Retention",
+          "description": "Indwelling urinary catheter is indicated for acute urinary retention."
+        },
+        {
+          "name": "VA-VAAES URO CATH IND URO SURGERY",
+          "print_name": "Urinary Catheter Indication: Urologic Surgery",
+          "description": "Indwelling urinary catheter is indicated for urologic surgery."
+        },
+        {
+          "name": "VA-VAAES URO CATH INDWELL",
+          "print_name": "Indwelling Urinary Catheter",
+          "description": "Indwelling urinary catheter (HEADER)."
+        },
+        {
+          "name": "VA-VAAES URO CATH INDWELL INSERT",
+          "print_name": "Indwelling Urinary Catheter Inserted",
+          "description": "Indwelling urinary catheter inserted."
+        },
+        {
+          "name": "VA-VAAES URO CATH INDWELL POA",
+          "print_name": "Indwelling Urinary Catheter Present On Admission",
+          "description": "Indwelling urinary catheter documented as present on admission."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC",
+          "print_name": "Intermittent Straight Cath",
+          "description": "Intermittent straight cath (HEADER)."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC CAREGIVER",
+          "print_name": "Intermittent Straight Cath Performed By: Caregiver",
+          "description": "Intermittent straight cath completed by caregiver."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC CG SF MAINTAIN",
+          "print_name": "Intermittent Straight Cath: Caregiver Maintained Sterile Field",
+          "description": "Intermittent straight cath completed by patient caregiver during which the caregiver maintained a sterile field, washed hands prior to donning sterile gloves, wore sterile gloves, used a sterile drape/sponge, used a sterile periurethral catheter and used single use lubricant."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC COUDE",
+          "print_name": "Intermittent Straight Cath Type: Coude",
+          "description": "The type of intermittent straight cath used was a urethral coude catheter."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC OTHER",
+          "print_name": "Intermittent Straight Cath Type: Other",
+          "description": "The type of intermittent straight cath used was a urethral red rubber catheter."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC PATIENT",
+          "print_name": "Intermittent Straight Cath Performed By: Patient",
+          "description": "Intermittent straight cath completed by patient (HEADER)."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC PT ASSIST",
+          "print_name": "Intermittent Straight Cath Performed By: Patient W/ Assist",
+          "description": "Intermittent straight cath completed by patient with assistance."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC PT IND",
+          "print_name": "Intermittent Straight Cath Performed By: Patient Independent",
+          "description": "Intermittent straight cath completed by patient independently."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC PT OTHER",
+          "print_name": "Intermittent Straight Cath Performed By: PT W/ Other Assist",
+          "description": "Intermittent straight cath completed by patient with assistance other than assist or total assist."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC PT SF MAINTAIN",
+          "print_name": "Intermittent Straight Cath: Patient Maintained Sterile Field",
+          "description": "Intermittent straight cath completed by hospital staff during which the staff maintained a sterile field, washed hands prior to donning sterile gloves, wore sterile gloves, used a sterile drape/sponge, used a sterile periurethral catheter and used single use lubricant."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC PT TOT ASSIST",
+          "print_name": "Intermittent Straight Cath Performed By: PT W/ Total Assist",
+          "description": "Intermittent straight cath completed by patient with total assistance."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC RED RUBBER",
+          "print_name": "Intermittent Straight Cath Type: Red Rubber",
+          "description": "The type of intermittent straight cath used was a urethral red rubber catheter."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC REG",
+          "print_name": "Intermittent Straight Cath Type: Regular",
+          "description": "The type of intermittent straight cath used was a urethral regular catheter."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC STAFF",
+          "print_name": "Intermittent Straight Cath Performed By: Staff",
+          "description": "Intermittent straight cath completed by hospital staff."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC STAFF SF MAINTAIN",
+          "print_name": "Intermittent Straight Cath: Staff Maintained Sterile Field",
+          "description": "Intermittent straight cath completed by hospital staff during which the staff maintained a sterile field, washed hands prior to donning sterile gloves, wore sterile gloves, used a sterile drape/sponge, used a sterile periurethral catheter and used single use lubricant."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC TIEMAN",
+          "print_name": "Intermittent Straight Cath Type: Tieman",
+          "description": "The type of intermittent straight cath used was a urethral tieman catheter."
+        },
+        {
+          "name": "VA-VAAES URO CATH ISC URETHRAL",
+          "print_name": "Intermittent Straight Cath Type: Urethral",
+          "description": "The type of intermittent straight cath used was a urethral catheter."
+        },
+        {
+          "name": "VA-VAAES URO COLOR/CHAR AMBER",
+          "print_name": "Urine Color/Characteristic: Amber",
+          "description": "Urine color/characteristic documented as amber."
+        },
+        {
+          "name": "VA-VAAES URO COLOR/CHAR BLOOD",
+          "print_name": "Urine Color/Characteristic: Blood",
+          "description": "Urine color/characteristic documented as blood."
+        },
+        {
+          "name": "VA-VAAES URO COLOR/CHAR CLEAR",
+          "print_name": "Urine Color/Characteristic: Clear",
+          "description": "Urine color/characteristic documented as clear."
+        },
+        {
+          "name": "VA-VAAES URO COLOR/CHAR CLOTS",
+          "print_name": "Urine Color/Characteristic: Clots",
+          "description": "Urine color/characteristic documented as clots."
+        },
+        {
+          "name": "VA-VAAES URO COLOR/CHAR DARK BROWN",
+          "print_name": "Urine Color/Characteristic: Dark Brown",
+          "description": "Urine color/characteristic documented as dark brown."
+        },
+        {
+          "name": "VA-VAAES URO COLOR/CHAR PINK",
+          "print_name": "Urine Color/Characteristic: Pink",
+          "description": "Urine color/characteristic documented as pink."
+        },
+        {
+          "name": "VA-VAAES URO COLOR/CHAR SEDIMENT",
+          "print_name": "Urine Color/Characteristic: Sediment",
+          "description": "Urine color/characteristic documented as sediment."
+        },
+        {
+          "name": "VA-VAAES URO COLOR/CHAR YELLOW",
+          "print_name": "Urine Color/Characteristic: Yellow",
+          "description": "Urine color/characteristic documented as yellow."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION ANURIC",
+          "print_name": "Urinary Elimination: Anuric",
+          "description": "Urinary elimination documented as anuric."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION CONDUIT",
+          "print_name": "Urinary Elimination: Conduit",
+          "description": "Urinary elimination documented as conduit."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION CONTINENT",
+          "print_name": "Urinary Elimination: Continent",
+          "description": "Urinary elimination documented as continent."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION INCONTINENT",
+          "print_name": "Urinary Elimination: Incontinent",
+          "description": "Urinary elimination documented as incontinent."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION INTER CATH",
+          "print_name": "Urinary Elimination: Intermittent Catheterization",
+          "description": "Urinary elimination documented as intermittent catheterization."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION NOT VOIDING",
+          "print_name": "Urinary Elimination: Not Voiding",
+          "description": "Urinary elimination documented as not voiding."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION OSTOMY",
+          "print_name": "Urinary Elimination: Ostomy",
+          "description": "Urinary elimination documented as ostomy."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION STENT",
+          "print_name": "Urinary Elimination: Stent",
+          "description": "Urinary elimination documented as stent."
+        },
+        {
+          "name": "VA-VAAES URO ELIMINATION URINARY CATH",
+          "print_name": "Urinary Elimination: Urinary Catheter",
+          "description": "Urinary elimination documented as urinary catheter."
+        }
+      ]
+    }
+  ]
+}

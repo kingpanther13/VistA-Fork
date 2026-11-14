@@ -28,3 +28,6 @@ __history
 *.project
 *.pydevproject
 
+# NursingBooster runtime log (holds a local path)
+NursingAddon/templates/last_apply_log.txt
+

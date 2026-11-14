@@ -1,0 +1,2 @@
+# Everything here runs inside a Linux container; a CRLF checkout breaks the PRD loader and scripts.
+* text=auto eol=lf
