@@ -1,0 +1,2 @@
+# Keep Reminder Exchange files byte-exact; the loader rejects CRLF.
+*.PRD -text
